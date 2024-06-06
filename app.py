@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import sqlite3
 import random
@@ -6,7 +7,8 @@ import datetime
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-DATABASE = 'clima_organizacional.db'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE = os.path.join(BASE_DIR, 'database', 'clima_organizacional.db')
 
 # Função para conectar ao banco de dados
 def get_db():

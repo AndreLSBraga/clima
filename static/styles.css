@@ -1,4 +1,5 @@
 body, html {
+    width: 100%;
     height: 100%;
     margin: 0;
     font-family: "Roboto", sans-serif;
@@ -8,7 +9,7 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #CCC5B9;
+    background-color: #E6E6EA;
 }
 
 .container {
@@ -17,11 +18,11 @@ body, html {
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #FFFCF2;
+    background-color: #F4F4F8;
     width: 80%;
-    max-width: 800px;  /* Define a largura máxima */
-    min-width: 300px;  /* Define a largura mínima */
-    min-height: 400px;  /* Define a altura mínima */
+    max-width: 800px;  
+    min-width: 300px;  
+    min-height: 400px;  
 }
 
 .text {
@@ -33,7 +34,7 @@ body, html {
 h1 {
     font-size: 32px;
     margin-bottom: 20px;
-    color: #EB5E28;
+    color: #2AB7CA;
 }
 
 .question {
@@ -77,20 +78,20 @@ form {
 }
 
 .suggestion.box textarea {
-    padding: 10px; /* Adiciona espaço interno ao redor do texto */
-    width: 100%; /* Define a largura da textarea como 100% do seu contêiner pai */
-    max-width: 100%; /* Define a largura máxima da textarea */
-    border: 2px solid #ccc; /* Adiciona uma borda de 2px sólida cinza */
-    border-radius: 5px; /* Adiciona bordas arredondadas */
-    font-size: 16px; /* Define o tamanho da fonte */
-    background-color: #f2f2f2; /* Define a cor de fundo */
-    color: #333; /* Define a cor do texto */
-    transition: border-color 0.3s ease; /* Adiciona uma transição suave na cor da borda */
+    padding: 10px; 
+    width: 100%; 
+    max-width: 100%; 
+    border: 2px solid #000000; 
+    border-radius: 5px; 
+    font-size: 16px; 
+    background-color: #E6E6EA; 
+    color: #333; 
+    transition: border-color 0.3s ease; 
 }
 
 .suggestion.box textarea:focus {
-    border-color: #EB5E28; /* Muda a cor da borda quando a textarea está em foco */
-    outline: none; /* Remove o contorno padrão do foco */
+    border-color: #FE4A49; 
+    outline: none; 
 }
 
 .question-number {
@@ -104,7 +105,7 @@ form {
     text-align: center;
     display: flex;
     justify-content: center;
-    gap: 10px;  /* Espaçamento entre os botões */
+    gap: 10px;  
 }
 
 .buttons button {
@@ -112,15 +113,16 @@ form {
     margin: 5px;
     border: none;
     border-radius: 5px;
-    background-color: #403D39; /* Cor de fundo */
-    color: white; /* Cor do texto */
+    background-color: #403D39; 
+    color: white; 
     font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease; /* Transição suave ao passar o mouse */
+    transition: background-color 0.3s ease; 
+    width: 40%;
 }
 
 .buttons button:hover {
-    background-color: #EB5E28; /* Cor de fundo ao passar o mouse */
+    background-color: #FE4A49; 
 }
 
 input[type="text"] {
@@ -128,21 +130,21 @@ input[type="text"] {
     width: 80%;
     max-width: 300px;
     margin-bottom: 20px;
-    border: 2px solid #ccc; /* Adiciona uma borda de 2px sólida cinza */
-    border-radius: 5px; /* Adiciona bordas arredondadas */
-    font-size: 16px; /* Define o tamanho da fonte */
-    background-color: #f2f2f2; /* Define a cor de fundo */
-    color: #333; /* Define a cor do texto */
+    border: 2px solid #ccc; 
+    border-radius: 5px; 
+    font-size: 16px; 
+    background-color: #f2f2f2; 
+    color: #333; 
     transition: border-color 0.3s ease;
 }
 
 input[type="text"]:focus {
-    border-color: #EB5E28; /* Muda a cor da borda quando o input está em foco */
-    outline: none; /* Remove o contorno padrão do foco */
+    border-color: #FE4A49; 
+    outline: none; 
 }
 
 .alert {
-    background-color: #403D39;
+    background-color: #2AB7CA;
     color: white;
     padding: 15px;
     margin-bottom: 20px;

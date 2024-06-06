@@ -1,22 +1,31 @@
 import sqlite3
+import os
 
-conn = sqlite3.connect('clima_organizacional.db')
+# Defina o caminho para o banco de dados
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE = os.path.join(BASE_DIR, 'database', 'clima_organizacional.db')
+
+# Conecte-se ao banco de dados
+conn = sqlite3.connect(DATABASE)
 cursor = conn.cursor()
 
-cursor.execute('DROP TABLE respostas')
+# Exclua a tabela 'respostas' se ela existir
+cursor.execute('DROP TABLE IF EXISTS respostas')
 
-# Criar a tabela 'usuarios'
+# Crie a tabela 'usuarios'
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY
 )
 ''')
 
-# cursor.execute('''
+# Insira alguns registros na tabela 'usuarios'
+# usuarios = [(1,), (2,), (3,)]
+# cursor.executemany('''
 # INSERT INTO usuarios (id) VALUES (?)
-# ''', [(1,), (2,), (3,)])
+# ''', usuarios)
 
-# Criar a tabela 'RESPOSTAS'
+# Crie a tabela 'respostas'
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS respostas (
     id INTEGER,
@@ -29,7 +38,6 @@ CREATE TABLE IF NOT EXISTS respostas (
 )
 ''')
 
-
-
+# Confirme as mudanças e feche a conexão
 conn.commit()
 conn.close()
