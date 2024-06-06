@@ -9,7 +9,28 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.background-image-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 50px); /* Ajuste o minmax conforme necessário */
+    grid-auto-rows: 50px; /* Ajuste conforme necessário */
+    z-index: -1; /* Certifique-se de que o container de imagem de fundo está atrás de tudo */
     background-color: #E6E6EA;
+}
+
+.background-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
 }
 
 .container {
@@ -19,6 +40,7 @@ body, html {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: #F4F4F8;
+    z-index: 1;
     width: 80%;
     max-width: 800px;  
     min-width: 300px;  
@@ -26,13 +48,13 @@ body, html {
 }
 
 .text {
-    font-size: 24px;
+    font-size: 32px;
     text-align: center;
     margin-bottom: 20px;
 }
 
 h1 {
-    font-size: 32px;
+    font-size: 80px;
     margin-bottom: 20px;
     color: #2AB7CA;
 }
@@ -140,12 +162,12 @@ form {
     margin: 5px;
     border: none;
     border-radius: 5px;
-    background-color: #403D39; 
+    background-color: #186C77; 
     color: white; 
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease; 
-    width: 40%;
+    width: 25%;
 }
 
 .buttons button:hover {

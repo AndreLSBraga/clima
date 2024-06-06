@@ -71,17 +71,17 @@ def perguntas():
     grupos_perguntas = {
         "Bem-estar": [
             "Como você avalia a comunicação interna na empresa?",
-            "Você se sente valorizado pelo seu trabalho?",
-            "Como você avalia o equilíbrio entre vida pessoal e profissional?",
+            "Você sente que o seu trabalho é importante para a companhia?",
+            "Há um equilibrio entre minha vida pessoal e profissional?",
         ],
         "Saúde Mental": [
             "Você se sente motivado no seu trabalho diário?",
-            "Como você avalia a transparência nas decisões da empresa?",
             "Você sente que tem os recursos necessários para realizar seu trabalho?",
         ],
         "Liderança": [
             "Como você avalia a liderança da sua equipe?",
             "Você sente que seu trabalho é reconhecido?",
+            "Como você avalia a transparência nas decisões da empresa?",
             "Você recomendaria a empresa como um bom lugar para trabalhar?",
         ],
         "Crescimento Profissional": [
@@ -93,6 +93,9 @@ def perguntas():
             "Como você avalia a carga de trabalho?",
             "Você está satisfeito com o suporte da sua equipe?",
             "Como você avalia o ambiente físico de trabalho?",
+        ],
+        "Serviços Gerais":[
+            "Como você avalia a limpeza, organização dos banheiros?"
         ]
     }
 
