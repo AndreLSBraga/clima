@@ -66,31 +66,39 @@ def final():
 
 @app.route('/perguntas', methods=['GET', 'POST'])
 def perguntas():
-    todas_perguntas = [
-        "Como você avalia a comunicação interna na empresa?",
-        "Você se sente valorizado pelo seu trabalho?",
-        "Como você avalia as oportunidades de crescimento na empresa?",
-        "Você se sente motivado no seu trabalho diário?",
-        "Como você avalia o equilíbrio entre vida pessoal e profissional?",
-        "Você está satisfeito com os benefícios oferecidos pela empresa?",
-        "Como você avalia a liderança da sua equipe?",
-        "Você sente que seu trabalho é reconhecido?",
-        "Como você avalia a colaboração entre os colegas de trabalho?",
-        "Você recomendaria a empresa como um bom lugar para trabalhar?",
-        "Como você avalia a transparência nas decisões da empresa?",
-        "Você sente que tem os recursos necessários para realizar seu trabalho?",
-        "Como você avalia o ambiente físico de trabalho?",
-        "Você se sente bem informado sobre as metas da empresa?",
-        "Como você avalia a política de feedback da empresa?",
-        "Você está satisfeito com o suporte da sua equipe?",
-        "Como você avalia a carga de trabalho?",
-        "Você sente que tem oportunidades de desenvolver novas habilidades?",
-        "Como você avalia o equilíbrio de responsabilidades em sua equipe?",
-        "Você se sente parte da comunidade da empresa?"
-    ]
+    grupos_perguntas = {
+        "Bem-estar": [
+            "Como você avalia a comunicação interna na empresa?",
+            "Você se sente valorizado pelo seu trabalho?",
+            "Como você avalia o equilíbrio entre vida pessoal e profissional?",
+        ],
+        "Saúde Mental": [
+            "Você se sente motivado no seu trabalho diário?",
+            "Como você avalia a transparência nas decisões da empresa?",
+            "Você sente que tem os recursos necessários para realizar seu trabalho?",
+        ],
+        "Liderança": [
+            "Como você avalia a liderança da sua equipe?",
+            "Você sente que seu trabalho é reconhecido?",
+            "Você recomendaria a empresa como um bom lugar para trabalhar?",
+        ],
+        "Crescimento Profissional": [
+            "Como você avalia as oportunidades de crescimento na empresa?",
+            "Você está satisfeito com os benefícios oferecidos pela empresa?",
+            "Você sente que tem oportunidades de desenvolver novas habilidades?",
+        ],
+        "Equilíbrio Trabalho-Vida": [
+            "Como você avalia a carga de trabalho?",
+            "Você está satisfeito com o suporte da sua equipe?",
+            "Como você avalia o ambiente físico de trabalho?",
+        ]
+    }
 
     if 'perguntas_selecionadas' not in session:
-        session['perguntas_selecionadas'] = random.sample(todas_perguntas, 10)
+        perguntas_selecionadas = []
+        for grupo in grupos_perguntas.values():
+            perguntas_selecionadas += random.sample(grupo, min(2, len(grupo)))  # Seleciona 2 perguntas de cada grupo
+        session['perguntas_selecionadas'] = random.sample(perguntas_selecionadas, 10)  # Seleciona 10 perguntas no total
 
     pergunta_atual = session.get('pergunta_atual', 0)
     pergunta_atual = int(pergunta_atual)  # Certifique-se de que é um inteiro

@@ -4,15 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entrada</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto&display=swap">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>Clima!</h1>
-        <form action="/" method="POST">
-            <input type="text" name="user_id" placeholder="Digite seu ID" required> 
-            <button type="submit">Iniciar</button>
-        </form>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
@@ -20,6 +17,12 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
+        <form action="/" method="POST">
+            <input type="text" name="user_id" placeholder="Digite seu ID" required> 
+            <div class="buttons">
+                <button type="submit" name="anterior">Acessar</button>
+            </div>
+        </form>
     </div>
 </body>
 </html>
