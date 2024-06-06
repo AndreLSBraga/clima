@@ -15,7 +15,7 @@ body, html {
 .container {
     text-align: center;
     border: 1px solid #ccc;
-    padding: 30px;
+    padding: 50px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: #F4F4F8;
@@ -54,17 +54,44 @@ form {
 
 .slider {
     margin-top: 20px;
+    margin-left: 0;
+    margin-right: 0;
     width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 15px;
+    border-radius: 5px;
+    background: linear-gradient(to right, #FE4A49 0%, #FE4A49 40%, #FED766 40%, #FED766 79%, #2AB7CA 79%, #2AB7CA 100%);
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #403D39;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
 }
 
 .slider-scale {
+    width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content:space-between;
     position: absolute;
     top: -25px;
     left: 0;
     right: 0;
-    padding: 0 10px;
 }
 
 .slider-scale span {
