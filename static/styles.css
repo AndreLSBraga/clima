@@ -1,0 +1,105 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #C6D3D8;
+}
+
+.container {
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    width: 80%;
+    max-width: 800px;  /* Define a largura máxima */
+    min-width: 300px;  /* Define a largura mínima */
+    min-height: 400px;  /* Define a altura mínima */
+}
+
+.text {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.question {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+form {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.slider-container {
+    margin-top: 20px;
+    position: relative;
+}
+
+.slider {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.slider-scale {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: -25px;
+    left: 0;
+    right: 0;
+    padding: 0 10px;
+}
+
+.slider-scale span {
+    margin-top: 20px;
+    font-size: 12px;
+}
+
+.suggestion{
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.question-number {
+    font-size: 12px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;  /* Espaçamento entre os botões */
+}
+
+input[type="text"] {
+    padding: 10px;
+    width: 80%;
+    max-width: 300px;
+    margin-bottom: 20px;
+}
+
+.alert {
+    background-color: #19b80b;
+    color: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.alert p {
+    margin: 0;
+}
