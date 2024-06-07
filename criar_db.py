@@ -38,6 +38,17 @@ CREATE TABLE IF NOT EXISTS respostas (
 )
 ''')
 
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS sugestoes (
+    id INTEGER,
+    data TEXT,
+    datetime TEXT,
+    categoria TEXT,
+    sugestao TEXT,
+    FOREIGN KEY (id) REFERENCES usuarios (id)
+)
+''')
+
 # Confirme as mudanças e feche a conexão
 conn.commit()
 conn.close()

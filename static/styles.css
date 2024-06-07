@@ -111,6 +111,61 @@ body, html {
     min-height: 400px;  
 }
 
+.panel{
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.left-panel {
+    flex: 1;
+    margin: 10px;
+    height: 100%;
+}
+
+.right-panel {
+    flex: 1;
+    margin: 10px;
+    height: 100%;
+}
+
+.sugestao-lista {
+    list-style: none;
+    padding: 0;
+    
+}
+
+.sugestao-lista li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 5px 10px; /* Ajustado para diminuir o tamanho da caixa */
+    border: 1px solid #000;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.sugestao-lista li.selected {
+    background-color: #FE4A49;
+    color: #fff;
+}
+
+.sugestao-lista li a {
+    text-decoration: none;
+    color: inherit;
+    flex-grow: 1;
+}
+
+.sugestao-lista li a:hover {
+    text-decoration: underline;
+}
+
+.sugestao-lista li i {
+    margin-right: 10px;
+    font-size: 18px; /* Garantir que o tamanho do ícone seja adequado */
+}
+
 .text {
     font-size: 32px;
     text-align: center;
@@ -124,6 +179,17 @@ h1 {
     font-weight: 900;
     font-style: normal;
     font-size: 120px;
+    margin-bottom: 20px;
+    color: #2AB7CA;
+}
+
+h3 {
+    margin: 0 auto;
+    font-family: "Exo", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 900;
+    font-style: normal;
+    font-size: 48px;
     margin-bottom: 20px;
     color: #2AB7CA;
 }
@@ -191,23 +257,42 @@ form {
 }
 
 .suggestion{
+    width: 100%;
+    height: 270px;
     margin-top: 10px;
     font-size: 18px;
+    flex:1;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
-.suggestion.box textarea {
-    padding: 10px; 
-    width: 100%; 
-    max-width: 100%; 
+.suggestion-box{
+    flex: 1;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.suggestion.text{
+    margin-bottom:0;
+}
+
+.suggestion textarea {
+    flex: 1;
+    padding: 30px;
+    width: 80%; 
     border: 2px solid #000000; 
     border-radius: 5px; 
     font-size: 16px; 
     background-color: #E6E6EA; 
     color: #333; 
     transition: border-color 0.3s ease; 
+    box-sizing: border-box;
 }
 
-.suggestion.box textarea:focus {
+.suggestion textarea:focus {
     border-color: #FE4A49; 
     outline: none; 
 }
@@ -258,10 +343,22 @@ button[name="abrir_sugestao"] {
     transition: background-color 0.3s ease; 
     width: 55%;
 }
-
-/* button[name="responder"] {
-    background-color: #DF0101;
-} */
+button[name="abrir_sugestao"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #186C77; 
+    color: white; 
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; 
+    width: 55%;
+}
 
 .buttons button:hover {
     background-color: #FE4A49; 

@@ -61,9 +61,7 @@ def entrada():
 
 @app.route('/perguntas', methods=['GET', 'POST'])
 def perguntas():
-
-    user_id = session['user_id']
-    if user_id not in session:
+    if 'user_id' not in session:
         return redirect(url_for('entrada'))
 
     grupos_perguntas = {
@@ -160,8 +158,7 @@ def perguntas():
 
 @app.route('/respondido', methods=['GET', 'POST'])
 def final():
-    user_id = session['user_id']
-    if user_id not in session:
+    if 'user_id' not in session:
         return redirect(url_for('entrada'))
 
     if request.method == 'POST':
@@ -172,16 +169,23 @@ def final():
 @app.route('/sugestao', methods=['GET', 'POST'])
 def sugestao():
     if request.method == 'POST':
-        sugestao_text = request.form['sugestao_text']
+        sugestao_text = request.form['sugestao']
+        categoria = request.form['categoria']
+
+        if not sugestao_text or not categoria:
+            flash("Por favor, preencha a categoria e/ou sugestão.")
+            return redirect(url_for('sugestao'))
+
+        print(sugestao_text,categoria)
         user_id = session.get('user_id', 'Anonimo')  # Obtenha o user_id da sessão, ou 'Anonimo' se não estiver disponível
         date_time = datetime.datetime.now()
         data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
         
         conn, cursor = get_db()
         cursor.execute('''
-        INSERT INTO sugestoes (id, data, datetime, sugestao)
-        VALUES (?, ?, ?, ?)
-        ''', (user_id, data_atual, date_time, sugestao_text))
+        INSERT INTO sugestoes (id, data, datetime, categoria, sugestao)
+        VALUES (?, ?, ?, ?, ?)
+        ''', (user_id, data_atual, date_time, categoria, sugestao_text))
         conn.commit()
         conn.close()
 
