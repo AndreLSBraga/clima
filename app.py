@@ -61,6 +61,11 @@ def entrada():
 
 @app.route('/perguntas', methods=['GET', 'POST'])
 def perguntas():
+
+    user_id = session['user_id']
+    if user_id not in session:
+        return redirect(url_for('entrada'))
+
     grupos_perguntas = {
         "Bem-estar": [
             "Como você avalia a comunicação interna na empresa?",
@@ -155,6 +160,13 @@ def perguntas():
 
 @app.route('/respondido', methods=['GET', 'POST'])
 def final():
+    user_id = session['user_id']
+    if user_id not in session:
+        return redirect(url_for('entrada'))
+
+    if request.method == 'POST':
+        if 'abrir_sugestao' in request.form:
+            return redirect(url_for('sugestao'))
     return render_template('final.html')
 
 @app.route('/sugestao', methods=['GET', 'POST'])

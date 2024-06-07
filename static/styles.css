@@ -223,6 +223,7 @@ form {
     display: flex;
     justify-content: center;
     gap: 10px;  
+    margin-top: 10px;
 }
 
 .buttons button {
@@ -240,6 +241,22 @@ form {
     cursor: pointer;
     transition: background-color 0.3s ease; 
     width: 25%;
+}
+button[name="abrir_sugestao"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #186C77; 
+    color: white; 
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; 
+    width: 55%;
 }
 
 /* button[name="responder"] {
