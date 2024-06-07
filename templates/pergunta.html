@@ -3,11 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perguntas</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto&display=swap">
+    <title>Clima ! - Perguntas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <h2>Clima !</h2>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('entrada') }}" class="active">Responder</a></li>
+            <li><a href="{{ url_for('sugestao') }}">Sugestões</a></li>
+        </ul>
+    </nav>
     <div class="container">
         <div class="question">{{ pergunta }}</div>
         <form action="/perguntas" method="POST">
@@ -29,10 +39,10 @@
             </div>
             <div class="question-number">Pergunta {{ pergunta_num }} de {{ total_perguntas }}</div>
             <div class="buttons">
-                <button type="submit" name="anterior">Anterior</button>
-                <button type="submit" name="pular">Pular</button>
-                <button type="submit" name="proxima">Próxima</button>
-            </div>
+                <button type="submit" name="anterior"><i class="fa-solid fa-angle-left"></i></i> Anterior</button>
+                <button type="submit" name="pular"></i> Pular<i class="fas fa-forward"></i></button>
+                <button type="submit" name="proxima"></i> Próxima<i class="fa-solid fa-angle-right"></i></i></button>
+            </div>            
         </form>
     </div>
     <script src="{{ url_for('static', filename='background.js') }}"></script>

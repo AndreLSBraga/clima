@@ -10,12 +10,10 @@ app.secret_key = 'your_secret_key'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(BASE_DIR, 'database', 'clima_organizacional.db')
 
-# Função para conectar ao banco de dados
 def get_db():
     conn = sqlite3.connect(DATABASE)
     return conn, conn.cursor()
 
-# Função para verificar se o ID existe
 def id_existe(user_id):
     conn, cursor = get_db()
     cursor.execute('SELECT COUNT(*) FROM usuarios WHERE id = ?', (user_id,))
@@ -23,7 +21,6 @@ def id_existe(user_id):
     conn.close()
     return result > 0
 
-# Função para verificar se já há uma resposta nesta semana
 def resposta_existe_esta_semana(user_id):
     semana_atual = datetime.datetime.now().isocalendar()[1]
     ano_atual = datetime.datetime.now().year
@@ -61,10 +58,6 @@ def entrada():
 
         return redirect(url_for('perguntas'))
     return render_template('entrada.html')
-
-@app.route('/respondido', methods=['GET', 'POST'])
-def final():
-    return render_template('final.html')
 
 @app.route('/perguntas', methods=['GET', 'POST'])
 def perguntas():
@@ -159,6 +152,31 @@ def perguntas():
         pergunta = perguntas_selecionadas[pergunta_atual]
 
     return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=10)
+
+@app.route('/respondido', methods=['GET', 'POST'])
+def final():
+    return render_template('final.html')
+
+@app.route('/sugestao', methods=['GET', 'POST'])
+def sugestao():
+    if request.method == 'POST':
+        sugestao_text = request.form['sugestao_text']
+        user_id = session.get('user_id', 'Anonimo')  # Obtenha o user_id da sessão, ou 'Anonimo' se não estiver disponível
+        date_time = datetime.datetime.now()
+        data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
+        
+        conn, cursor = get_db()
+        cursor.execute('''
+        INSERT INTO sugestoes (id, data, datetime, sugestao)
+        VALUES (?, ?, ?, ?)
+        ''', (user_id, data_atual, date_time, sugestao_text))
+        conn.commit()
+        conn.close()
+
+        flash("Sugestão enviada com sucesso!")
+        return redirect(url_for('sugestao'))
+    
+    return render_template('sugestao.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

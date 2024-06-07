@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clima !</title>
-    <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <title>Clima ! - Sugestões</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -13,16 +13,16 @@
             <h2>Clima !</h2>
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('entrada') }}" class="active">Responder</a></li>
-            <li><a href="{{ url_for('sugestao') }}">Sugestões</a></li>
+            <li><a href="{{ url_for('entrada') }}">Responder</a></li>
+            <li><a href="{{ url_for('sugestao') }}" class="active">Sugestões</a></li>
         </ul>
     </nav>
     <div class="container">
-        <h1>Clima !</h1>
-        <form action="/" method="POST">
-            <input type="text" name="user_id" placeholder="Digite seu ID" required> 
+        <h1>Sugestões</h1>
+        <form action="/sugestao" method="POST">
+            <textarea name="sugestao_text" placeholder="Deixe sua sugestão aqui..." required></textarea>
             <div class="buttons">
-                <button type="submit" name="responder">Responder</button>
+                <button type="submit" name="enviar_sugestao">Enviar Sugestão</button>
             </div>
         </form>
         <div class="alerts">

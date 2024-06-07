@@ -3,24 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clima ! finalizado</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto&display=swap">
+    <title>Clima ! - Respondido</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Clima ! respondido</h1>
-        <div class="text"> Obrigado pela participação.</div>
-        <div class="text"> Até o próximo Clima !</div>
-
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <h2>Clima !</h2>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('entrada') }}" class="active">Responder</a></li>
+            <li><a href="{{ url_for('sugestao') }}">Sugestões</a></li>
+        </ul>
+    </nav>
+    <form action="/respondido" method="POST">
+        <div class="container">
+            <div class="text"> Obrigado(a) pela participação.</div>
+            <div class="text"> Até o próximo Clima !</div>
+            <img src = "../static/images/done.svg">
+            <div class="text"> Se desejar fazer alguma sugestão, acesse a aba de sugestões e deixe um comentário</div>
+        </div>
+    </form>
     <script src="{{ url_for('static', filename='background.js') }}"></script>
 </body>
 </html>
