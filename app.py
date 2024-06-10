@@ -191,18 +191,32 @@ def final():
             return redirect(url_for('sugestao'))
     return render_template('final.html')
 
-@app.route('/sugestao', methods=['GET', 'POST'])
-def sugestao():
+@app.route('/inicio_sugestao', methods=['GET', 'POST'])
+def inicio_sugestao():
     if request.method == 'POST':
+        area_selecionada = request.form['area']  # Recebe a área selecionada pelo usuário
+        user_id = request.form['user_id']
+        if not user_id:
+            user_id= -1
+        return redirect(url_for('sugestao',area=area_selecionada, user_id=user_id))  # Redireciona para a página de sugestão após a interação
+    return render_template('id_sugestao.html')  # Renderiza a tela inicial
+
+
+@app.route('/sugestao', methods=['GET', 'POST'])
+
+def sugestao():
+
+    if request.method == 'POST':
+        area = request.form.get('area')  # Ajustado para obter dados de formulário
+        user_id = request.form.get('user_id')  # Ajustado para obter dados de formulário
+        print(area,user_id)
         sugestao_text = request.form['sugestao']
         categoria = request.form['categoria']
 
         if not sugestao_text or not categoria:
             flash("Por favor, preencha a categoria e/ou sugestão.")
             return redirect(url_for('sugestao'))
-
-        print(sugestao_text,categoria)
-        user_id = session.get('user_id', -1)  # Obtenha o user_id da sessão, ou -1 se não estiver disponível
+        
         date_time = datetime.datetime.now()
         data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
         
