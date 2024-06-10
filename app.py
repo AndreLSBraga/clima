@@ -30,7 +30,6 @@ def resposta_existe_esta_semana(user_id):
     conn.close()
     for resultado in resultados:
         data_resposta = datetime.datetime.strptime(resultado[0], "%Y-%m-%d")
-        print(data_resposta)
         if data_resposta.isocalendar()[1] == semana_atual and data_resposta.year == ano_atual:
             return True
     return False
@@ -54,6 +53,7 @@ def entrada():
         # Inicializar sessão para armazenar estado da navegação e respostas
         session['user_id'] = user_id
         session['pergunta_atual'] = 0
+        session['perguntas_selecionadas'] = []
         session['respostas'] = []
 
         return redirect(url_for('perguntas'))
@@ -65,45 +65,71 @@ def perguntas():
         return redirect(url_for('entrada'))
 
     grupos_perguntas = {
-        "Bem-estar": [
-            "Como você avalia a comunicação interna na empresa?",
-            "Você sente que o seu trabalho é importante para a companhia?",
-            "Há um equilibrio entre minha vida pessoal e profissional?",
+        "Satisfação no Trabalho": [
+            "Você está satisfeito com o seu ambiente de trabalho?",
+            "Como você avalia a relação com seus colegas de trabalho?",
+            "Acha que suas habilidades e competências são bem aproveitadas na sua função atual?",
+            "Sente que seu trabalho é reconhecido pela empresa?",
+            "Como você descreveria o equilíbrio entre sua vida profissional e pessoal?"
         ],
-        "Saúde Mental": [
-            "Você se sente motivado no seu trabalho diário?",
-            "Você sente que tem os recursos necessários para realizar seu trabalho?",
+        "Comunicação": [
+            "A comunicação entre os membros da equipe é clara e eficaz?",
+            "Você se sente à vontade para compartilhar suas ideias e sugestões com a gerência?",
+            "A comunicação da empresa sobre objetivos e metas é transparente?",
+            "Você recebe feedback construtivo sobre o seu desempenho?",
+            "Como você avalia a frequência e a qualidade das reuniões de equipe?"
         ],
         "Liderança": [
-            "Como você avalia a liderança da sua equipe?",
-            "Você sente que seu trabalho é reconhecido?",
-            "Como você avalia a transparência nas decisões da empresa?",
-            "Você recomendaria a empresa como um bom lugar para trabalhar?",
+            "Você sente que a liderança da sua equipe é acessível e apoiadora?",
+            "A gerência se preocupa com o desenvolvimento profissional dos colaboradores?",
+            "Os líderes da empresa inspiram confiança e respeito?",
+            "Como você avalia a capacidade da liderança em tomar decisões justas?",
+            "Você se sente motivado pela forma como a liderança conduz a equipe?"
         ],
-        "Crescimento Profissional": [
-            "Como você avalia as oportunidades de crescimento na empresa?",
-            "Você está satisfeito com os benefícios oferecidos pela empresa?",
-            "Você sente que tem oportunidades de desenvolver novas habilidades?",
+        "Desenvolvimento e Crescimento": [
+            "A empresa oferece oportunidades claras para desenvolvimento e crescimento profissional?",
+            "Você tem acesso a treinamentos e cursos para aprimorar suas habilidades?",
+            "Existe um plano de carreira definido para sua posição?",
+            "Sente que pode atingir suas metas de carreira dentro da empresa?",
+            "A empresa incentiva a inovação e a criatividade?"
         ],
-        "Equilíbrio Trabalho-Vida": [
-            "Como você avalia a carga de trabalho?",
-            "Você está satisfeito com o suporte da sua equipe?",
-            "Como você avalia o ambiente físico de trabalho?",
+        "Condições de Trabalho": [
+            "Você acha que as condições de trabalho (infraestrutura, equipamentos, etc.) são adequadas?",
+            "A empresa oferece um ambiente seguro e saudável para trabalhar?",
+            "As políticas de trabalho remoto ou flexível atendem às suas necessidades?",
+            "Você tem os recursos necessários para realizar seu trabalho eficientemente?",
+            "Como você avalia a carga de trabalho e as expectativas em relação a prazos?"
         ],
-        "Serviços Gerais":[
-            "Como você avalia a limpeza, organização dos banheiros?"
+        "Cultura Organizacional": [
+            "A cultura da empresa está alinhada com seus valores pessoais?",
+            "Você sente que a empresa promove um ambiente inclusivo e diversificado?",
+            "A empresa valoriza a colaboração e o trabalho em equipe?",
+            "Você está ciente das políticas da empresa sobre ética e conduta?",
+            "A empresa promove atividades que incentivam o engajamento e a integração dos colaboradores?"
         ]
     }
-
-    if 'perguntas_selecionadas' not in session:
+    
+    
+    if 'perguntas_selecionadas' not in session or session['perguntas_selecionadas'] == [] :
         perguntas_selecionadas = []
         for grupo in grupos_perguntas.values():
-            perguntas_selecionadas += random.sample(grupo, min(2, len(grupo)))  # Seleciona 2 perguntas de cada grupo
-        session['perguntas_selecionadas'] = random.sample(perguntas_selecionadas, 10)  # Seleciona 10 perguntas no total
+            selecionadas = random.sample(grupo, min(5, len(grupo)))  # Seleciona 2 perguntas de cada grupo
+            perguntas_selecionadas += selecionadas
+        if len(perguntas_selecionadas) >= 15:
+            session['perguntas_selecionadas'] = random.sample(perguntas_selecionadas, 15)  # Seleciona 15 perguntas no total
+        else:
+            session['perguntas_selecionadas'] = perguntas_selecionadas
+
 
     pergunta_atual = session.get('pergunta_atual', 0)
     pergunta_atual = int(pergunta_atual)  # Certifique-se de que é um inteiro
     perguntas_selecionadas = session['perguntas_selecionadas']
+    print(len(perguntas_selecionadas))
+    print(perguntas_selecionadas)
+
+    # Verifica se a pergunta atual está dentro do intervalo correto
+    if pergunta_atual >= len(perguntas_selecionadas):
+        return redirect(url_for('final'))
     pergunta = perguntas_selecionadas[pergunta_atual]
 
     if request.method == 'POST':
@@ -118,12 +144,12 @@ def perguntas():
                 resposta = float(resposta)
             except ValueError:
                 flash("A resposta deve ser um número entre 0 e 10.")
-                return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=10)
+                return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=15)
 
             session['respostas'].append({'pergunta': pergunta, 'resposta': resposta, 'sugestao': sugestao})
 
         if 'proxima' in request.form or 'pular' in request.form:
-            if pergunta_atual < 9:
+            if pergunta_atual < len(perguntas_selecionadas) - 1:
                 session['pergunta_atual'] = pergunta_atual + 1
             else:
                 user_id = session['user_id']
@@ -148,13 +174,12 @@ def perguntas():
         elif 'anterior' in request.form:
             if pergunta_atual > 0:
                 session['pergunta_atual'] = pergunta_atual - 1
-                #session['respostas'].pop()  # Remove a última resposta ao voltar para a pergunta anterior
 
         pergunta_atual = session.get('pergunta_atual', 0)
         pergunta_atual = int(pergunta_atual)  # Certifique-se de que é um inteiro
         pergunta = perguntas_selecionadas[pergunta_atual]
 
-    return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=10)
+    return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=15)
 
 @app.route('/respondido', methods=['GET', 'POST'])
 def final():
@@ -177,7 +202,7 @@ def sugestao():
             return redirect(url_for('sugestao'))
 
         print(sugestao_text,categoria)
-        user_id = session.get('user_id', 'Anonimo')  # Obtenha o user_id da sessão, ou 'Anonimo' se não estiver disponível
+        user_id = session.get('user_id', -1)  # Obtenha o user_id da sessão, ou -1 se não estiver disponível
         date_time = datetime.datetime.now()
         data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
         
