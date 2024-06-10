@@ -12,6 +12,8 @@ cursor = conn.cursor()
 # Exclua a tabela 'respostas' se ela existir
 cursor.execute('DROP TABLE IF EXISTS respostas')
 
+cursor.execute('DROP TABLE IF EXISTS sugestoes')
+
 # Crie a tabela 'usuarios'
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS usuarios (
@@ -41,6 +43,7 @@ CREATE TABLE IF NOT EXISTS respostas (
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS sugestoes (
     id INTEGER,
+    area TEXT,
     data TEXT,
     datetime TEXT,
     categoria TEXT,
