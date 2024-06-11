@@ -27,6 +27,7 @@ def resposta_existe_esta_semana(user_id):
     conn, cursor = get_db()
     cursor.execute('SELECT data FROM respostas WHERE id = ?', (user_id,))
     resultados = cursor.fetchall()
+    
     conn.close()
     for resultado in resultados:
         data_resposta = datetime.datetime.strptime(resultado[0], "%Y-%m-%d")
@@ -66,50 +67,49 @@ def perguntas():
 
     grupos_perguntas = {
         "Satisfação no Trabalho": [
-            "Você está satisfeito com o seu ambiente de trabalho?",
-            "Como você avalia a relação com seus colegas de trabalho?",
-            "Acha que suas habilidades e competências são bem aproveitadas na sua função atual?",
-            "Sente que seu trabalho é reconhecido pela empresa?",
-            "Como você descreveria o equilíbrio entre sua vida profissional e pessoal?"
+            "Quão satisfeito estou com meu ambiente de trabalho?",
+            "Como avalio minha relação com meus colegas de trabalho?",
+            "Como avalio o aproveitamento das minhas habilidades e competências na minha função atual?",
+            "Como avalio o reconhecimento do meu trabalho pela empresa?",
+            "Como descrevo o equilíbrio entre minha vida profissional e pessoal?"
         ],
         "Comunicação": [
-            "A comunicação entre os membros da equipe é clara e eficaz?",
-            "Você se sente à vontade para compartilhar suas ideias e sugestões com a gerência?",
-            "A comunicação da empresa sobre objetivos e metas é transparente?",
-            "Você recebe feedback construtivo sobre o seu desempenho?",
-            "Como você avalia a frequência e a qualidade das reuniões de equipe?"
+            "Como avalio a clareza e eficácia da comunicação entre os membros da minha equipe?",
+            "Como avalio meu conforto para compartilhar ideias e sugestões com a gerência?",
+            "Como avalio a transparência da comunicação da empresa sobre objetivos e metas?",
+            "Como avalio o feedback construtivo que recebo sobre o meu desempenho?",
+            "Como avalio a frequência e qualidade das reuniões de equipe?"
         ],
         "Liderança": [
-            "Você sente que a liderança da sua equipe é acessível e apoiadora?",
-            "A gerência se preocupa com o desenvolvimento profissional dos colaboradores?",
-            "Os líderes da empresa inspiram confiança e respeito?",
-            "Como você avalia a capacidade da liderança em tomar decisões justas?",
-            "Você se sente motivado pela forma como a liderança conduz a equipe?"
+            "Como avalio a acessibilidade e apoio da liderança da minha equipe?",
+            "Como avalio a preocupação da gerência com o meu desenvolvimento profissional?",
+            "Como avalio a confiança e respeito inspirados pelos líderes da empresa?",
+            "Como avalio a capacidade da liderança em tomar decisões justas?",
+            "Como avalio a motivação proporcionada pela liderança na condução da equipe?"
         ],
         "Desenvolvimento e Crescimento": [
-            "A empresa oferece oportunidades claras para desenvolvimento e crescimento profissional?",
-            "Você tem acesso a treinamentos e cursos para aprimorar suas habilidades?",
-            "Existe um plano de carreira definido para sua posição?",
-            "Sente que pode atingir suas metas de carreira dentro da empresa?",
-            "A empresa incentiva a inovação e a criatividade?"
+            "Como avalio as oportunidades para meu desenvolvimento e crescimento profissional oferecidas pela empresa?",
+            "Como avalio o acesso a treinamentos e cursos para aprimorar minhas habilidades?",
+            "Como avalio o plano de carreira definido para minha posição?",
+            "Como avalio minhas chances de atingir minhas metas de carreira dentro da empresa?",
+            "Como avalio o incentivo à inovação e criatividade pela empresa?"
         ],
         "Condições de Trabalho": [
-            "Você acha que as condições de trabalho (infraestrutura, equipamentos, etc.) são adequadas?",
-            "A empresa oferece um ambiente seguro e saudável para trabalhar?",
-            "As políticas de trabalho remoto ou flexível atendem às suas necessidades?",
-            "Você tem os recursos necessários para realizar seu trabalho eficientemente?",
-            "Como você avalia a carga de trabalho e as expectativas em relação a prazos?"
+            "Como avalio as condições de trabalho (infraestrutura, equipamentos, etc.)?",
+            "Como avalio o ambiente seguro e saudável oferecido pela empresa?",
+            "Como avalio as políticas de trabalho remoto ou flexível em atender às minhas necessidades?",
+            "Como avalio os recursos necessários para realizar meu trabalho eficientemente?",
+            "Como avalio a carga de trabalho e as expectativas em relação a prazos?"
         ],
         "Cultura Organizacional": [
-            "A cultura da empresa está alinhada com seus valores pessoais?",
-            "Você sente que a empresa promove um ambiente inclusivo e diversificado?",
-            "A empresa valoriza a colaboração e o trabalho em equipe?",
-            "Você está ciente das políticas da empresa sobre ética e conduta?",
-            "A empresa promove atividades que incentivam o engajamento e a integração dos colaboradores?"
+            "Como avalio o alinhamento da cultura da empresa com meus valores pessoais?",
+            "Como avalio a promoção de um ambiente inclusivo e diversificado pela empresa?",
+            "Como avalio a valorização da colaboração e trabalho em equipe pela empresa?",
+            "Como avalio meu conhecimento das políticas da empresa sobre ética e conduta?",
+            "Como avalio as atividades promovidas pela empresa que incentivam meu engajamento e integração?"
         ]
     }
-    
-    
+
     if 'perguntas_selecionadas' not in session or session['perguntas_selecionadas'] == [] :
         perguntas_selecionadas = []
         for grupo in grupos_perguntas.values():
@@ -124,8 +124,6 @@ def perguntas():
     pergunta_atual = session.get('pergunta_atual', 0)
     pergunta_atual = int(pergunta_atual)  # Certifique-se de que é um inteiro
     perguntas_selecionadas = session['perguntas_selecionadas']
-    print(len(perguntas_selecionadas))
-    print(perguntas_selecionadas)
 
     # Verifica se a pergunta atual está dentro do intervalo correto
     if pergunta_atual >= len(perguntas_selecionadas):
@@ -134,10 +132,11 @@ def perguntas():
 
     if request.method == 'POST':
         if 'pular' in request.form:
-            session['respostas'].append({'pergunta': pergunta, 'resposta': -1, 'sugestao': ''})
+            session['respostas'].append({'pergunta': pergunta, 'resposta': -1, 'sugestao': '', 'auto_identificacao': False})
         else:
             resposta = request.form['resposta']
             sugestao = request.form.get('sugestao', '')
+            auto_identificacao = 'auto_identificacao' in request.form
 
             # Assegure-se de que a resposta é um número flutuante
             try:
@@ -146,8 +145,7 @@ def perguntas():
                 flash("A resposta deve ser um número entre 0 e 10.")
                 return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=15)
 
-            session['respostas'].append({'pergunta': pergunta, 'resposta': resposta, 'sugestao': sugestao})
-
+            session['respostas'].append({'pergunta': pergunta, 'resposta': resposta, 'sugestao': sugestao, 'auto_identificacao': auto_identificacao})
         if 'proxima' in request.form or 'pular' in request.form:
             if pergunta_atual < len(perguntas_selecionadas) - 1:
                 session['pergunta_atual'] = pergunta_atual + 1
@@ -156,11 +154,27 @@ def perguntas():
                 date_time = datetime.datetime.now()
                 data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
                 conn, cursor = get_db()
+                cursor.execute('SELECT area FROM usuarios where id = (?)',(user_id))
+                area_lista = cursor.fetchone()
+                area = area_lista[0]
                 for resposta in session['respostas']:
                     cursor.execute('''
-                    INSERT INTO respostas (id, data, datetime, descricao_pergunta, resposta, sugestao)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                    ''', (user_id, data_atual, date_time, resposta['pergunta'], resposta['resposta'], resposta['sugestao']))
+                        INSERT INTO respostas (id, data, datetime, descricao_pergunta, resposta)
+                        VALUES (?, ?, ?, ?, ?)
+                    ''', (user_id, data_atual, date_time, resposta['pergunta'], resposta['resposta']))
+
+                    if resposta['sugestao']:
+                        if resposta	['auto_identificacao']:
+                            cursor.execute('''
+                                INSERT INTO sugestoes (id, area, data, datetime,  pergunta, sugestao, auto_identificacao, id_auto_identificacao)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                            ''', (user_id, area, data_atual, date_time, resposta['pergunta'], resposta['sugestao'], resposta['auto_identificacao'], user_id))
+                        else:
+                            cursor.execute('''
+                                INSERT INTO sugestoes (id, area, data, datetime,  pergunta, sugestao)
+                                VALUES (?, ?, ?, ?, ?, ?)
+                            ''', (user_id, area, data_atual, date_time, resposta['pergunta'], resposta['sugestao']))
+                
                 conn.commit()
                 conn.close()
 
@@ -198,7 +212,6 @@ def inicio_sugestao():
         session['area'] = request.form['area']
         session['user_id'] = request.form['user_id']
         user_id = session['user_id']
-        print(user_id)
         if not user_id:
             session['user_id'] = -1
         return redirect(url_for('sugestao'))  # Redireciona para a página de sugestão após a interação
@@ -214,7 +227,6 @@ def sugestao():
         user_id = session['user_id']
         sugestao_text = request.form['sugestao']
         categoria = request.form['categoria']
-        print(area, user_id,sugestao_text, categoria)
 
         if not sugestao_text or not categoria:
             flash("Por favor, preencha a categoria e/ou sugestão.")
@@ -225,9 +237,9 @@ def sugestao():
         
         conn, cursor = get_db()
         cursor.execute('''
-        INSERT INTO sugestoes (id, area, data, datetime, categoria, sugestao)
-        VALUES (?, ?, ?, ?, ?, ?)
-        ''', (user_id, area, data_atual, date_time, categoria, sugestao_text))
+            INSERT INTO sugestoes (id, area, data, datetime, categoria, sugestao)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ''', (user_id, area, data_atual, date_time, categoria, sugestao_text))
         conn.commit()
         conn.close()
 
@@ -237,4 +249,5 @@ def sugestao():
     return render_template('sugestao.html')
 
 if __name__ == '__main__':
+    
     app.run(debug=True)

@@ -10,22 +10,19 @@ conn = sqlite3.connect(DATABASE)
 cursor = conn.cursor()
 
 # Exclua a tabela 'respostas' se ela existir
+cursor.execute('DROP TABLE IF EXISTS usuarios')
 cursor.execute('DROP TABLE IF EXISTS respostas')
-
 cursor.execute('DROP TABLE IF EXISTS sugestoes')
 
 # Crie a tabela 'usuarios'
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS usuarios (
-    id INTEGER PRIMARY KEY
+    id INTEGER PRIMARY KEY,
+    cargo TEXT,
+    area TEXT,
+    gestor TEXT
 )
 ''')
-
-# Insira alguns registros na tabela 'usuarios'
-# usuarios = [(1,), (2,), (3,)]
-# cursor.executemany('''
-# INSERT INTO usuarios (id) VALUES (?)
-# ''', usuarios)
 
 # Crie a tabela 'respostas'
 cursor.execute('''
@@ -35,7 +32,6 @@ CREATE TABLE IF NOT EXISTS respostas (
     datetime TEXT,
     descricao_pergunta TEXT,
     resposta REAL,
-    sugestao TEXT,
     FOREIGN KEY (id) REFERENCES usuarios (id)
 )
 ''')
@@ -47,10 +43,31 @@ CREATE TABLE IF NOT EXISTS sugestoes (
     data TEXT,
     datetime TEXT,
     categoria TEXT,
+    pergunta TEXT,
     sugestao TEXT,
+    auto_identificacao INT,
+    id_auto_identificacao INT,
     FOREIGN KEY (id) REFERENCES usuarios (id)
 )
 ''')
+
+# Insira alguns registros na tabela 'usuarios'
+usuarios = [
+    (1, 'Gerente', 'Vendas', 'Carlos Silva'),
+    (2, 'Analista', 'TI', 'Ana Costa'),
+    (3, 'Assistente', 'RH', 'Pedro Souza'),
+    (4, 'Supervisor', 'Produção', 'Fernanda Lima'),
+    (5, 'Coordenador', 'Marketing', 'João Pereira'),
+    (6, 'Técnico', 'Manutenção', 'Mariana Ferreira'),
+    (7, 'Consultor', 'Financeiro', 'Rodrigo Oliveira'),
+    (8, 'Desenvolvedor', 'TI', 'Paula Santos'),
+    (9, 'Designer', 'Criação', 'Juliana Almeida'),
+    (10, 'Engenheiro', 'Projetos', 'Lucas Costa')
+]
+cursor.executemany('INSERT INTO usuarios (id, cargo, area, gestor) VALUES (?, ?, ?, ?)', usuarios)
+
+
+
 
 # Confirme as mudanças e feche a conexão
 conn.commit()
