@@ -130,7 +130,7 @@ def create_tables():
 
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS sugestoes_fato (
-        id_fantasia TEXT PRIMARY KEY,
+        id_fantasia TEXT,
         fk_cargo INTEGER,
         fk_area INTEGER,
         fk_subarea INTEGER,
@@ -239,7 +239,7 @@ def insert_dados():
         (6,'Nos últimos 3 meses em algum momento eu senti que não tinha tempo suficiente para realizar minhas funções?',1),
         (7,'O ambiente de trabalho possibilita a concentração necessária para desempenhar as minhas funções?',1),
         (8,'O quanto a cultura da empresa está alinhada com os meus valores?',2),
-        (9,'Qaunto trabalhar aqui é motivo de orgulho para mim?',2),
+        (9,'Qaunto trabalhar aqui é motivo de orgulho para mim?', 2),
         (10,'Qual a probabilidade de indicar a empresa para um amigo?',2),
         (11,'Quanto a comunicação entre gestor e funcionários é transparente?',2),
         (12,'Quanto as formas de bonificações e recompensas fazem sentido para mim?',2),
@@ -284,7 +284,36 @@ def insert_dados():
     conn.commit()
     conn.close()
 
+def consulta_db():
+    conn, cursor = get_db()
+    cursor.execute('SELECT desc_pergunta FROM perguta_dim WHERE fk_pergunta = ?', (2,))
+    pergunta = cursor.fetchone()[0]
+    conn.close()
+    print(pergunta)
 
-drop_tables();
-create_tables();
-insert_dados();
+conn, cursor = get_db()
+cursor.execute('DROP TABLE IF EXISTS sugestoes_fato')
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS sugestoes_fato (
+        id_fantasia TEXT,
+        fk_cargo INTEGER,
+        fk_area INTEGER,
+        fk_subarea INTEGER,
+        fk_gestor INTEGER,
+        fk_pergunta INTEGER,
+        fk_categoria INTEGER,
+        data TEXT,
+        datetime TEXT,
+        sugestao TEXT,
+        id_autoidentificacao INTERGER,
+        FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
+        FOREIGN KEY (fk_area) REFERENCES area_dim (fk_area),
+        FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
+        FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
+        FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim (fk_pergunta),
+        FOREIGN KEY (fk_categoria) REFERENCES categoria_dim (fk_categoria)
+        FOREIGN KEY (id_autoidentificacao) REFERENCES usuarios_dim (id) 
+    )
+    ''')
+conn.commit()
+conn.close()
