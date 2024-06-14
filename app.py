@@ -4,6 +4,7 @@ import sqlite3
 import random
 import datetime
 import hashlib
+from config import ADMIN_USERNAME, ADMIN_PASSWORD
 
 app = Flask(__name__)
 app.secret_key = 'batata'
@@ -302,6 +303,53 @@ def sugestao():
         return redirect(url_for('sugestao'))
 
     return render_template('sugestao.html', areas=areas, subareas=subareas, gestores=gestores, categorias=categorias)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        if check_admin(username, password):
+            session['logged_in'] = True
+            session['username'] = username
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Login inválido. Tente novamente.', 'error')
+
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
+
+@app.route('/dashboard')
+def dashboard():
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    
+    db = get_db()
+    cursor = db.cursor()
+
+    id_gestor = session['username']
+    #Traz o fk_gestor para verificar quantas respostas do time dele existem
+    cursor.execute(f'SELECT fk_gestor, desc_gestor FROM gestor_dim WHERE id = {id_gestor}')
+    fk_gestor = cursor.fetchone()[0]
+    nome_gestor = cursor.fetchone()[1]
+
+    def verifica_qtd_respostas():
+        cursor.execute(f'SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = {fk_gestor}')
+        quantidade_respostas = cursor.fetchone()[0]
+        #CONTINUAR AQUI, TENTANDO CRIAR VALIDAÇÕES PARA MOSTRAR AS RESPOSTAS OU NÃO
+
+    return render_template('dashboard.html')
+
+def check_admin(username, password):
+    admin_username = ADMIN_USERNAME
+    admin_password_hash = ADMIN_PASSWORD
+    return username == admin_username and password == admin_password_hash
 
 if __name__ == '__main__':
     app.run(debug=True)
