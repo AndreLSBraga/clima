@@ -295,7 +295,6 @@ conn, cursor = get_db()
 cursor.execute('DROP TABLE IF EXISTS sugestoes_fato')
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS sugestoes_fato (
-        id_fantasia TEXT,
         fk_cargo INTEGER,
         fk_area INTEGER,
         fk_subarea INTEGER,

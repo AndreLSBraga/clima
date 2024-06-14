@@ -151,7 +151,7 @@ def perguntas():
         gestor = session['gestor']
 
         if 'pular' in request.form:
-            session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': -1})
+            session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': -1, 'sugestao': ''})
         else:
             resposta = request.form['resposta']
             sugestao = request.form.get('sugestao', '')
@@ -182,25 +182,28 @@ def perguntas():
                     conn.commit()
                         
                     if resposta['sugestao']:
-                        print(resposta['sugestao'])
                         if resposta	['auto_identificacao']:
-                            print(resposta['auto_identificacao'])
                             cursor.execute('''
-                                INSERT INTO sugestoes_fato (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_categoria, data, datetime, sugestao, id_autoidentificacao)
+                                INSERT INTO sugestoes_fato (fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, data, datetime, sugestao, id_autoidentificacao)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                ''', (id_fantasia, cargo, area, subarea, gestor, resposta['categoria'], data_atual, date_time, resposta['sugestao'], user_id))
+                                ''', (cargo, area, subarea, gestor, resposta['pergunta'], resposta['categoria'], data_atual, date_time, resposta['sugestao'], user_id))
                             conn.commit()
                         else:
                             cursor.execute('''
-                                INSERT INTO sugestoes_fato (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_categoria, data, datetime, sugestao)
+                                INSERT INTO sugestoes_fato (fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, data, datetime, sugestao)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                ''', (id_fantasia, cargo, area, subarea, gestor, resposta['categoria'], data_atual, date_time, resposta['sugestao']))
+                                ''', (cargo, area, subarea, gestor, resposta['pergunta'], resposta['categoria'], data_atual, date_time, resposta['sugestao']))
                             conn.commit()
                 session.pop('perguntas_selecionadas', None)
                 session.pop('pergunta_atual', None)
                 session.pop('respostas', None)
 
                 flash("Respostas enviadas com sucesso!")
+                cursor.execute(''' 
+                               INSERT INTO usuarios_respostas_fato (id, data, datetime)
+                               VALUES (?,?,?)
+                               ''', (user_id, data_atual, date_time))
+                conn.commit()
                 return redirect(url_for('final'))
 
         elif 'anterior' in request.form:
@@ -245,7 +248,7 @@ def inicio_sugestao():
 def sugestao():
     
     if request.method == 'POST':
-        area = session['area']
+        subarea = session['subarea']
         user_id = session['user_id']
         sugestao_text = request.form['sugestao']
         categoria = request.form['categoria']
@@ -261,15 +264,14 @@ def sugestao():
         cursor.execute('''
             INSERT INTO sugestoes (id, area, data, datetime, categoria, sugestao)
             VALUES (?, ?, ?, ?, ?, ?)
-            ''', (user_id, area, data_atual, date_time, categoria, sugestao_text))
+            ''', (user_id, subarea, data_atual, date_time, categoria, sugestao_text))
         conn.commit()
         conn.close()
 
         flash("Sugestão enviada com sucesso!")
         return redirect(url_for('inicio_sugestao'))
     
-    return render_template('sugestao.html')
+    return render_template('inicio_sugestao.html')
 
 if __name__ == '__main__':
-    
     app.run(debug=True)
