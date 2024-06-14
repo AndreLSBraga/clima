@@ -25,27 +25,29 @@
                 <div class="left-panel">
                     <h4>Selecione sua área:</h4>
                     <select name="area" id="area" class="custom-select" required>
-                        <option value="Adegas">Adegas</option>
-                        <option value="Brassagem">Brassagem</option>
-                        <option value="Bblend">Bblend</option>
-                        <option value="Filtração">Filtração</option>
-                        <option value="Engenharia">Engenharia</option>
-                        <option value="Linha 501">Linha 501</option>
-                        <option value="Linha 502">Linha 502</option>
-                        <option value="Linha 503">Linha 503</option>
-                        <option value="Linha 511">Linha 511</option>
-                        <option value="Linha 512">Linha 512</option>
-                        <option value="Linha 561">Linha 561</option>
-                        <option value="Linha 562">Linha 561</option>
-                        <option value="Linha Two-Pack">Linha Two-Pack</option>
-                        <option value="Meio Ambiente">Meio Ambiente</option>
-                        <option value="Utilidades">Utilidades</option>
-                        <option value="Xaroparia">Xaroparia</option>
+                        {% for area in areas %}
+                            <option value="{{ area }}">{{ area }}</option>
+                        {% endfor %}
                     </select>
-                </div>
-                    
+                    <h4>Selecione a sub-área:</h4>
+                    <select name="subarea" id="subarea" class="custom-select" required>
+                        {% for subarea in subareas %}
+                            <option value="{{ subarea }}">{{ subarea }}</option>
+                        {% endfor %}
+                    </select>
+                    <h4>Selecione o gestor:</h4>
+                    <select name="gestor" id="gestor" class="custom-select" required>
+                        {% for gestor in gestores %}
+                            <option value="{{ gestor }}">{{ gestor }}</option>
+                        {% endfor %}
+                    </select>
+                    <h4>Selecione a categoria da pergunta:</h4>
+                    <select name="categoria" id="categoria" class="custom-select" required>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria }}">{{ categoria }}</option>
+                        {% endfor %}
+                    </select>
                 
-                <div class="right-panel"> 
                     <h4>Desejo me identificar:</h4>
                     <input type="text" name="user_id" id="user_id" placeholder="Digite seu ID, se desejar se identificar"> 
                 </div>

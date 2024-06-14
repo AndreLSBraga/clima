@@ -119,6 +119,7 @@ def perguntas():
     # Construir o dicionário de grupos de perguntas
     grupos_perguntas = cria_grupos_perguntas(perguntas)
 
+
     if 'perguntas_selecionadas' not in session or session['perguntas_selecionadas'] == [] :
         perguntas_selecionadas = []
         for grupo in grupos_perguntas.values():
@@ -233,6 +234,38 @@ def final():
 @app.route('/inicio_sugestao', methods=['GET', 'POST'])
     
 def inicio_sugestao():
+
+    def chama_tabela(tabela):
+        conn, cursor = get_db()
+        cursor.execute(f'SELECT desc_{tabela} FROM {tabela}_dim')
+        areas = cursor.fetchall()
+        conn.close
+        return areas
+    area = chama_tabela('area')
+    subarea = chama_tabela('subarea')
+    gestor = chama_tabela('gestor')
+    categoria = chama_tabela('categoria')
+
+    def cria_grupo(tabela):
+        grupo_tabela = set() 
+        for variavel_tupla in tabela:
+            variavel = variavel_tupla[0]  
+            grupo_tabela.add(variavel) 
+        return grupo_tabela
+    
+    areas = cria_grupo(area)
+    subareas = cria_grupo(subarea)
+    gestores = cria_grupo(gestor)
+    categorias = cria_grupo(categoria)
+    # Construir o dicionário de grupos de perguntas
+    
+    # def chama_subareas():
+    #     conn, cursor = get_db()
+    #     cursor.execute('SELECT fk_subarea, desc_subarea FROM subarea_dim')
+    #     areas = cursor.fetchall()
+    #     conn.close
+    #     return areas
+
     if request.method == 'POST':
         session['area'] = request.form['area']
         session['user_id'] = request.form['user_id']
@@ -240,7 +273,7 @@ def inicio_sugestao():
         if not user_id:
             session['user_id'] = -1
         return redirect(url_for('sugestao'))  # Redireciona para a página de sugestão após a interação
-    return render_template('inicio_sugestao.html')  # Renderiza a tela inicial
+    return render_template('inicio_sugestao.html', areas=areas, subareas=subareas, gestores=gestores, categorias=categorias)  # Renderiza a tela inicial
     
 
 @app.route('/sugestao', methods=['GET', 'POST'])
