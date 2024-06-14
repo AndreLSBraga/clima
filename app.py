@@ -243,7 +243,7 @@ def sugestao():
         cursor.execute(f'SELECT desc_{tabela} FROM {tabela}_dim')
         areas = cursor.fetchall()
         return areas
-
+    
     area = chama_tabela('area')
     subarea = chama_tabela('subarea')
     gestor = chama_tabela('gestor')
@@ -257,6 +257,7 @@ def sugestao():
         return grupo_tabela
     
     areas = cria_grupo(area)
+    print(areas)
     subareas = cria_grupo(subarea)
     gestores = cria_grupo(gestor)
     categorias = cria_grupo(categoria)
@@ -266,7 +267,6 @@ def sugestao():
         cursor = db.cursor()
 
         area = request.form['area']
-        session['area'] = area
         subarea = request.form['subarea']
         categoria = request.form['categoria']
         user_id = request.form['user_id']
@@ -282,16 +282,17 @@ def sugestao():
         date_time = datetime.datetime.now()
         data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
         
-        def encontra_fk(tabela):
-            variavel = f'desc_{tabela}'
-            tabela_dim = f'{tabela}_dim'
-            cursor.execute(f'SELECT {variavel} FROM {tabela_dim}')
+        def encontra_fk(variavel,tabela):
+            variavel = f"'{variavel}'"
+            cursor.execute(f'SELECT fk_{tabela} FROM {tabela}_dim WHERE desc_{tabela}={variavel}')
             fk_variavel=cursor.fetchone()[0]
+            print(fk_variavel)
             return fk_variavel
         
-        fk_area = encontra_fk('area')
-        fk_subarea = encontra_fk('subarea')
-        fk_categoria = encontra_fk('categoria')
+        fk_area = encontra_fk(area,'area')
+        fk_subarea = encontra_fk(subarea,'subarea')
+        fk_categoria = encontra_fk(categoria,'categoria')
+        print(fk_area,fk_subarea,fk_categoria)
 
         cursor.execute('''
             INSERT INTO sugestoes_fato (fk_area, fk_subarea, fk_categoria, data, datetime, sugestao, id_autoidentificacao)
