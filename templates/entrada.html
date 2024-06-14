@@ -14,25 +14,25 @@
         </div>
         <ul class="navbar-menu">
             <li><a href="{{ url_for('entrada') }}" class="active">Responder</a></li>
-            <li><a href="{{ url_for('inicio_sugestao') }}">Sugestões</a></li>
+            <li><a href="{{ url_for('sugestao') }}">Sugestões</a></li>
         </ul>
     </nav>
     <div class="container">
         <h1>Clima !</h1>
         <form action="/" method="POST">
-            <input type="text" name="user_id" placeholder="Digite seu ID" required> 
+            <input type="text" name="user_id" placeholder="Digite seu ID"> 
             <div class="buttons">
                 <button type="submit" name="responder">Responder</button>
             </div>
         </form>
         <div class="alerts">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
         </div>
     </div>
     <script src="{{ url_for('static', filename='background.js') }}"></script>

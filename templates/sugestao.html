@@ -11,29 +11,41 @@
 <body>
     <nav class="navbar">
         <div class="navbar-logo">
-            <h2>Clima ! - Sugestões</h2>
+            <h2>Clima !</h2>
         </div>
         <ul class="navbar-menu">
             <li><a href="{{ url_for('entrada') }}">Responder</a></li>
-            <li><a href="{{ url_for('inicio_sugestao') }}" class="active">Sugestões</a></li>
+            <li><a href="{{ url_for('sugestao') }}" class="active">Sugestões</a></li>
         </ul>
     </nav>
     <div class="container">
         <h3>Sugestões</h3>
-        <form action="{{ url_for('sugestao', area=area, user_id=user_id) }}" method="GET">
-        </form>
-        <form action="{{ url_for('sugestao', area=area, user_id=user_id) }}" method="POST"> 
+        <form action="/sugestao" method="POST"> 
             <div class="panel">
                 <div class="left-panel">
-                    <h4>Selecione a categoria:</h4>
-                    <ul class="sugestao-lista">
-                        <li data-theme="img-sugestao" data-value="Bem-estar"><i class="fas fa-heartbeat"></i><a>Bem-estar</a></li>
-                        <li data-theme="img-sugestao" data-value="Saúde Mental"><i class="fas fa-brain"></i><a>Saúde Mental</a></li>
-                        <li data-theme="img-sugestao" data-value="Liderança"><i class="fas fa-users-cog"></i><a>Liderança</a></li>
-                        <li data-theme="img-sugestao" data-value="Crescimento Profissional"><i class="fas fa-chart-line"></i><a>Crescimento Profissional</a></li>
-                        <li data-theme="img-sugestao" data-value="Equilíbrio Trabalho-Vida"><i class="fas fa-users"></i><a>Equilíbrio Trabalho-Vida</a></li>
-                        <li data-theme="img-sugestao" data-value="Ferramenta"><i class="fas fa-wrench"></i><a>Ferramenta</a></li>
-                    </ul>
+                    <h4>Selecione sua área:</h4>
+                    <select name="area" id="area" class="custom-select" required>
+                        {% for area in areas %}
+                            <option value="{{ area }}">{{ area }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <h4>Selecione a sub-área:</h4>
+                    <select name="subarea" id="subarea" class="custom-select" required>
+                        {% for subarea in subareas %}
+                            <option value="{{ subarea }}">{{ subarea }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <h4>Selecione a categoria da pergunta:</h4>
+                    <select name="categoria" id="categoria" class="custom-select" required>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria }}">{{ categoria }}</option>
+                        {% endfor %}
+                    </select>
+                
+                    <h4>Desejo me identificar:</h4>
+                    <input type="text" name="user_id" id="user_id" placeholder="Digite seu ID, se desejar se identificar"> 
                 </div>
                 <div class="right-panel"> 
                     <h4>Deixe aqui a sua sugestão:</h4>
@@ -44,36 +56,21 @@
                     </div>
                 </div>
             </div>
-            <input type="hidden" name="categoria" id="categoria">
             <div class="buttons">
                 <button type="submit" name="enviar_sugestao">Enviar Sugestão</button>
             </div>
-        </form>
 
-        <div class="alerts">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-        </div>
+            <div class="alerts">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </form>
     </div>
     <script src="{{ url_for('static', filename='background.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const listItems = document.querySelectorAll('.sugestao-lista li');
-            const categoriaInput = document.getElementById('categoria');
-
-            listItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    listItems.forEach(li => li.classList.remove('selected'));
-                    item.classList.add('selected');
-                    categoriaInput.value = item.getAttribute('data-value');
-                });
-            });
-        });
-    </script>
 </body>
 </html>

@@ -120,19 +120,16 @@ body, html {
 .left-panel {
     flex: 1;
     margin: 10px;
-    height: 100%;
 }
 
 .right-panel {
     flex: 1;
     margin: 10px;
-    height: 100%;
 }
 
 .sugestao-lista {
     list-style: none;
-    padding: 0;
-    
+    padding: 0;   
 }
 
 .sugestao-lista li {
@@ -258,7 +255,7 @@ form {
 
 .suggestion{
     width: 100%;
-    height: 270px;
+    height: 80%;
     margin-top: 10px;
     font-size: 18px;
     flex:1;
@@ -294,6 +291,7 @@ form {
 .suggestion textarea {
     flex: 1;
     padding: 30px;
+    height: 100%;
     width: 80%; 
     border: 2px solid #000000; 
     border-radius: 5px; 
@@ -339,23 +337,7 @@ form {
     transition: background-color 0.3s ease; 
     width: 25%;
 }
-button[name="abrir_sugestao"] {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    padding: 10px 20px;
-    margin: 5px;
-    border: none;
-    border-radius: 5px;
-    background-color: #186C77; 
-    color: white; 
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease; 
-    width: 55%;
-}
-button[name="abrir_sugestao"] {
+button[name="enviar_sugestao"] {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -373,7 +355,7 @@ button[name="abrir_sugestao"] {
 }
 
 .buttons button:hover {
-    background-color: #FE4A49; 
+    background-color: #2AB7CA; 
 }
 
 button[name="anterior"]:hover {
@@ -410,23 +392,40 @@ input[type="text"]:focus {
     outline: none; 
 }
 
-.alerts{
+.alerts {
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
 .alert {
-    background-color: #FE4A49;
-    color: white;
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 5px;
+    text-align: center;
+}
+
+/* Alertas de erro */
+.alert-error {
+    background-color: #FE4A49;
+    color: white;
+}
+
+/* Alertas de sucesso */
+.alert-success {
+    background-color: #03C956;
+    color: white;
+}
+
+/* Alertas gerais */
+.alert-warning {
+    background-color: #FECB34;
+    color: #000;
 }
 
 .alert p {
     margin: 0;
 }
-
 
 .custom-select {
     width: 100%;

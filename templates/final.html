@@ -13,14 +13,13 @@
             <h2>Clima !</h2>
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('entrada') }}" class="active">Responder</a></li>
+            <li><a href="{{ url_for('entrada') }}">Responder</a></li>
             <li><a href="{{ url_for('sugestao') }}">Sugestões</a></li>
         </ul>
     </nav>
     <form action="/respondido" method="POST">
         <div class="container">
             <div class="text"> Obrigado(a) pela participação.</div>
-            <div class="text"> Até o próximo Clima !</div>
             <img src = "../static/images/done.svg">
             <div class="buttons">
                 <button type="submit" name="abrir_sugestao">Tenho uma sugestão<i class="fa-duotone fa-lightbulb-on"></i></button>
