@@ -6,7 +6,7 @@ import datetime
 import hashlib
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = 'batata'
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(BASE_DIR, 'database', 'clima_organizacional.db')
@@ -17,6 +17,7 @@ def get_db():
         g.db.row_factory = sqlite3.Row
     return g.db
 
+#Fechar o banco quando o app for encerrado
 @app.teardown_appcontext
 def close_db(e=None):
     db = g.pop('db', None)
@@ -60,11 +61,11 @@ def entrada():
             return redirect(url_for('entrada'))
 
         if not id_existe(user_id):
-            flash("O ID não foi encontrado. Procure o suporte","error")
+            flash("O ID não foi encontrado. Procure seu gestor","error")
             return redirect(url_for('entrada'))
 
         if resposta_existe_esta_semana(user_id):
-            flash("Você já respondeu o clima desta semana.","success")
+            flash("Você já respondeu essa semana.","success")
             return redirect(url_for('entrada'))
         
         id_fantasia = codifica_id(user_id)
@@ -150,7 +151,7 @@ def perguntas():
         area = session['area']
         subarea = session['subarea']
         gestor = session['gestor']
-
+        print(request.form)
         if 'pular' in request.form:
             session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': -1, 'sugestao': ''})
         else:
@@ -166,10 +167,11 @@ def perguntas():
 
             session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': resposta, 'sugestao': sugestao, 'auto_identificacao': auto_identificacao})
         
-        if 'proxima' in request.form or 'pular' in request.form:
+        if 'proxima' in request.form or 'pular' in request.form or 'enviar-final' in request.form:
             if pergunta_atual < len(perguntas_selecionadas) - 1:
                 session['pergunta_atual'] = pergunta_atual + 1
             else:
+
                 user_id = session['user_id']
                 date_time = datetime.datetime.now()
                 data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -223,13 +225,12 @@ def perguntas():
 
 @app.route('/respondido', methods=['GET', 'POST'])
 def final():
-    print(session)
     if 'user_id' not in session or 'area' not in session:
         return redirect(url_for('entrada'))
 
     if request.method == 'POST':
         session.clear()
-        if 'abrir_sugestao' in request.form:
+        if 'enviar_sugestao' in request.form:
             return redirect(url_for('sugestao'))
     return render_template('final.html')
 
@@ -257,7 +258,6 @@ def sugestao():
         return grupo_tabela
     
     areas = cria_grupo(area)
-    print(areas)
     subareas = cria_grupo(subarea)
     gestores = cria_grupo(gestor)
     categorias = cria_grupo(categoria)
@@ -286,13 +286,11 @@ def sugestao():
             variavel = f"'{variavel}'"
             cursor.execute(f'SELECT fk_{tabela} FROM {tabela}_dim WHERE desc_{tabela}={variavel}')
             fk_variavel=cursor.fetchone()[0]
-            print(fk_variavel)
             return fk_variavel
         
         fk_area = encontra_fk(area,'area')
         fk_subarea = encontra_fk(subarea,'subarea')
         fk_categoria = encontra_fk(categoria,'categoria')
-        print(fk_area,fk_subarea,fk_categoria)
 
         cursor.execute('''
             INSERT INTO sugestoes_fato (fk_area, fk_subarea, fk_categoria, data, datetime, sugestao, id_autoidentificacao)

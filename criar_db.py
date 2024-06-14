@@ -292,27 +292,15 @@ def consulta_db():
     print(pergunta)
 
 conn, cursor = get_db()
-cursor.execute('DROP TABLE IF EXISTS sugestoes_fato')
+cursor.execute('DROP TABLE IF EXISTS usuarios_respostas_fato')
+# Crie a tabela 'usuarios_respostas_fato'
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS sugestoes_fato (
-        fk_cargo INTEGER,
-        fk_area INTEGER,
-        fk_subarea INTEGER,
-        fk_gestor INTEGER,
-        fk_pergunta INTEGER,
-        fk_categoria INTEGER,
-        data TEXT,
-        datetime TEXT,
-        sugestao TEXT,
-        id_autoidentificacao INTERGER,
-        FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
-        FOREIGN KEY (fk_area) REFERENCES area_dim (fk_area),
-        FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
-        FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
-        FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim (fk_pergunta),
-        FOREIGN KEY (fk_categoria) REFERENCES categoria_dim (fk_categoria)
-        FOREIGN KEY (id_autoidentificacao) REFERENCES usuarios_dim (id) 
-    )
-    ''')
+CREATE TABLE IF NOT EXISTS usuarios_respostas_fato (
+    id INTEGER ,
+    data TEXT,
+    datetime TEXT,
+    FOREIGN KEY (id) REFERENCES usuarios_dim (id)
+)
+''')
 conn.commit()
 conn.close()

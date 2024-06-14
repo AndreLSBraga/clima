@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clima ! - Perguntas</title>
+    <title>Pulsa 7L - Perguntas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
@@ -11,7 +11,7 @@
 <body>
     <nav class="navbar">
         <div class="navbar-logo">
-            <h2>Clima !</h2>
+            <h2>Pulsa 7L</h2>
         </div>
         <ul class="navbar-menu">
             <li><a href="{{ url_for('entrada') }}" class="active">Responder</a></li>
@@ -20,7 +20,7 @@
     </nav>
     <div class="container">
         <div class="question">{{ pergunta }}</div>
-        <form action="/perguntas" method="POST">
+        <form id="formPerguntas" action="/perguntas" method="POST">
             <div class="slider-container">
                 <input type="range" name="resposta" min="0" max="10" step="0.01" value="5" class="slider" id="resposta">
                 <div class="slider-scale">
@@ -42,9 +42,24 @@
             <div class="question-number">Pergunta {{ pergunta_num }} de {{ total_perguntas }}</div>
             <div class="buttons">
                 <button type="submit" name="anterior"><i class="fa-solid fa-angle-left"></i> Anterior</button>
-                <button type="submit" name="pular"> Pular<i class="fas fa-forward"></i></button>
-                <button type="submit" name="proxima"> Próxima<i class="fa-solid fa-angle-right"></i></i></button>
-            </div>            
+                {% if pergunta_num == total_perguntas %}
+                    <button type="submit" name="pular" onclick="confirmarEnvio()"> Pular e Enviar<i class="fa-solid fa-paper-plane"></i></button>
+                    <button type="button" name="enviar-inicial" onclick="confirmarEnvio()">Enviar<i class="fa-solid fa-paper-plane"></i></button>
+                {% else %}
+                    <button type="submit" name="pular"> Pular<i class="fas fa-forward"></i></button>
+                    <button type="submit" name="proxima">Próxima<i class="fa-solid fa-angle-right"></i></button>
+                {% endif %}
+            </div>      
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <h2>Confirmar Envio</h2>
+                    <p type="text">Você tem certeza de que deseja enviar suas respostas?</p>
+                    <div class="buttons">
+                        <button name="pular" onclick="fecharModal()">Cancelar</button>
+                        <button type="submit" name="enviar-final"onclick="enviarFormulario()">Enviar<i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
         </form>
         <div class="alerts">
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -56,6 +71,29 @@
                 {% endwith %}
         </div>
     </div>
+    
     <script src="{{ url_for('static', filename='background.js') }}"></script>
+    <script>
+        function confirmarEnvio() {
+            var modal = document.getElementById('myModal');
+            if (modal) {
+                modal.style.display = 'block';
+            }
+        }
+
+        function fecharModal() {
+            var modal = document.getElementById('myModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function enviarFormulario() {
+            var form = document.getElementById("formPerguntas");
+            if (form) {
+                form.submit();
+            }
+        }
+    </script>
 </body>
 </html>
