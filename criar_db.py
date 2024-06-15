@@ -1,5 +1,7 @@
 import sqlite3
 import os
+import random
+from datetime import datetime, timedelta
 
 # Defina o caminho para o banco de dados
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -196,10 +198,10 @@ def insert_dados():
     cursor.executemany('INSERT INTO subarea_dim (fk_subarea, desc_subarea) VALUES (?, ?)', subarea)
 
     gestor = [
-        (1, 'Ana Costa'),
-        (2, 'Lucas Costa'),
-        (3, 'Mariana Ferreira'),
-        (4, 4)
+        (1, 'Ana Costa',1),
+        (2, 'Lucas Costa',2),
+        (3, 'Mariana Ferreira',3),
+        (4, 'Cristiano Silva', 4)
     ]
     cursor.executemany('INSERT INTO gestor_dim (fk_gestor, desc_gestor) VALUES (?, ?)', gestor)
 
@@ -291,16 +293,75 @@ def consulta_db():
     conn.close()
     print(pergunta)
 
-conn, cursor = get_db()
-cursor.execute('DROP TABLE IF EXISTS usuarios_respostas_fato')
-# Crie a tabela 'usuarios_respostas_fato'
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS usuarios_respostas_fato (
-    id INTEGER ,
-    data TEXT,
-    datetime TEXT,
-    FOREIGN KEY (id) REFERENCES usuarios_dim (id)
-)
-''')
-conn.commit()
-conn.close()
+def random_date(start_date, end_date):
+    """ Gera uma data aleatória entre start_date e end_date """
+    time_between_dates = end_date - start_date
+    days_between_dates = time_between_dates.days
+    random_number_of_days = random.randrange(days_between_dates)
+    random_date = start_date + timedelta(days=random_number_of_days)
+    return random_date
+
+def insert_respostas_fato():
+    conn, cursor = get_db()
+
+    # Limpar a tabela se já existir dados
+    cursor.execute('DELETE FROM respostas_fato')
+
+    # Definir horário fixo
+    fixed_time = '10:00:00'
+
+    # Gerar 100 linhas de dados de exemplo
+    for i in range(1, 101):
+        # Gerar dados aleatórios
+        fk_cargo = random.randint(1, 8)
+        fk_area = random.randint(1, 9)
+        fk_subarea = random.randint(1, 9)
+        fk_gestor = random.randint(1, 4)
+        fk_pergunta = random.randint(1, 47)
+        fk_categoria = random.randint(1, 8)
+        
+        # Gerar data aleatória nos últimos 3 meses
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=90)  # 90 dias para trás
+        data = random_date(start_date, end_date).strftime('%Y-%m-%d')
+
+        # Utilizar o horário fixo definido
+        datetime_str = f'{data} {fixed_time}'
+
+        resposta = round(random.uniform(0, 10), 2)
+        id_fantasia = i
+
+        # Inserir na tabela respostas_fato
+        cursor.execute('''
+            INSERT INTO respostas_fato 
+            (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, data, datetime, resposta) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, data, datetime_str, resposta))
+
+    conn.commit()
+    conn.close()
+
+# Executar a função para inserir os dados
+insert_respostas_fato()
+
+
+# conn, cursor = get_db()
+# cursor.execute('DROP TABLE IF EXISTS gestor_dim')
+# # Crie a tabela 'usuarios_respostas_fato'
+# cursor.execute('''
+#     CREATE TABLE IF NOT EXISTS gestor_dim (
+#         fk_gestor INTEGER PRIMARY KEY,
+#         desc_gestor TEXT,
+#         id_gestor TEXT,
+#         FOREIGN KEY (fk_gestor) REFERENCES usuarios_dim(fk_gestor)
+#     )
+#     ''')
+# gestor = [
+#         (1, 'Ana Costa',1),
+#         (2, 'Lucas Costa',2),
+#         (3, 'Mariana Ferreira',3),
+#         (4, 'Cristiano Silva', 4)
+#     ]
+# cursor.executemany('INSERT INTO gestor_dim (fk_gestor, desc_gestor, id_gestor) VALUES (?, ?,?)', gestor)
+# conn.commit()
+# conn.close()

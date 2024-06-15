@@ -52,23 +52,38 @@ def codifica_id(user_id):
     id_fantasia = hashlib.sha256(user_id_bytes).hexdigest()
     return id_fantasia
 
+def valida_id(user_id, destino):
+    if not user_id.isdigit():
+        flash("Digite apenas números no ID","error")
+        return redirect(url_for(destino))
+
+    if not id_existe(user_id):
+        flash("O ID não foi encontrado. Procure seu gestor","error")
+        return redirect(url_for(destino))
+
+    return None
+
+def consulta_categorias():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT fk_categoria, desc_categoria FROM categoria_dim')
+        categorias = cursor.fetchall() 
+        return categorias
+
 @app.route('/', methods=['GET', 'POST'])
 def entrada():
     if request.method == 'POST':
         user_id = request.form['user_id']
-
-        if not user_id.isdigit():
-            flash("Digite apenas números no ID","error")
-            return redirect(url_for('entrada'))
-
-        if not id_existe(user_id):
-            flash("O ID não foi encontrado. Procure seu gestor","error")
-            return redirect(url_for('entrada'))
-
+        
+        testa_id = valida_id(user_id,'entrada')
+        if testa_id:
+            print(f'redicionar para {testa_id}')
+            return testa_id
+        
         if resposta_existe_esta_semana(user_id):
             flash("Você já respondeu essa semana.","success")
             return redirect(url_for('entrada'))
-        
+
         id_fantasia = codifica_id(user_id)
         db = get_db()
         cursor = db.cursor()
@@ -317,7 +332,6 @@ def login():
         else:
             flash('Login inválido. Tente novamente.', 'error')
 
-    
     return render_template('login.html')
 
 @app.route('/logout')
@@ -333,18 +347,73 @@ def dashboard():
     db = get_db()
     cursor = db.cursor()
 
-    id_gestor = session['username']
+    email_gestor = session['username'].split('@')
+    id_gestor = email_gestor[0]
+
+    testa_id = valida_id(id_gestor,'login')
+    if testa_id:
+        print(f'redicionar para {testa_id}')
+        return testa_id
+    
     #Traz o fk_gestor para verificar quantas respostas do time dele existem
-    cursor.execute(f'SELECT fk_gestor, desc_gestor FROM gestor_dim WHERE id = {id_gestor}')
-    fk_gestor = cursor.fetchone()[0]
-    nome_gestor = cursor.fetchone()[1]
+    def consulta_gestor(id_gestor):
+        cursor.execute('SELECT fk_gestor, desc_gestor FROM gestor_dim WHERE id_gestor = ?',(id_gestor))
+        dados_gestor = cursor.fetchone()
+        fk_gestor, nome_gestor = dados_gestor
+        return fk_gestor,nome_gestor
+    
+    def verifica_qtd_respostas(fk_gestor, fk_categoria=None, fk_pergunta=None):
+        if fk_categoria and fk_pergunta:
+            cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ?',(fk_gestor,fk_categoria, fk_pergunta))
+        elif fk_categoria:
+            cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = ? and fk_categoria = ?',(fk_gestor,fk_categoria,))
+        else:     
+            cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = ?',(fk_gestor,))
+        num_respostas = cursor.fetchone()[0]
+        return num_respostas
+    
+    def consulta_nota(fk_gestor, fk_categoria=None, fk_pergunta=None):
+        if fk_categoria and fk_pergunta:
+            cursor.execute('SELECT AVG(resposta) FROM respostas_fato WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ?',(fk_gestor,fk_categoria, fk_pergunta))
+        elif fk_categoria:
+            cursor.execute('SELECT AVG(resposta) FROM respostas_fato WHERE fk_gestor = ? and fk_categoria = ?',(fk_gestor,fk_categoria,))
+        else:     
+            cursor.execute('SELECT AVG(resposta) FROM respostas_fato WHERE fk_gestor = ?',(fk_gestor,))        
+        nota_media = cursor.fetchone()[0]
+        nota_media = round(nota_media,2)
+        return nota_media
+    
+    
+    def gera_cards():
+        categorias = consulta_categorias()
+        cards = []
+        for fk_categoria, desc_categoria in categorias:
+            valor = consulta_nota(fk_gestor,fk_categoria)
+            size_bar = valor * 10
+            quantidade_respostas = verifica_qtd_respostas(fk_gestor,fk_categoria)
+            card = {
+                'id': fk_categoria,
+                'title': desc_categoria,
+                'size': size_bar,
+                'value': valor,
+                'total': 10,
+                'qtd_respostas': quantidade_respostas
+            }
+            cards.append(card)
+        return cards
+    
+    fk_gestor = consulta_gestor(id_gestor)[0]
+    nome_gestor = consulta_gestor(id_gestor)[1]
+    quantidade_respostas = verifica_qtd_respostas(fk_gestor)
+    nota_media = consulta_nota(fk_gestor)
+    size_bar = nota_media * 10 
+    cards = gera_cards()
 
-    def verifica_qtd_respostas():
-        cursor.execute(f'SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = {fk_gestor}')
-        quantidade_respostas = cursor.fetchone()[0]
-        #CONTINUAR AQUI, TENTANDO CRIAR VALIDAÇÕES PARA MOSTRAR AS RESPOSTAS OU NÃO
+    return render_template('dashboard.html', nome = nome_gestor, qtd_respostas = quantidade_respostas, nota_media = nota_media, size_bar = size_bar, cards=cards)
 
-    return render_template('dashboard.html')
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
 
 def check_admin(username, password):
     admin_username = ADMIN_USERNAME

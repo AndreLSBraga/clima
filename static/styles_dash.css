@@ -1,0 +1,257 @@
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: "Titillium Web", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.background-image-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 50px); /* Ajuste o minmax conforme necessário */
+    grid-auto-rows: 50px; /* Ajuste conforme necessário */
+    z-index: -1; /* Certifique-se de que o container de imagem de fundo está atrás de tudo */
+}
+
+.background-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.sidebar {
+    width: 150px; /* Ajuste conforme necessário */
+    height: 100vh;
+    background-color: #E6E6EA;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza o conteúdo horizontalmente */
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+}
+
+.sidebar-logo h2 {
+    margin: 0;
+    color: #2AB7CA;
+    font-family: "Exo", sans-serif;
+    font-size: 24px;
+    margin-bottom: 20px; /* Espaçamento entre o título e as opções */
+}
+
+.sidebar-menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column; /* Organiza os itens verticalmente */
+    align-items: center; /* Centraliza os itens horizontalmente */
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-menu li {
+    width: 100%;
+    text-align: center;
+}
+
+.sidebar-menu li a {
+    text-decoration: none;
+    color: #000000;
+    font-family: "Titillium Web", sans-serif;
+    font-size: 18px;
+    padding: 10px 20px;
+    display: block; /* Faz o link ocupar toda a área do item da lista */
+    position: relative;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+.sidebar-menu li a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 3px;
+    background-color: #FE4A49;
+    transition: width 0.3s;
+}
+
+.sidebar-menu li a:hover::after,
+.sidebar-menu li a.active::after {
+    width: 100%;
+}
+
+.sidebar-menu li a:hover {
+    color: #ffffff;
+    background-color: #FE4A49;
+}
+
+.main-content {
+    margin-left: 150px; /* Espaço para a barra lateral */
+    padding-left: 25px;
+    width: 100%; /* Ajuste conforme necessário */
+    height: 100vh;
+    box-sizing: border-box; /* Inclui o padding e o border no cálculo do width e height */
+    background-color: #F4F4F8;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    min-width: 300px;
+    min-height: 400px;
+}
+
+.introbar {
+    text-align: left;
+    margin-bottom: 25px;
+}
+
+.introbar h1 {
+    margin-bottom: 0;
+}
+
+.introbar p {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: absolute;
+    height: 100%;
+}
+
+.container-cards.geral {
+    display: flex;
+    width: 100%;
+}
+
+
+.card {
+    background-color: #F4F4F8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#card-geral {
+    width: 30%;
+    align-items: center;
+}
+
+
+#card-grafico {
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-cards.detalhado {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.container-cards.detalhado h3{
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.card-detalhe {
+    width: calc(25% - 20px); /* Calcula o width de forma responsiva */
+    background-color: #F4F4F8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+
+.bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bar-container h2{
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.bar {
+    display:flex;
+    margin-bottom: 10px;
+}
+.bar-size {
+    background-color: #d9d9db;
+    border-color: #0000;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    flex:1;
+    margin-right: 10px;
+}
+
+.bar-value {
+    background-color: #2AB7CA;
+    height: 30px;
+    line-height: 30px;
+    text-align: right;
+    padding-right: 10px;
+    color: white;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+
+.bar-total {
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.info-respostas p {
+    font-size: 14px;
+}
+
+.details-button {
+    background-color: #2AB7CA; /* Cor de fundo do botão */
+    color: white; /* Cor do texto e ícone */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espaço entre o ícone e o texto */
+    transition: background-color 0.3s;
+}
+
+.details-button:hover {
+    background-color: #218a9e; /* Cor de fundo ao passar o mouse */
+}
+
+.details-button i {
+    font-size: 18px; /* Tamanho do ícone */
+}
