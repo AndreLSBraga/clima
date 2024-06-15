@@ -22,8 +22,13 @@
     </div>
     <div class="main-content">
         <div class="introbar">
-            <h1>Bem-vindo, {{nome}}!</h1>
-            <p>Aqui está o resultado da sua Pulsa 7L. A nota está baseada em {{qtd_respostas}} respostas, entre os dias {{data_min}} e {{data_max}}</p>
+            <div class="introbar-text">
+                <h1>Bem-vindo, {{nome}}!</h1>
+                <p>Aqui está o resultado da sua Pulsa 7L. A nota está baseada em {{qtd_respostas}} respostas, entre os dias {{data_min}} e {{data_max}}</p>
+            </div>
+            <div class="introbar-filters">
+                filtros
+            </div>
         </div>
         <div class="container">
             <div class="container-cards geral">
@@ -53,7 +58,7 @@
             <div class="container-cards detalhado">
                 {% for card in cards %}
                 <div class="card-detalhe" id="card-{{ card.id }}">
-                    <h3>{{ card.title }}</h3>
+                    <h3>{{ card.title }}:</h3>
                     <div class="bar">
                         <div class="bar-size">
                             <div class="bar-value" style="width: {{ card.size }}%;">{{ card.value }}</div>

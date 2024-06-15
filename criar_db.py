@@ -117,6 +117,7 @@ def create_tables():
         fk_gestor INTEGER,
         fk_pergunta INTEGER,
         fk_categoria INTEGER,
+        semana_atual TEXT,
         data TEXT,
         datetime TEXT,
         resposta REAL,
@@ -304,14 +305,11 @@ def random_date(start_date, end_date):
 def insert_respostas_fato():
     conn, cursor = get_db()
 
-    # Limpar a tabela se já existir dados
-    cursor.execute('DELETE FROM respostas_fato')
-
     # Definir horário fixo
     fixed_time = '10:00:00'
 
     # Gerar 100 linhas de dados de exemplo
-    for i in range(1, 101):
+    for i in range(1, 501):
         # Gerar dados aleatórios
         fk_cargo = random.randint(1, 8)
         fk_area = random.randint(1, 9)
@@ -323,25 +321,25 @@ def insert_respostas_fato():
         # Gerar data aleatória nos últimos 3 meses
         end_date = datetime.now()
         start_date = end_date - timedelta(days=90)  # 90 dias para trás
-        data = random_date(start_date, end_date).strftime('%Y-%m-%d')
-
+        data = random_date(start_date, end_date)
+        
         # Utilizar o horário fixo definido
-        datetime_str = f'{data} {fixed_time}'
-
+        datetime_str = f'{data.strftime("%Y-%m-%d")} {fixed_time}'
+        semana_atual = data.isocalendar()[1]
         resposta = round(random.uniform(0, 10), 2)
         id_fantasia = i
 
         # Inserir na tabela respostas_fato
         cursor.execute('''
             INSERT INTO respostas_fato 
-            (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, data, datetime, resposta) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, data, datetime_str, resposta))
+            (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, semana_atual, data, datetime, resposta) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, semana_atual, data.strftime('%Y-%m-%d'), datetime_str, resposta))
 
     conn.commit()
     conn.close()
 
-# Executar a função para inserir os dados
+
 insert_respostas_fato()
 
 

@@ -118,6 +118,8 @@ body, html {
 .introbar {
     text-align: left;
     margin-bottom: 25px;
+    display: flex;
+    justify-content: flex-start;
 }
 
 .introbar h1 {
@@ -231,7 +233,7 @@ body, html {
 }
 
 .info-respostas p {
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .details-button {

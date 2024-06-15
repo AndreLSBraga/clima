@@ -70,6 +70,7 @@ def consulta_categorias():
         categorias = cursor.fetchall() 
         return categorias
 
+
 @app.route('/', methods=['GET', 'POST'])
 def entrada():
     if request.method == 'POST':
@@ -160,6 +161,7 @@ def perguntas():
     pergunta = cursor.fetchone()[0]
     cursor.execute('SELECT fk_categoria FROM pergunta_dim WHERE fk_pergunta = ?', (num_pergunta,))
     categoria = cursor.fetchone()[0]
+    semana_atual = datetime.datetime.now().isocalendar()[1]
 
     if request.method == 'POST':
         id_fantasia = session['id_fantasia']
@@ -194,17 +196,17 @@ def perguntas():
 
                 for resposta in session['respostas']:
                     cursor.execute('''
-                        INSERT INTO respostas_fato (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, data, datetime, resposta)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        ''', (id_fantasia, cargo, area, subarea, gestor, resposta['pergunta'], resposta['categoria'], data_atual, date_time, resposta['resposta']))
+                        INSERT INTO respostas_fato (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, semana_atual, data, datetime, resposta)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ''', (id_fantasia, cargo, area, subarea, gestor, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['resposta']))
                     db.commit()
 
                     if resposta['sugestao']:
                         if resposta['auto_identificacao']:
                             cursor.execute('''
-                                INSERT INTO sugestoes_fato (fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, data, datetime, sugestao, id_autoidentificacao)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                ''', (cargo, area, subarea, gestor, resposta['pergunta'], resposta['categoria'], data_atual, date_time, resposta['sugestao'], user_id))
+                                INSERT INTO sugestoes_fato (fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, semana_atual, data, datetime, sugestao, id_autoidentificacao)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                ''', (cargo, area, subarea, gestor, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['sugestao'], user_id))
                             db.commit()
                         else:
                             cursor.execute('''
@@ -362,54 +364,71 @@ def dashboard():
         fk_gestor, nome_gestor = dados_gestor
         return fk_gestor,nome_gestor
     
-    def verifica_qtd_respostas(fk_gestor, fk_categoria=None, fk_pergunta=None):
+    def consulta_quantidade(tabela, fk_gestor, fk_categoria=None, fk_pergunta=None):
         if fk_categoria and fk_pergunta:
-            cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ?',(fk_gestor,fk_categoria, fk_pergunta))
+            cursor.execute(f'SELECT COUNT(*) FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ?',(fk_gestor,fk_categoria, fk_pergunta))
         elif fk_categoria:
-            cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = ? and fk_categoria = ?',(fk_gestor,fk_categoria,))
+            cursor.execute(f'SELECT COUNT(*) FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ?',(fk_gestor,fk_categoria,))
         else:     
-            cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = ?',(fk_gestor,))
+            cursor.execute(f'SELECT COUNT(*) FROM {tabela} WHERE fk_gestor = ?',(fk_gestor,))
         num_respostas = cursor.fetchone()[0]
         return num_respostas
     
-    def consulta_nota(fk_gestor, fk_categoria=None, fk_pergunta=None):
+    def consulta_media(coluna, tabela, fk_gestor, fk_categoria=None, fk_pergunta=None):
         if fk_categoria and fk_pergunta:
-            cursor.execute('SELECT AVG(resposta) FROM respostas_fato WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ?',(fk_gestor,fk_categoria, fk_pergunta))
+            cursor.execute(f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ?',(fk_gestor,fk_categoria, fk_pergunta))
         elif fk_categoria:
-            cursor.execute('SELECT AVG(resposta) FROM respostas_fato WHERE fk_gestor = ? and fk_categoria = ?',(fk_gestor,fk_categoria,))
+            cursor.execute(f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ?',(fk_gestor,fk_categoria,))
         else:     
-            cursor.execute('SELECT AVG(resposta) FROM respostas_fato WHERE fk_gestor = ?',(fk_gestor,))        
+            cursor.execute(f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = ?',(fk_gestor,))        
         nota_media = cursor.fetchone()[0]
         nota_media = round(nota_media,2)
         return nota_media
     
+    def consulta_min_max(coluna, tabela, fk_gestor, fk_categoria=None, fk_pergunta=None):
+        if fk_categoria and fk_pergunta:
+            cursor.execute(f'SELECT min({coluna}), max({coluna}) FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ?',(fk_gestor,fk_categoria, fk_pergunta))
+        elif fk_categoria:
+            cursor.execute(f'SELECT min({coluna}), max({coluna}) FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ?',(fk_gestor,fk_categoria,))
+        else:     
+            cursor.execute(f'SELECT min({coluna}), max({coluna}) FROM {tabela} WHERE fk_gestor = ?',(fk_gestor,)) 
+        datas = cursor.fetchone()
+        data_min, data_max = datas
+        return data_min, data_max
+
     
     def gera_cards():
         categorias = consulta_categorias()
         cards = []
         for fk_categoria, desc_categoria in categorias:
-            valor = consulta_nota(fk_gestor,fk_categoria)
+            valor = consulta_media('resposta','respostas_fato', fk_gestor, fk_categoria)
             size_bar = valor * 10
-            quantidade_respostas = verifica_qtd_respostas(fk_gestor,fk_categoria)
+            quantidade_respostas = consulta_quantidade('respostas_fato',fk_gestor,fk_categoria)
+            data_min = consulta_min_max('data', 'respostas_fato', fk_gestor, fk_categoria)[0]
+            data_max = consulta_min_max('data', 'respostas_fato', fk_gestor, fk_categoria)[1]
             card = {
                 'id': fk_categoria,
                 'title': desc_categoria,
                 'size': size_bar,
                 'value': valor,
                 'total': 10,
-                'qtd_respostas': quantidade_respostas
+                'qtd_respostas': quantidade_respostas,
+                'data_min': data_min,
+                'data_max': data_max
             }
             cards.append(card)
         return cards
     
     fk_gestor = consulta_gestor(id_gestor)[0]
     nome_gestor = consulta_gestor(id_gestor)[1]
-    quantidade_respostas = verifica_qtd_respostas(fk_gestor)
-    nota_media = consulta_nota(fk_gestor)
+    data_min = consulta_min_max('data', 'respostas_fato', fk_gestor)[0]
+    data_max = consulta_min_max('data', 'respostas_fato', fk_gestor)[1]
+    quantidade_respostas = consulta_quantidade('respostas_fato',fk_gestor)
+    nota_media = consulta_media('resposta','respostas_fato',fk_gestor)
     size_bar = nota_media * 10 
     cards = gera_cards()
 
-    return render_template('dashboard.html', nome = nome_gestor, qtd_respostas = quantidade_respostas, nota_media = nota_media, size_bar = size_bar, cards=cards)
+    return render_template('dashboard.html', nome = nome_gestor, qtd_respostas = quantidade_respostas, nota_media = nota_media, size_bar = size_bar, cards=cards, data_min = data_min, data_max = data_max)
 
 @app.route('/settings')
 def settings():
