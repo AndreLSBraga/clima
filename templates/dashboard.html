@@ -42,12 +42,20 @@
                             <div class="bar-total">10</div>
                         </div>
                         
-                        <h2>Frequência Geral:</h2>
+                        <h2>NPS:</h2>
                         <div class="bar">
                             <div class="bar-size">
                                 <div class="bar-value" style="width: {{size_bar}}%;">{{nota_media}}</div>
                             </div>
-                            <div class="bar-total">100</div>
+                            <div class="bar-total">10</div>
+                        </div>
+
+                        <h2>Segurança Psicológica:</h2>
+                        <div class="bar">
+                            <div class="bar-size">
+                                <div class="bar-value" style="width: {{size_bar}}%;">{{nota_media}}</div>
+                            </div>
+                            <div class="bar-total">10</div>
                         </div>
                     </div>
                 </div>
@@ -55,6 +63,7 @@
                     <canvas id="lineChart"></canvas>
                 </div>
             </div>
+            <h1>Dimensões:</h1>
             <div class="container-cards detalhado">
                 {% for card in cards %}
                 <div class="card-detalhe" id="card-{{ card.id }}">
@@ -75,7 +84,79 @@
                 </div>
                 {% endfor %}
             </div>
-            </div>
+            <h1>Sugestões:</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Categoria</th>
+                        <th>Sugestão</th>
+                        <th>Respondido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2024-06-01</td>
+                        <td>Categoria 1</td>
+                        <td>Texto da sugestão 1</td>
+                        <td><input type="checkbox" checked></td>
+                    </tr>
+                    <tr>
+                        <td>2024-06-02</td>
+                        <td>Categoria 2</td>
+                        <td>Texto da sugestão 2</td>
+                        <td><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>2024-06-03</td>
+                        <td>Categoria 3</td>
+                        <td>Texto da sugestão 3</td>
+                        <td><input type="checkbox" checked></td>
+                    </tr>
+                    <tr>
+                        <td>2024-06-04</td>
+                        <td>Categoria 4</td>
+                        <td>Texto da sugestão 4</td>
+                        <td><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>2024-06-05</td>
+                        <td>Categoria 5</td>
+                        <td>Texto da sugestão 5</td>
+                        <td><input type="checkbox" checked></td>
+                    </tr>
+                    <tr>
+                        <td>2024-06-01</td>
+                        <td>Categoria 1</td>
+                        <td>Texto da sugestão 1</td>
+                        <td><input type="checkbox" checked></td>
+                    </tr>
+                    <tr>
+                        <td>2024-06-02</td>
+                        <td>Categoria 2</td>
+                        <td>Texto da sugestão 2</td>
+                        <td><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>2024-06-03</td>
+                        <td>Categoria 3</td>
+                        <td>Texto da sugestão 3</td>
+                        <td><input type="checkbox" checked></td>
+                    </tr>
+                    <tr>
+                        <td>2024-06-04</td>
+                        <td>Categoria 4</td>
+                        <td>Texto da sugestão 4</td>
+                        <td><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td>2024-06-05</td>
+                        <td>Categoria 5</td>
+                        <td>Texto da sugestão 5</td>
+                        <td><input type="checkbox" checked></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
     <script>

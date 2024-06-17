@@ -266,7 +266,6 @@ def sugestao():
         fk_gestor = consulta_tabelas('fk_gestor', 'gestor_dim', 'desc_gestor',gestor)[0]
         fk_cargo = consulta_tabelas('fk_cargo', 'cargo_dim', 'desc_cargo',cargo)[0]
         fk_categoria = consulta_tabelas('fk_categoria', 'categoria_dim', 'desc_categoria',categoria)[0]
-        print(subarea, gestor, cargo, categoria, idade, sexo, sugestao)
 
         if None in (subarea, gestor, cargo, categoria, idade, sexo, sugestao):
             flash("Selecione as opções acima, todos os campos são obrigatórios.", "warning")
@@ -319,7 +318,7 @@ def dashboard():
     
     #Traz o fk_gestor para verificar quantas respostas do time dele existem
     def consulta_gestor(id_gestor):
-        cursor.execute('SELECT fk_gestor, desc_gestor FROM gestor_dim WHERE id_gestor = ?',(id_gestor))
+        cursor.execute('SELECT fk_gestor, desc_gestor FROM gestor_dim WHERE id = ?',(id_gestor))
         dados_gestor = cursor.fetchone()
         fk_gestor, nome_gestor = dados_gestor
         return fk_gestor,nome_gestor
@@ -355,8 +354,17 @@ def dashboard():
         datas = cursor.fetchone()
         data_min, data_max = datas
         return data_min, data_max
-
     
+    def consulta_sugestoes( tabela, fk_gestor, coluna=None , fk_categoria=None, fk_pergunta=None):
+        if fk_categoria and fk_pergunta:
+            cursor.execute(f'SELECT {coluna} FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ?',(fk_gestor,fk_categoria, fk_pergunta))
+        elif fk_categoria:
+            cursor.execute(f'SELECT {coluna} FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ?',(fk_gestor,fk_categoria,))
+        else:
+            cursor.execute(f'SELECT * FROM sugestoes_fato WHERE fk_gestor = ?',(fk_gestor,)) 
+        sugestoes = cursor.fetchall()
+        return sugestoes
+
     def gera_cards():
         categorias = consulta_categorias()
         cards = []
@@ -379,6 +387,25 @@ def dashboard():
             cards.append(card)
         return cards
     
+    def gera_tabela():
+        sugestoes = consulta_sugestoes('sugestoes_fato', fk_gestor)
+        print(sugestoes)
+        tabela = []
+        for sugestao in sugestoes:
+            data = consulta_sugestoes()
+            categoria = consulta_sugestoes()
+            sugestao = consulta_sugestoes()
+            respondido = consulta_sugestoes()
+            print(data)
+            row = {
+                'data': data,
+                'categoria': categoria,
+                'sugestao': sugestao,
+                'respondido': respondido
+            }
+            tabela.append(row)
+        return tabela
+    
     fk_gestor = consulta_gestor(id_gestor)[0]
     nome_gestor = consulta_gestor(id_gestor)[1]
     data_min = consulta_min_max('data', 'respostas_fato', fk_gestor)[0]
@@ -387,8 +414,9 @@ def dashboard():
     nota_media = consulta_media('resposta','respostas_fato',fk_gestor)
     size_bar = nota_media * 10 
     cards = gera_cards()
-
-    return render_template('dashboard.html', nome = nome_gestor, qtd_respostas = quantidade_respostas, nota_media = nota_media, size_bar = size_bar, cards=cards, data_min = data_min, data_max = data_max)
+    tabela = gera_tabela()
+    print(tabela)
+    return render_template('dashboard.html', nome = nome_gestor, qtd_respostas = quantidade_respostas, nota_media = nota_media, size_bar = size_bar, cards=cards, data_min = data_min, data_max = data_max, tabela = tabela)
 
 @app.route('/settings')
 def settings():

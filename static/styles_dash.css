@@ -10,7 +10,19 @@ body, html {
     justify-content: center;
     align-items: center;
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
+}
+
+h1 {
+    margin: 0 auto;
+    font-family: "Exo", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 42px;
+    margin-bottom: 10px;
+    color: #000;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .background-image-container {
@@ -107,6 +119,7 @@ body, html {
     padding-left: 25px;
     width: 100%; /* Ajuste conforme necessário */
     height: 100vh;
+    overflow-y: auto;
     box-sizing: border-box; /* Inclui o padding e o border no cálculo do width e height */
     background-color: #F4F4F8;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -256,4 +269,56 @@ body, html {
 
 .details-button i {
     font-size: 18px; /* Tamanho do ícone */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+table th, table td {
+    padding: 12px 15px;
+    text-align: center;  /* Centraliza o texto */
+    border-bottom: 1px solid #E6E6EA;
+    border-right: 1px solid #E6E6EA; /* Adiciona borda direita */
+}
+
+table th {
+    background-color: #F4F4F8;
+    font-weight: 600;
+    color: #4A4A4A;
+    font-size: 18px;
+}
+
+table td {
+    font-family: "Titillium Web", sans-serif;
+    font-size: 16px;
+    color: #4A4A4A;
+}
+
+table td input[type="checkbox"] {
+    margin: 0 auto;
+    display: block;
+}
+
+table th:last-child, table td:last-child {
+    border-right: none;
+}
+
+table th:nth-child(3), table td:nth-child(3) {
+    width: 50%;
+}
+
+table tr:nth-child(even) {
+    background-color: #FAFAFA;
+}
+
+table tr:hover {
+    background-color: #F1F1F1;
+    cursor: pointer;
 }
