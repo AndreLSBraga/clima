@@ -103,6 +103,7 @@ def create_tables():
     CREATE TABLE IF NOT EXISTS gestor_dim (
         fk_gestor INTEGER PRIMARY KEY,
         desc_gestor TEXT,
+        id INTERGER,
         FOREIGN KEY (fk_gestor) REFERENCES usuarios_dim(fk_gestor)
     )
     ''')
@@ -110,19 +111,18 @@ def create_tables():
     # Crie a tabela 'respostas_fato'
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS respostas_fato (
-        id_fantasia TEXT PRIMARY KEY,
-        fk_cargo INTEGER,
-        fk_area INTEGER,
         fk_subarea INTEGER,
         fk_gestor INTEGER,
+        fk_cargo INTEGER,
+        idade TEXT,
+        sexo TEXT,
         fk_pergunta INTEGER,
         fk_categoria INTEGER,
-        semana_atual TEXT,
+        semana TEXT,
         data TEXT,
         datetime TEXT,
         resposta REAL,
         FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
-        FOREIGN KEY (fk_area) REFERENCES area_dim (fk_area),
         FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
         FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
         FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim (fk_pergunta),
@@ -130,27 +130,25 @@ def create_tables():
     )
     ''')
 
-
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS sugestoes_fato (
-        id_fantasia TEXT,
         fk_cargo INTEGER,
         fk_area INTEGER,
         fk_subarea INTEGER,
         fk_gestor INTEGER,
+        idade TEXT,
+        sexo TEXT,
         fk_pergunta INTEGER,
         fk_categoria INTEGER,
+        semana TEXT,
         data TEXT,
         datetime TEXT,
         sugestao TEXT,
-        id_autoidentificacao INTERGER,
         FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
-        FOREIGN KEY (fk_area) REFERENCES area_dim (fk_area),
         FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
         FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
         FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim (fk_pergunta),
         FOREIGN KEY (fk_categoria) REFERENCES categoria_dim (fk_categoria)
-        FOREIGN KEY (id_autoidentificacao) REFERENCES usuarios_dim (id) 
     )
     ''')
 
@@ -204,7 +202,7 @@ def insert_dados():
         (3, 'Mariana Ferreira',3),
         (4, 'Cristiano Silva', 4)
     ]
-    cursor.executemany('INSERT INTO gestor_dim (fk_gestor, desc_gestor) VALUES (?, ?)', gestor)
+    cursor.executemany('INSERT INTO gestor_dim (fk_gestor, desc_gestor,id) VALUES (?, ?,?)', gestor)
 
     categoria = [
         (1,'Clima Organizacional'),
@@ -305,18 +303,24 @@ def random_date(start_date, end_date):
 def insert_respostas_fato():
     conn, cursor = get_db()
 
-    # Definir horário fixo
     fixed_time = '10:00:00'
 
-    # Gerar 100 linhas de dados de exemplo
+    # Possíveis valores para idade e sexo
+    idades = ["24", "25-39", "40-54", "55+"]
+    sexos = ["M", "F", "ND"]
+
+    # Gerar 500 linhas de dados de exemplo
     for i in range(1, 501):
         # Gerar dados aleatórios
         fk_cargo = random.randint(1, 8)
-        fk_area = random.randint(1, 9)
         fk_subarea = random.randint(1, 9)
         fk_gestor = random.randint(1, 4)
         fk_pergunta = random.randint(1, 47)
         fk_categoria = random.randint(1, 8)
+        
+        # Selecionar idade e sexo aleatórios
+        idade = random.choice(idades)
+        sexo = random.choice(sexos)
         
         # Gerar data aleatória nos últimos 3 meses
         end_date = datetime.now()
@@ -327,39 +331,45 @@ def insert_respostas_fato():
         datetime_str = f'{data.strftime("%Y-%m-%d")} {fixed_time}'
         semana_atual = data.isocalendar()[1]
         resposta = round(random.uniform(0, 10), 2)
-        id_fantasia = i
 
         # Inserir na tabela respostas_fato
         cursor.execute('''
             INSERT INTO respostas_fato 
-            (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, semana_atual, data, datetime, resposta) 
+            (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_pergunta, fk_categoria, semana, data, datetime, resposta) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, semana_atual, data.strftime('%Y-%m-%d'), datetime_str, resposta))
+        ''', (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_pergunta, fk_categoria, semana_atual, data.strftime('%Y-%m-%d'), datetime_str, resposta))
 
     conn.commit()
     conn.close()
 
 
-insert_respostas_fato()
+# drop_tables()
+# create_tables()
+# insert_dados()
+# insert_respostas_fato()
 
 
-# conn, cursor = get_db()
-# cursor.execute('DROP TABLE IF EXISTS gestor_dim')
-# # Crie a tabela 'usuarios_respostas_fato'
-# cursor.execute('''
-#     CREATE TABLE IF NOT EXISTS gestor_dim (
-#         fk_gestor INTEGER PRIMARY KEY,
-#         desc_gestor TEXT,
-#         id_gestor TEXT,
-#         FOREIGN KEY (fk_gestor) REFERENCES usuarios_dim(fk_gestor)
-#     )
-#     ''')
-# gestor = [
-#         (1, 'Ana Costa',1),
-#         (2, 'Lucas Costa',2),
-#         (3, 'Mariana Ferreira',3),
-#         (4, 'Cristiano Silva', 4)
-#     ]
-# cursor.executemany('INSERT INTO gestor_dim (fk_gestor, desc_gestor, id_gestor) VALUES (?, ?,?)', gestor)
-# conn.commit()
-# conn.close()
+conn, cursor = get_db()
+cursor.execute('DROP TABLE IF EXISTS sugestoes_fato')
+# Crie a tabela 'usuarios_respostas_fato'
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS sugestoes_fato (
+        fk_cargo INTEGER,
+        fk_area INTEGER,
+        fk_subarea INTEGER,
+        fk_gestor INTEGER,
+        idade TEXT,
+        sexo TEXT,
+        fk_pergunta INTEGER,
+        fk_categoria INTEGER,
+        semana TEXT,
+        data TEXT,
+        datetime TEXT,
+        sugestao TEXT,
+        FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
+        FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
+        FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
+        FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim (fk_pergunta),
+        FOREIGN KEY (fk_categoria) REFERENCES categoria_dim (fk_categoria)
+    )
+    ''')

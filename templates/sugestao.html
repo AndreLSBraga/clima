@@ -24,28 +24,48 @@
             <div class="panel">
                 <div class="left-panel">
                     <h4>Selecione sua área:</h4>
-                    <select name="area" id="area" class="custom-select" required>
+                    <select name="area" id="area" class="custom-select">
+                        <option value="" disabled selected hidden>Selecione uma opção</option>
                         {% for area in areas %}
                             <option value="{{ area }}">{{ area }}</option>
                         {% endfor %}
                     </select>
-                    
-                    <h4>Selecione a sub-área:</h4>
-                    <select name="subarea" id="subarea" class="custom-select" required>
-                        {% for subarea in subareas %}
-                            <option value="{{ subarea }}">{{ subarea }}</option>
+                    <h4>Selecione seu gestor:</h4>
+                    <select name="gestor" id="gestor" class="custom-select">
+                        <option value="" disabled selected hidden>Selecione uma opção</option>
+                        {% for gestor in gestores %}
+                            <option value="{{ gestor }}">{{ gestor }}</option>
                         {% endfor %}
                     </select>
-
+                    <h4>Selecione seu cargo:</h4>
+                    <select name="cargo" id="cargo" class="custom-select">
+                        <option value="" disabled selected hidden>Selecione uma opção</option>
+                        {% for cargo in cargos %}
+                            <option value="{{ cargo }}">{{ cargo }}</option>
+                        {% endfor %}
+                    </select>
+                    <h4>Faixa Etária:</h4>
+                    <select name="idade" id="idade" class="custom-select" >
+                        <option value="" disabled selected hidden>Selecione uma opção</option>
+                        <option value="-24">24 anos ou menos</option>
+                        <option value="25-39">25-39 anos</option>
+                        <option value="40-54">40-54 anos</option>
+                        <option value="55+">55 anos ou mais</option>
+                    </select>
+                    <h4>Sexo:</h4>
+                    <select name="sexo" id="sexo" class="custom-select">
+                        <option value="" disabled selected hidden>Selecione uma opção</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Feminino</option>
+                        <option value="ND">Não informar</option>
+                    </select>
                     <h4>Selecione a categoria da pergunta:</h4>
                     <select name="categoria" id="categoria" class="custom-select" required>
                         {% for categoria in categorias %}
+                            <option value="" disabled selected hidden>Selecione uma opção</option>
                             <option value="{{ categoria }}">{{ categoria }}</option>
                         {% endfor %}
                     </select>
-                
-                    <h4>Desejo me identificar:</h4>
-                    <input type="text" name="user_id" id="user_id" placeholder="Digite seu ID, se desejar se identificar"> 
                 </div>
                 <div class="right-panel"> 
                     <h4>Deixe aqui a sua sugestão:</h4>

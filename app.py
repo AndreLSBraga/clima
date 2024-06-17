@@ -64,61 +64,62 @@ def valida_id(user_id, destino):
     return None
 
 def consulta_categorias():
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute('SELECT fk_categoria, desc_categoria FROM categoria_dim')
-        categorias = cursor.fetchall() 
-        return categorias
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT fk_categoria, desc_categoria FROM categoria_dim')
+    categorias = cursor.fetchall() 
+    return categorias
+
+def consulta_tabelas(coluna, tabela, col_filtro = None, filtro = None):
+    db = get_db()
+    cursor = db.cursor()
+    lista = []
+    if filtro:
+        cursor.execute(f'SELECT {coluna} FROM {tabela} WHERE {col_filtro} = ?', (filtro,)),
+    else:
+        cursor.execute(f'SELECT {coluna} FROM {tabela}')
+    dados = cursor.fetchall()
+    
+    for dado in dados:
+        item = dado[0]
+        lista.append(item)
+    return lista
 
 
 @app.route('/', methods=['GET', 'POST'])
 def entrada():
+    subareas = consulta_tabelas('desc_subarea','subarea_dim')
+    cargos = consulta_tabelas('desc_cargo','cargo_dim')
+    gestores = consulta_tabelas('desc_gestor','gestor_dim')
+
     if request.method == 'POST':
-        user_id = request.form['user_id']
-        
-        testa_id = valida_id(user_id,'entrada')
-        if testa_id:
-            print(f'redicionar para {testa_id}')
-            return testa_id
-        
-        if resposta_existe_esta_semana(user_id):
-            flash("Você já respondeu essa semana.","success")
-            return redirect(url_for('entrada'))
+        subarea = request.form.get('area', None)
+        gestor = request.form.get('gestor', None)
+        cargo = request.form.get('cargo', None)
 
-        id_fantasia = codifica_id(user_id)
-        db = get_db()
-        cursor = db.cursor()
-    
-        cursor.execute('SELECT fk_cargo FROM usuarios_dim WHERE id = ?', (user_id,))
-        cargo = cursor.fetchone()[0]
+        fk_subarea = consulta_tabelas('fk_subarea', 'subarea_dim', 'desc_subarea',subarea)
+        fk_gestor = consulta_tabelas('fk_gestor', 'gestor_dim', 'desc_gestor',gestor)
+        fk_cargo = consulta_tabelas('fk_cargo', 'cargo_dim', 'desc_cargo',cargo)
 
-        cursor.execute('SELECT fk_area FROM usuarios_dim WHERE id = ?', (user_id,))
-        area = cursor.fetchone()[0]
-
-        cursor.execute('SELECT fk_subarea FROM usuarios_dim WHERE id = ?', (user_id,))
-        subarea = cursor.fetchone()[0]
-
-        cursor.execute('SELECT fk_gestor FROM usuarios_dim WHERE id = ?', (user_id,))
-        gestor = cursor.fetchone()[0]
-
-        session['user_id'] = user_id
-        session['id_fantasia'] = id_fantasia
-        session['cargo'] = cargo
-        session['area'] = area
-        session['subarea'] = subarea
-        session['gestor'] = gestor
+        session['idade'] = request.form.get('idade', None)
+        session['sexo'] = request.form.get('sexo', None)
+        session['cargo'] = fk_cargo
+        session['subarea'] = fk_subarea
+        session['gestor'] = fk_gestor
         session['pergunta_atual'] = 0
         session['perguntas_selecionadas'] = []
         session['respostas'] = []
+
+        if None in (session['idade'], session['sexo'], session['cargo'], session['subarea'], session['gestor']):
+            flash("Todos os campos são obrigatórios.", "warning")
+        else:
+            return redirect(url_for('perguntas'))
         
-        return redirect(url_for('perguntas'))
-    return render_template('entrada.html')
+    return render_template('entrada.html',areas=subareas, cargos=cargos, gestores=gestores)
 
 @app.route('/perguntas', methods=['GET', 'POST'])
 def perguntas():
-    if 'user_id' not in session :
-        return redirect(url_for('entrada'))
-
+    
     def chama_perguntas():
         db = get_db()
         cursor = db.cursor()
@@ -161,21 +162,23 @@ def perguntas():
     pergunta = cursor.fetchone()[0]
     cursor.execute('SELECT fk_categoria FROM pergunta_dim WHERE fk_pergunta = ?', (num_pergunta,))
     categoria = cursor.fetchone()[0]
+    
+    date_time = datetime.datetime.now()
+    data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
     semana_atual = datetime.datetime.now().isocalendar()[1]
 
     if request.method == 'POST':
-        id_fantasia = session['id_fantasia']
-        cargo = session['cargo']
-        area = session['area']
-        subarea = session['subarea']
-        gestor = session['gestor']
-        print(request.form)
+        subarea = session['subarea'][0]
+        gestor = session['gestor'][0]
+        cargo = session['cargo'][0]
+        idade = session['idade'][0]
+        sexo = session['sexo'][0]
+
         if 'pular' in request.form:
             session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': -1, 'sugestao': ''})
         else:
             resposta = request.form['resposta']
             sugestao = request.form.get('sugestao', '')
-            auto_identificacao = 'auto_identificacao' in request.form
 
             try:
                 resposta = float(resposta)
@@ -183,48 +186,32 @@ def perguntas():
                 flash("A resposta deve ser um número entre 0 e 10.","warning")
                 return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=15)
 
-            session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': resposta, 'sugestao': sugestao, 'auto_identificacao': auto_identificacao})
+            session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': resposta, 'sugestao': sugestao})
         
         if 'proxima' in request.form or 'pular' in request.form or 'enviar-final' in request.form:
             if pergunta_atual < len(perguntas_selecionadas) - 1:
                 session['pergunta_atual'] = pergunta_atual + 1
             else:
 
-                user_id = session['user_id']
-                date_time = datetime.datetime.now()
-                data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
-
                 for resposta in session['respostas']:
                     cursor.execute('''
-                        INSERT INTO respostas_fato (id_fantasia, fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, semana_atual, data, datetime, resposta)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        ''', (id_fantasia, cargo, area, subarea, gestor, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['resposta']))
+                        INSERT INTO respostas_fato (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_pergunta, fk_categoria, semana, data, datetime, resposta)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ''',  (subarea, gestor, cargo, idade, sexo, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['resposta']))
                     db.commit()
 
                     if resposta['sugestao']:
-                        if resposta['auto_identificacao']:
-                            cursor.execute('''
-                                INSERT INTO sugestoes_fato (fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, semana_atual, data, datetime, sugestao, id_autoidentificacao)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                ''', (cargo, area, subarea, gestor, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['sugestao'], user_id))
-                            db.commit()
-                        else:
-                            cursor.execute('''
-                                INSERT INTO sugestoes_fato (fk_cargo, fk_area, fk_subarea, fk_gestor, fk_pergunta, fk_categoria, data, datetime, sugestao)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                ''', (cargo, area, subarea, gestor, resposta['pergunta'], resposta['categoria'], data_atual, date_time, resposta['sugestao']))
-                            db.commit()
+                        cursor.execute('''
+                            INSERT INTO sugestoes_fato (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_pergunta, fk_categoria, semana, data, datetime, sugestao)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+                            ''', (subarea, gestor, cargo, idade, sexo, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['sugestao']))
+                        db.commit()
 
                 session.pop('perguntas_selecionadas', None)
                 session.pop('pergunta_atual', None)
                 session.pop('respostas', None)
 
                 flash("Respostas enviadas com sucesso!","success")
-                cursor.execute('''
-                               INSERT INTO usuarios_respostas_fato (id, data, datetime)
-                               VALUES (?, ?, ?)
-                               ''', (user_id, data_atual, date_time))
-                db.commit()
                 return redirect(url_for('final'))
 
         elif 'anterior' in request.form:
@@ -243,90 +230,64 @@ def perguntas():
 
 @app.route('/respondido', methods=['GET', 'POST'])
 def final():
-    if 'user_id' not in session or 'area' not in session:
+    if 'subarea' not in session:
         return redirect(url_for('entrada'))
 
     if request.method == 'POST':
-        session.clear()
         if 'enviar_sugestao' in request.form:
+            session.clear()
             return redirect(url_for('sugestao'))
     return render_template('final.html')
 
 @app.route('/sugestao', methods=['GET', 'POST'])
-def sugestao():
-    session.pop('user_id', None)
-    session.pop('id_fantasia', None)
-    def chama_tabela(tabela):
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute(f'SELECT desc_{tabela} FROM {tabela}_dim')
-        areas = cursor.fetchall()
-        return areas
-    
-    area = chama_tabela('area')
-    subarea = chama_tabela('subarea')
-    gestor = chama_tabela('gestor')
-    categoria = chama_tabela('categoria')
 
-    def cria_grupo(tabela):
-        grupo_tabela = set()
-        for variavel_tupla in tabela:
-            variavel = variavel_tupla[0]
-            grupo_tabela.add(variavel)
-        return grupo_tabela
-    
-    areas = cria_grupo(area)
-    subareas = cria_grupo(subarea)
-    gestores = cria_grupo(gestor)
-    categorias = cria_grupo(categoria)
+def sugestao():
+    db = get_db()
+    cursor = db.cursor()
+
+    date_time = datetime.datetime.now()
+    data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
+    semana_atual = datetime.datetime.now().isocalendar()[1]
+    subareas = consulta_tabelas('desc_subarea','subarea_dim')
+    cargos = consulta_tabelas('desc_cargo','cargo_dim')
+    gestores = consulta_tabelas('desc_gestor','gestor_dim')
+    categorias = consulta_tabelas('desc_categoria','categoria_dim')
 
     if request.method == 'POST':
-        db = get_db()
-        cursor = db.cursor()
+        subarea = request.form.get('area', None)
+        gestor = request.form.get('gestor', None)
+        cargo = request.form.get('cargo', None)
+        categoria = request.form.get('categoria', None)
+        idade = request.form.get('idade', None)
+        sexo = request.form.get('sexo', None)
+        sugestao = request.form.get('sugestao', None)
 
-        area = request.form['area']
-        subarea = request.form['subarea']
-        categoria = request.form['categoria']
-        user_id = request.form['user_id']
-        sugestao_text = request.form['sugestao']
-        
-        if not user_id:
-            user_id = -1
+        fk_subarea = consulta_tabelas('fk_subarea', 'subarea_dim', 'desc_subarea',subarea)[0]
+        fk_gestor = consulta_tabelas('fk_gestor', 'gestor_dim', 'desc_gestor',gestor)[0]
+        fk_cargo = consulta_tabelas('fk_cargo', 'cargo_dim', 'desc_cargo',cargo)[0]
+        fk_categoria = consulta_tabelas('fk_categoria', 'categoria_dim', 'desc_categoria',categoria)[0]
+        print(subarea, gestor, cargo, categoria, idade, sexo, sugestao)
 
-        if not area or not subarea or not categoria or not sugestao_text:
-            flash("Por favor, preencha a um texto na sua sugestão.","warning")
-            return redirect(url_for('sugestao'))
-        
-        date_time = datetime.datetime.now()
-        data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
-        
-        def encontra_fk(variavel,tabela):
-            variavel = f"'{variavel}'"
-            cursor.execute(f'SELECT fk_{tabela} FROM {tabela}_dim WHERE desc_{tabela}={variavel}')
-            fk_variavel=cursor.fetchone()[0]
-            return fk_variavel
-        
-        fk_area = encontra_fk(area,'area')
-        fk_subarea = encontra_fk(subarea,'subarea')
-        fk_categoria = encontra_fk(categoria,'categoria')
+        if None in (subarea, gestor, cargo, categoria, idade, sexo, sugestao):
+            flash("Selecione as opções acima, todos os campos são obrigatórios.", "warning")
+        else:
+            cursor.execute('''
+                INSERT INTO sugestoes_fato (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_categoria, semana, data, datetime, sugestao)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_categoria, semana_atual, data_atual, date_time, sugestao))
+            db.commit()
 
-        cursor.execute('''
-            INSERT INTO sugestoes_fato (fk_area, fk_subarea, fk_categoria, data, datetime, sugestao, id_autoidentificacao)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (fk_area, fk_subarea, fk_categoria, data_atual, date_time, sugestao_text, user_id))
-        db.commit()
+            flash("Sugestão enviada com sucesso!", "success")
+            return redirect(url_for('final'))
 
-        flash("Sugestão enviada com sucesso!", "success")
-        return redirect(url_for('sugestao'))
-
-    return render_template('sugestao.html', areas=areas, subareas=subareas, gestores=gestores, categorias=categorias)
+    return render_template('sugestao.html', areas=subareas, gestores=gestores, cargos=cargos, categorias=categorias)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
+    
         if check_admin(username, password):
             session['logged_in'] = True
             session['username'] = username
@@ -354,7 +315,6 @@ def dashboard():
 
     testa_id = valida_id(id_gestor,'login')
     if testa_id:
-        print(f'redicionar para {testa_id}')
         return testa_id
     
     #Traz o fk_gestor para verificar quantas respostas do time dele existem
