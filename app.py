@@ -335,11 +335,11 @@ def dashboard():
     
     def consulta_media(coluna, tabela, fk_gestor, fk_categoria=None, fk_pergunta=None):
         if fk_categoria and fk_pergunta:
-            cursor.execute(f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ?',(fk_gestor,fk_categoria, fk_pergunta))
+            cursor.execute(f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ? and resposta >= 0',(fk_gestor,fk_categoria, fk_pergunta))
         elif fk_categoria:
-            cursor.execute(f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ?',(fk_gestor,fk_categoria,))
+            cursor.execute(f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ? and resposta >= 0',(fk_gestor,fk_categoria,))
         else:     
-            cursor.execute(f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = ?',(fk_gestor,))        
+            cursor.execute(f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = ? and resposta >= 0',(fk_gestor,))        
         nota_media = cursor.fetchone()[0]
         nota_media = round(nota_media,2)
         return nota_media
@@ -362,7 +362,9 @@ def dashboard():
             cursor.execute(f'SELECT {coluna} FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ?',(fk_gestor,fk_categoria,))
         else:
             cursor.execute(f'SELECT * FROM sugestoes_fato WHERE fk_gestor = ?',(fk_gestor,)) 
-        sugestoes = cursor.fetchall()
+        dados = cursor.fetchall()
+        sugestoes = [dict(row) for row in dados]
+        print(sugestoes)
         return sugestoes
 
     def gera_cards():
@@ -389,13 +391,15 @@ def dashboard():
     
     def gera_tabela():
         sugestoes = consulta_sugestoes('sugestoes_fato', fk_gestor)
-        print(sugestoes)
         tabela = []
         for sugestao in sugestoes:
-            data = consulta_sugestoes()
-            categoria = consulta_sugestoes()
-            sugestao = consulta_sugestoes()
-            respondido = consulta_sugestoes()
+            data = sugestao['data']
+            fk_categoria = sugestao['fk_categoria']
+            cursor.execute(f'SELECT desc_categoria FROM categoria_dim WHERE fk_categoria = {fk_categoria}')
+            categoria = cursor.fetchone()[0]
+            sugestao = sugestao['sugestao']
+            # respondido = bool(sugestao['respondido'],False)
+            respondido = bool(False)
             print(data)
             row = {
                 'data': data,
@@ -415,7 +419,8 @@ def dashboard():
     size_bar = nota_media * 10 
     cards = gera_cards()
     tabela = gera_tabela()
-    print(tabela)
+    print(f'os cards são {cards}')
+    print(f'a tabela é {tabela}')
     return render_template('dashboard.html', nome = nome_gestor, qtd_respostas = quantidade_respostas, nota_media = nota_media, size_bar = size_bar, cards=cards, data_min = data_min, data_max = data_max, tabela = tabela)
 
 @app.route('/settings')
