@@ -234,7 +234,7 @@ form {
     appearance: none;
     height: 15px;
     border-radius: 5px;
-    background: linear-gradient(to right, #FE4A49 0%, #FE4A49 40%, #FED766 40%, #FED766 79%, #2AB7CA 79%, #2AB7CA 100%);
+    background: linear-gradient(to right, #FE4A49 0%, #FE4A49 40%, #FED766 40%, #FED766 79%, #57DB8C 79%, #2AC96A 100%);
     outline: none;
     opacity: 0.7;
     transition: opacity .2s;

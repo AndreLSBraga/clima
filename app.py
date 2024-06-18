@@ -166,7 +166,8 @@ def perguntas():
     date_time = datetime.datetime.now()
     data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
     semana_atual = datetime.datetime.now().isocalendar()[1]
-
+    id = codifica_id(date_time)
+    
     if request.method == 'POST':
         subarea = session['subarea'][0]
         gestor = session['gestor'][0]
@@ -202,9 +203,9 @@ def perguntas():
 
                     if resposta['sugestao']:
                         cursor.execute('''
-                            INSERT INTO sugestoes_fato (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_pergunta, fk_categoria, semana, data, datetime, sugestao)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
-                            ''', (subarea, gestor, cargo, idade, sexo, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['sugestao']))
+                            INSERT INTO sugestoes_fato (id, fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_pergunta, fk_categoria, semana, data, datetime, sugestao, respondido)
+                                VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ''', (id,subarea, gestor, cargo, idade, sexo, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['sugestao'], 0))
                         db.commit()
 
                 session.pop('perguntas_selecionadas', None)
@@ -252,7 +253,7 @@ def sugestao():
     cargos = consulta_tabelas('desc_cargo','cargo_dim')
     gestores = consulta_tabelas('desc_gestor','gestor_dim')
     categorias = consulta_tabelas('desc_categoria','categoria_dim')
-
+    id = codifica_id(datetime)
     if request.method == 'POST':
         subarea = request.form.get('area', None)
         gestor = request.form.get('gestor', None)
@@ -271,9 +272,9 @@ def sugestao():
             flash("Selecione as opções acima, todos os campos são obrigatórios.", "warning")
         else:
             cursor.execute('''
-                INSERT INTO sugestoes_fato (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_categoria, semana, data, datetime, sugestao)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_categoria, semana_atual, data_atual, date_time, sugestao))
+                INSERT INTO sugestoes_fato (id, fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_categoria, semana, data, datetime, sugestao, respondido)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (id, fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_categoria, semana_atual, data_atual, date_time, sugestao, 0))
             db.commit()
 
             flash("Sugestão enviada com sucesso!", "success")
@@ -357,16 +358,40 @@ def dashboard():
     
     def consulta_sugestoes( tabela, fk_gestor, coluna=None , fk_categoria=None, fk_pergunta=None):
         if fk_categoria and fk_pergunta:
-            cursor.execute(f'SELECT {coluna} FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ?',(fk_gestor,fk_categoria, fk_pergunta))
+            cursor.execute(f'SELECT {coluna} FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ? and fk_pergunta = ? ORDER BY respondido ASC, datetime ASC',(fk_gestor,fk_categoria, fk_pergunta))
         elif fk_categoria:
-            cursor.execute(f'SELECT {coluna} FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ?',(fk_gestor,fk_categoria,))
+            cursor.execute(f'SELECT {coluna} FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ? ORDER BY respondido ASC, datetime DESC',(fk_gestor,fk_categoria,))
         else:
-            cursor.execute(f'SELECT * FROM sugestoes_fato WHERE fk_gestor = ?',(fk_gestor,)) 
+            cursor.execute(f'SELECT * FROM sugestoes_fato WHERE fk_gestor = ? ORDER BY respondido ASC, datetime DESC',(fk_gestor,)) 
         dados = cursor.fetchall()
         sugestoes = [dict(row) for row in dados]
-        print(sugestoes)
         return sugestoes
+    
+    def consulta_filtros(coluna_procurada, tabela, id_gestor):
+        cursor.execute(f'SELECT DISTINCT {coluna_procurada} FROM {tabela} WHERE fk_gestor = {id_gestor}')
+        dados = cursor.fetchall()
+        filtros = [dict(row) for row in dados]
+        return filtros
 
+    def gera_filtros(fk_gestor):
+        fk_cargos = consulta_filtros('fk_cargo','respostas_fato', fk_gestor)
+        print(fk_cargos)
+        cargos = []
+        for cargo_dict in fk_cargos:
+            fk_cargo = cargo_dict['fk_cargo']
+            
+            cursor.execute('SELECT desc_cargo FROM cargo_dim WHERE fk_cargo = ?', (fk_cargo,))
+            cargo = cursor.fetchone()[0]
+            cargos.append(cargo)
+
+        idades = consulta_filtros('idade','respostas_fato', fk_gestor)
+        sexos = consulta_filtros('sexo','respostas_fato', fk_gestor)
+        grupo_filtros = {
+            'cargos': cargos,
+            'idades': idades,
+            'sexos':sexos
+        }
+        return grupo_filtros
     def gera_cards():
         categorias = consulta_categorias()
         cards = []
@@ -398,9 +423,7 @@ def dashboard():
             cursor.execute(f'SELECT desc_categoria FROM categoria_dim WHERE fk_categoria = {fk_categoria}')
             categoria = cursor.fetchone()[0]
             sugestao = sugestao['sugestao']
-            # respondido = bool(sugestao['respondido'],False)
-            respondido = bool(False)
-            print(data)
+            respondido = 'a'
             row = {
                 'data': data,
                 'categoria': categoria,
@@ -410,18 +433,40 @@ def dashboard():
             tabela.append(row)
         return tabela
     
+    def gera_grafico(fk_gestor):
+        cursor.execute(f'SELECT DISTINCT semana FROM respostas_fato WHERE fk_gestor = {fk_gestor} ORDER BY semana asc')
+        semanas = cursor.fetchall()
+        grafico = []
+
+        for semana in semanas:
+            num_semana = semana['semana']
+            cursor.execute(f'SELECT AVG(resposta) FROM respostas_fato WHERE fk_gestor = {fk_gestor} and semana = {num_semana}')
+            nota = round(cursor.fetchone()[0],2)
+            cursor.execute(f'SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = {fk_gestor} and semana = {num_semana}')
+            num_respostas = cursor.fetchone()[0]
+
+            dados = {
+                'eixo_x': num_semana,
+                'nota': nota,
+                'num_respostas': num_respostas
+            }
+            grafico.append(dados)    
+        return grafico
+
+    dados_filtros = gera_filtros(id_gestor)
+    print(dados_filtros)
+    dados_grafico = gera_grafico(id_gestor)
     fk_gestor = consulta_gestor(id_gestor)[0]
     nome_gestor = consulta_gestor(id_gestor)[1]
     data_min = consulta_min_max('data', 'respostas_fato', fk_gestor)[0]
     data_max = consulta_min_max('data', 'respostas_fato', fk_gestor)[1]
     quantidade_respostas = consulta_quantidade('respostas_fato',fk_gestor)
-    nota_media = consulta_media('resposta','respostas_fato',fk_gestor)
+    nota_media = round(consulta_media('resposta','respostas_fato',fk_gestor),2)
     size_bar = nota_media * 10 
     cards = gera_cards()
     tabela = gera_tabela()
-    print(f'os cards são {cards}')
-    print(f'a tabela é {tabela}')
-    return render_template('dashboard.html', nome = nome_gestor, qtd_respostas = quantidade_respostas, nota_media = nota_media, size_bar = size_bar, cards=cards, data_min = data_min, data_max = data_max, tabela = tabela)
+
+    return render_template('dashboard.html', nome = nome_gestor, qtd_respostas = quantidade_respostas, nota_media = nota_media, size_bar = size_bar, cards=cards, data_min = data_min, data_max = data_max, tabela = tabela, dados_grafico=dados_grafico, filtros=dados_filtros)
 
 @app.route('/settings')
 def settings():

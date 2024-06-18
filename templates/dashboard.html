@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Exo:wght@100..900&family=Titillium+Web:wght@200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles_dash.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/build/chartjs-plugin-datalabels.min.js"></script>
 </head>
 <body>
     <div class="sidebar">
@@ -27,35 +28,86 @@
                 <p>Aqui está o resultado da sua Pulsa 7L. A nota está baseada em {{qtd_respostas}} respostas, entre os dias {{data_min}} e {{data_max}}</p>
             </div>
             <div class="introbar-filters">
-                filtros
+                <form id="filtroForm" method="POST" action="/aplicar-filtros">
+                    <div class="filtroForm-itens">
+                        <label for="intervalo_datas">Intervalo de Datas:</label>
+                        <input type="date" id="data_inicio" name="data_inicio" min="{{ data_min }}" max="{{ data_max }}">
+                        <span>até</span>
+                        <input type="date" id="data_fim" name="data_fim" min="{{ data_min }}" max="{{ data_max }}">
+                    </div>
+        
+                    <div class="filtroForm-itens">
+                        <label for="cargo">Cargos:</label>
+                        <select id="cargo" name="cargo" class="custom-select">
+                            <option value="" disabled selected hidden>Selecione um cargo</option>
+                            {% set cargos_existentes = [] %}
+                            {% for cargo in filtros.cargos %}
+                                {% if cargo not in cargos_existentes %}
+                                    {% set _ = cargos_existentes.append(cargo) %}
+                                    <option value="{{ cargo }}">{{ cargo }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+        
+                    <div class="filtroForm-itens">
+                        <label for="idade">Idade:</label>
+                        <select id="idade" name="idade" class="custom-select">
+                            <option value="" disabled selected hidden>Selecione uma idade</option>
+                            {% set idades_existentes = [] %}
+                            {% for idade in filtros.idades %}
+                                {% if idade.idade not in idades_existentes %}
+                                    {% set _ = idades_existentes.append(idade.idade) %}
+                                    <option value="{{ idade.idade }}">{{ idade.idade }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filtroForm-itens">
+                        <label for="sexo">Sexo:</label>
+                        <select id="sexo" name="sexo" class="custom-select">
+                            <option value="" disabled selected hidden>Selecione um sexo</option>
+                            {% set sexos_existentes = [] %}
+                            {% for sexo in filtros.sexos %}
+                                {% if sexo.sexo not in sexos_existentes %}
+                                    {% set _ = sexos_existentes.append(sexo.sexo) %}
+                                    <option value="{{ sexo.sexo }}">{{ sexo.sexo }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="buttons" id="clean"><i class="fas fa-eraser"></i>Limpar Filtros</button>
+                    <button type="submit" class="buttons" id="aplly"><i class="fas fa-filter"></i>Aplicar Filtros</button>
+                </form>
             </div>
         </div>
         <div class="container">
             <div class="container-cards geral">
                 <div class="card" id="card-geral">
                     <div class="bar-container">
-                        <h2>Nota Geral:</h2>
+                        <h2><i class="fas fa-star"></i>Nota Geral:</h2>
                         <div class="bar">
                             <div class="bar-size">
-                                <div class="bar-value" style="width: {{size_bar}}%;">{{nota_media}}</div>
+                                <div class="bar-value" data-nota="{{ nota_media }}" style="width: {{size_bar}}%;"></div>
+                                <span>{{nota_media}}</span>
                             </div>
-                            <div class="bar-total">10</div>
                         </div>
                         
-                        <h2>NPS:</h2>
+                        <h2><i class="fas fa-thumbs-up"></i>NPS:</h2>
                         <div class="bar">
                             <div class="bar-size">
-                                <div class="bar-value" style="width: {{size_bar}}%;">{{nota_media}}</div>
+                                <div class="bar-value" data-nota="{{ nota_media }}" style="width: {{size_bar}}%;"></div>
+                                <span>{{nota_media}}</span>
                             </div>
-                            <div class="bar-total">10</div>
                         </div>
 
-                        <h2>Segurança Psicológica:</h2>
+                        <h2><i class="fas fa-heart"></i>Segurança Psicológica:</h2>
                         <div class="bar">
                             <div class="bar-size">
-                                <div class="bar-value" style="width: {{size_bar}}%;">{{nota_media}}</div>
+                                <div class="bar-value" data-nota="{{ nota_media }}" style="width: {{size_bar}}%;"></div>
+                                <span>{{nota_media}}</span>
                             </div>
-                            <div class="bar-total">10</div>
                         </div>
                     </div>
                 </div>
@@ -67,18 +119,21 @@
             <div class="container-cards detalhado">
                 {% for card in cards %}
                 <div class="card-detalhe" id="card-{{ card.id }}">
-                    <h3>{{ card.title }}:</h3>
+                    <h3>
+                        <i class="{% if card.id == 1 %}fas fa-cloud{% elif card.id == 2 %}fas fa-user-tie{% elif card.id == 3 %}fas fa-tasks{% elif card.id == 4 %}fas fa-chart-line{% elif card.id == 5 %}fas fa-building{% elif card.id == 6 %}fas fa-dollar-sign{% elif card.id == 7 %}fas fa-smile{% elif card.id == 8 %}fas fa-comments{% endif %}"></i>
+                        {{ card.title }}:
+                    </h3>
                     <div class="bar">
                         <div class="bar-size">
-                            <div class="bar-value" style="width: {{ card.size }}%;">{{ card.value }}</div>
+                            <div class="bar-value" data-nota="{{ card.value }}" style="width: {{ card.size }}%;"></div>
+                            <span>{{card.value}}</span>
                         </div>
-                        <div class="bar-total">{{ card.total }}</div>
                     </div>
                     <div class="info-respostas">
                         <p>Nota baseada em {{card.qtd_respostas}} respostas, entre os dias {{data_min}} e {{data_max}}</p>
                     </div>
                     <div class="details">
-                        <button class="details-button">
+                        <button class="buttons">
                         <i class="fas fa-plus"></i> Detalhes
                     </button></i></div>
                 </div>
@@ -110,46 +165,133 @@
         </div>
     </div>
     <script>
-        // Data for the line chart
-        const labels = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
-        const data = {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Nota',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    data: [5, 6, 7, 8, 6],
-                },
-                {
-                    label: 'Frequência',
-                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    data: [2, 3, 4, 5, 4],
-                }
-            ]
-        };
+        // Recebendo dados do Flask
 
-        // Config for the line chart
+        function calcularCor(nota) {
+                if (nota < 4) {
+                    return '#FE4A49';  // Vermelho para notas menores que 4
+                } else if (nota < 8) {
+                    return '#FEC10B';  // Amarelo para notas entre 4 e 7.9
+                } else {
+                    return '#2AC96A';  // Verde para notas maiores ou iguais a 8
+                }
+            }
+
+        const dadosGrafico = {{ dados_grafico | tojson | safe }};
+        const labels = dadosGrafico.map(dado => dado.eixo_x);
+        const notaData = dadosGrafico.map(dado => dado.nota);
+        const respostaData = dadosGrafico.map(dado => dado.num_respostas);
+
+        // Configuração do gráfico
         const config = {
-            type: 'line',
-            data: data,
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Nota',
+                        backgroundColor: notaData.map(nota => calcularCor(nota)),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        data: notaData,
+                    }
+                    // {
+                    //     label: 'Nº Respostas',
+                    //     backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    //     borderColor: 'rgba(153, 102, 255, 1)',
+                    //     data: respostaData,
+                    // }
+                ]
+            },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Nota média por semana do ano', // Título do gráfico
+                        color: '#333', // Cor do título do gráfico
+                        font: {
+                            size: 20,
+                            weight: 'bold'
+                        }
+                    },
+                    legend: {
+                        position: 'bottom', // Coloca a legenda abaixo do gráfico
+                    },
+                    datalabels: { // Plugin para exibir os rótulos de dados nas barras
+                        anchor: 'end',
+                        align: 'end',
+                        color: '#333',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        formatter: function(value, context) {
+                            return value.toFixed(2); // Formato dos valores, ajuste conforme necessário
+                        }
                     }
-                }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Semanas do Ano', // Título do eixo x
+                            color: '#333', // Cor do título do eixo x
+                            font: {
+                                size: 16,
+                                weight: 'normal'
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Nota Média', // Título do eixo y
+                            color: '#333', // Cor do título do eixo y
+                            font: {
+                                size: 16,
+                                weight: 'normal'
+                            }
+                        },
+                        suggestedMin: 0, // Define o mínimo do eixo y como 0
+                        suggestedMax: 10, // Define o máximo do eixo y como 10
+                        ticks: {
+                            stepSize: 1 // Define o intervalo entre os ticks do eixo y
+                        }
+                    }
+                },
+                
             }
         };
 
-        // Render the chart
+        // Renderiza o gráfico
         const lineChart = new Chart(
             document.getElementById('lineChart'),
             config
         );
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Função para calcular a cor com base na nota
+            function calcularCor(nota) {
+                if (nota < 4) {
+                    return '#FE4A49';  // Nota menor que 4 será vermelho
+                } else if (nota < 8) {
+                    return '#FEC10B';  // Nota entre 4 e 6.9 será amarelo
+                } else {
+                    return '#2AC96A';  // Nota maior ou igual a 7 será verde
+                }
+            }
+            
+            // Selecionar todas as barras de progresso
+            const bars = document.querySelectorAll('.bar-value');
+            
+            // Iterar sobre cada barra de progresso e definir a cor com base na nota
+            bars.forEach(bar => {
+                const nota = parseFloat(bar.getAttribute('data-nota'));
+                bar.style.backgroundColor = calcularCor(nota);
+            });
+        });
+        </script>
 </body>
 </html>

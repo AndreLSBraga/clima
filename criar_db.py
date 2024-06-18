@@ -132,6 +132,7 @@ def create_tables():
 
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS sugestoes_fato (
+        id TEXT,
         fk_cargo INTEGER,
         fk_area INTEGER,
         fk_subarea INTEGER,
@@ -144,6 +145,7 @@ def create_tables():
         data TEXT,
         datetime TEXT,
         sugestao TEXT,
+        respondido INTEGER,
         FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
         FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
         FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
@@ -354,6 +356,7 @@ cursor.execute('DROP TABLE IF EXISTS sugestoes_fato')
 # Crie a tabela 'usuarios_respostas_fato'
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS sugestoes_fato (
+        id TEXT,
         fk_cargo INTEGER,
         fk_area INTEGER,
         fk_subarea INTEGER,
@@ -366,6 +369,7 @@ cursor.execute('''
         data TEXT,
         datetime TEXT,
         sugestao TEXT,
+        respondido INTEGER,
         FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
         FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
         FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
@@ -373,3 +377,5 @@ cursor.execute('''
         FOREIGN KEY (fk_categoria) REFERENCES categoria_dim (fk_categoria)
     )
     ''')
+conn.commit()
+conn.close()
