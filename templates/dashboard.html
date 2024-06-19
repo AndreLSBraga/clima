@@ -65,20 +65,20 @@
                     </div>
                     
                     <div class="filtroForm-itens">
-                        <label for="sexo">Sexo:</label>
-                        <select id="sexo" name="sexo" class="custom-select">
-                            <option value="" disabled selected hidden>Selecione um sexo</option>
-                            {% set sexos_existentes = [] %}
-                            {% for sexo in filtros.sexos %}
-                                {% if sexo.sexo not in sexos_existentes %}
-                                    {% set _ = sexos_existentes.append(sexo.sexo) %}
-                                    <option value="{{ sexo.sexo }}">{{ sexo.sexo }}</option>
+                        <label for="genero">Genêro:</label>
+                        <select id="genero" name="genero" class="custom-select">
+                            <option value="" disabled selected hidden>Selecione um genero</option>
+                            {% set generos_existentes = [] %}
+                            {% for genero in filtros.generos %}
+                                {% if genero.genero not in generos_existentes %}
+                                    {% set _ = generos_existentes.append(genero.genero) %}
+                                    <option value="{{ genero.genero }}">{{ genero.genero }}</option>
                                 {% endif %}
                             {% endfor %}
                         </select>
                     </div>
-                    <button type="submit" class="buttons" id="clean"><i class="fas fa-eraser"></i>Limpar Filtros</button>
-                    <button type="submit" class="buttons" id="aplly"><i class="fas fa-filter"></i>Aplicar Filtros</button>
+                    <button type="submit" class="buttons" name="limpar"><i class="fas fa-eraser"></i>Limpar Filtros</button>
+                    <button type="submit" class="buttons" name="filtrar"><i class="fas fa-filter"></i>Aplicar Filtros</button>
                 </form>
             </div>
         </div>
@@ -133,11 +133,17 @@
                         <p>Nota baseada em {{card.qtd_respostas}} respostas, entre os dias {{data_min}} e {{data_max}}</p>
                     </div>
                     <div class="details">
-                        <button class="buttons">
-                        <i class="fas fa-plus"></i> Detalhes
-                    </button></i></div>
+                        <button class="buttons" data-id="{{ card.id }}" name="detalhes"><i class="fas fa-plus"></i> Detalhes</button></i>
+                    </div>
                 </div>
                 {% endfor %}
+            </div>
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2 id="modalTitle"></h2>
+                    <p id="modalContent"></p>
+                </div>
             </div>
             <h1>Sugestões:</h1>
             <div class="tabela">
@@ -164,9 +170,8 @@
             </div>
         </div>
     </div>
-    <script>
-        // Recebendo dados do Flask
-
+    <script> // Cria gráfico
+    
         function calcularCor(nota) {
                 if (nota < 4) {
                     return '#FE4A49';  // Vermelho para notas menores que 4
@@ -270,7 +275,7 @@
             config
         );
     </script>
-    <script>
+    <script> //Colore as barras
         document.addEventListener('DOMContentLoaded', function() {
             // Função para calcular a cor com base na nota
             function calcularCor(nota) {
@@ -292,6 +297,158 @@
                 bar.style.backgroundColor = calcularCor(nota);
             });
         });
-        </script>
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const modal = document.getElementById("myModal");
+            const modalTitle = document.getElementById("modalTitle");
+            const modalContent = document.getElementById("modalContent");
+            const closeModal = document.getElementsByClassName("close")[0];
+    
+            document.querySelectorAll(".buttons[name='detalhes']").forEach(button => {
+                button.addEventListener("click", function() {
+                    const cardId = this.getAttribute("data-id");
+                    fetch(`/detalhes/${cardId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            modalTitle.textContent = data.title;
+                            modalContent.innerHTML = `
+                                <p>${data.content}</p>
+                                ${data.perguntas.map((pergunta, index) => `
+                                <div class="pergunta">
+                                    <div class="pergunta-info">
+                                        <h4>${pergunta.pergunta}</h4>
+                                        <div class="pergunta-bar">
+                                            <div class="pergunta-bar-size">
+                                                <div class="pergunta-bar-value" data-nota="${pergunta.nota}" style="width: ${pergunta.size}%;"></div>
+                                                <span>${pergunta.nota}</span>
+                                            </div>
+                                        </div>
+                                        <div class="info-respostas">
+                                            <p>Nota baseada em ${pergunta.respostas} respostas</p>
+                                        </div>
+                                    </div>
+                                    <div class="pergunta-grafico">
+                                        <canvas id="chart-${index}"></canvas>
+                                    </div>
+                                </div>
+                                `).join('')}
+                            `;
+    
+                            // Colorir as barras
+                            const bars = modalContent.querySelectorAll('.pergunta-bar-value');
+                            bars.forEach(bar => {
+                                const nota = parseFloat(bar.getAttribute('data-nota'));
+                                bar.style.backgroundColor = calcularCor(nota);
+                            });
+    
+                            // Gerar gráficos para cada pergunta
+                            data.perguntas.forEach((pergunta, index) => {
+                                const ctx = document.getElementById(`chart-${index}`).getContext('2d');
+                                const labels = pergunta.grafico.map(dado => `${dado.eixo_x}`);
+                                const notaData = pergunta.grafico.map(dado => dado.nota);
+    
+                                new Chart(ctx, {
+                                    type: 'bar',
+                                    data: {
+                                        labels: labels,
+                                        datasets: [
+                                            {
+                                                label: 'Nota',
+                                                backgroundColor: notaData.map(nota => calcularCor(nota)),
+                                                borderColor: 'rgba(75, 192, 192, 1)',
+                                                data: notaData
+                                            }
+                                        ]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            title: {
+                                                display: true,
+                                                text: `Nota média por semana`,
+                                                color: '#333',
+                                                font: {
+                                                    size: 20,
+                                                    weight: 'bold'
+                                                }
+                                            },
+                                            legend: {
+                                                position: 'bottom'
+                                            },
+                                            datalabels: {
+                                                anchor: 'end',
+                                                align: 'end',
+                                                color: '#333',
+                                                font: {
+                                                    size: 14,
+                                                    weight: 'bold'
+                                                },
+                                                formatter: function(value, context) {
+                                                    return value.toFixed(2);
+                                                }
+                                            }
+                                        },
+                                        scales: {
+                                            x: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Semanas do Ano',
+                                                    color: '#333',
+                                                    font: {
+                                                        size: 16,
+                                                        weight: 'normal'
+                                                    }
+                                                }
+                                            },
+                                            y: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Nota Média',
+                                                    color: '#333',
+                                                    font: {
+                                                        size: 16,
+                                                        weight: 'normal'
+                                                    }
+                                                },
+                                                suggestedMin: 0,
+                                                suggestedMax: 10,
+                                                ticks: {
+                                                    stepSize: 1
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+    
+                            modal.style.display = "block";
+                        });
+                });
+            });
+    
+            closeModal.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+    
+            window.addEventListener("click", function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+    
+        // Função para calcular a cor com base na nota
+        function calcularCor(nota) {
+            if (nota < 4) {
+                return '#FE4A49';  // Vermelho para notas menores que 4
+            } else if (nota < 8) {
+                return '#FEC10B';  // Amarelo para notas entre 4 e 7.9
+            } else {
+                return '#2AC96A';  // Verde para notas maiores ou iguais a 8
+            }
+        }
+    </script>
 </body>
 </html>

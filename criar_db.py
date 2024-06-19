@@ -115,7 +115,7 @@ def create_tables():
         fk_gestor INTEGER,
         fk_cargo INTEGER,
         idade TEXT,
-        sexo TEXT,
+        genero TEXT,
         fk_pergunta INTEGER,
         fk_categoria INTEGER,
         semana TEXT,
@@ -138,7 +138,7 @@ def create_tables():
         fk_subarea INTEGER,
         fk_gestor INTEGER,
         idade TEXT,
-        sexo TEXT,
+        genero TEXT,
         fk_pergunta INTEGER,
         fk_categoria INTEGER,
         semana TEXT,
@@ -213,8 +213,10 @@ def insert_dados():
         (4,'Plano de Carreira e Desenvolvimento'),
         (5,'Ambiente e Condições de Trabalho'),
         (6,'Salários e Benefícios'),
-        (7,'Satisfação e Engajamento'),
-        (8,'Comunicação e Transparência')
+        (7,'Feedback e Reconhecimento'),
+        (8,'Comunicação e Transparência'),
+        (9,'Segurança Psicológica'),
+        (10,'Serviços Gerais')
     ]
     cursor.executemany('INSERT INTO categoria_dim (fk_categoria, desc_categoria) VALUES (?, ?)', categoria)
 
@@ -280,7 +282,17 @@ def insert_dados():
         (44,'Quão satisfeito eu estou com as funções desempenhadas no meu dia a dia?',8),
         (45,'Sinto que há colaboração entre eu e meus colegas de trabalho?',8),
         (46,'Sinto que meu ambiente de trabalho é agradável?',8),
-        (47,'Sinto que minhas ideias são ouvidas pelo meu gestor?',8)
+        (47,'Sinto que minhas ideias são ouvidas pelo meu gestor?',8),
+        (48, 'Sinto que posso cometer erros sem medo de ser punido?', 9),
+        (49, 'Sinto que posso expressar minhas opiniões sem receio de represálias?', 9),
+        (50, 'Sinto que meu gestor valoriza meu bem-estar emocional?', 9),
+        (51, 'Sinto que há abertura para discutir problemas ou preocupações no trabalho?', 9),
+        (52, 'Sinto que sou tratado com respeito e dignidade por meus colegas de trabalho?', 9),
+        (53, 'Sinto que as instalações de trabalho são adequadas e bem mantidas?', 10),
+        (54, 'Sinto que as ferramentas e equipamentos fornecidos são adequados para minhas tarefas diárias?', 10),
+        (55, 'Sinto que recebo o suporte necessário para realizar meu trabalho de maneira eficaz?', 10),
+        (56, 'Sinto que os procedimentos de segurança são seguidos corretamente em meu local de trabalho?', 10),
+        (57, 'Sinto que meu ambiente de trabalho é limpo e organizado?', 10)
     ]
     cursor.executemany('INSERT INTO pergunta_dim (fk_pergunta, desc_pergunta, fk_categoria) VALUES (?, ?, ?)', perguntas)
 
@@ -307,9 +319,9 @@ def insert_respostas_fato():
 
     fixed_time = '10:00:00'
 
-    # Possíveis valores para idade e sexo
+    # Possíveis valores para idade e genero
     idades = ["24", "25-39", "40-54", "55+"]
-    sexos = ["M", "F", "ND"]
+    generos = ["M", "F", "ND"]
 
     # Gerar 500 linhas de dados de exemplo
     for i in range(1, 501):
@@ -317,12 +329,12 @@ def insert_respostas_fato():
         fk_cargo = random.randint(1, 8)
         fk_subarea = random.randint(1, 9)
         fk_gestor = random.randint(1, 4)
-        fk_pergunta = random.randint(1, 47)
-        fk_categoria = random.randint(1, 8)
+        fk_pergunta = random.randint(1, 57 )
+        fk_categoria = random.randint(1, 10)
         
-        # Selecionar idade e sexo aleatórios
+        # Selecionar idade e genero aleatórios
         idade = random.choice(idades)
-        sexo = random.choice(sexos)
+        genero = random.choice(generos)
         
         # Gerar data aleatória nos últimos 3 meses
         end_date = datetime.now()
@@ -337,9 +349,9 @@ def insert_respostas_fato():
         # Inserir na tabela respostas_fato
         cursor.execute('''
             INSERT INTO respostas_fato 
-            (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_pergunta, fk_categoria, semana, data, datetime, resposta) 
+            (fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_pergunta, fk_categoria, semana, data, datetime, resposta) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_pergunta, fk_categoria, semana_atual, data.strftime('%Y-%m-%d'), datetime_str, resposta))
+        ''', (fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_pergunta, fk_categoria, semana_atual, data.strftime('%Y-%m-%d'), datetime_str, resposta))
 
     conn.commit()
     conn.close()
@@ -348,34 +360,36 @@ def insert_respostas_fato():
 # drop_tables()
 # create_tables()
 # insert_dados()
-# insert_respostas_fato()
+insert_respostas_fato()
 
 
-conn, cursor = get_db()
-cursor.execute('DROP TABLE IF EXISTS sugestoes_fato')
-# Crie a tabela 'usuarios_respostas_fato'
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS sugestoes_fato (
-        id TEXT,
-        fk_cargo INTEGER,
-        fk_area INTEGER,
-        fk_subarea INTEGER,
-        fk_gestor INTEGER,
-        idade TEXT,
-        sexo TEXT,
-        fk_pergunta INTEGER,
-        fk_categoria INTEGER,
-        semana TEXT,
-        data TEXT,
-        datetime TEXT,
-        sugestao TEXT,
-        respondido INTEGER,
-        FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
-        FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
-        FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
-        FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim (fk_pergunta),
-        FOREIGN KEY (fk_categoria) REFERENCES categoria_dim (fk_categoria)
-    )
-    ''')
-conn.commit()
-conn.close()
+# conn, cursor = get_db()
+# # cursor.execute('DROP TABLE IF EXISTS sugestoes_fato')
+# # # Crie a tabela 'usuarios_respostas_fato'
+# # cursor.execute('''
+# #     CREATE TABLE IF NOT EXISTS sugestoes_fato (
+# #         id TEXT,
+# #         fk_cargo INTEGER,
+# #         fk_area INTEGER,
+# #         fk_subarea INTEGER,
+# #         fk_gestor INTEGER,
+# #         idade TEXT,
+# #         genero TEXT,
+# #         fk_pergunta INTEGER,
+# #         fk_categoria INTEGER,
+# #         semana TEXT,
+# #         data TEXT,
+# #         datetime TEXT,
+# #         sugestao TEXT,
+# #         respondido INTEGER,
+# #         FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
+# #         FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
+# #         FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
+# #         FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim (fk_pergunta),
+# #         FOREIGN KEY (fk_categoria) REFERENCES categoria_dim (fk_categoria)
+# #     )
+# #     ''')
+
+# cursor.execute('INSERT into categoria_dim (fk_categoria, desc_categoria) values(?, ?)', (10, "Serviços Gerais"))
+# conn.commit()
+# conn.close()

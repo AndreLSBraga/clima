@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, session, g
+from flask import Flask, render_template, request, redirect, url_for, flash, session, g, jsonify
 import sqlite3
 import random
 import datetime
@@ -102,7 +102,7 @@ def entrada():
         fk_cargo = consulta_tabelas('fk_cargo', 'cargo_dim', 'desc_cargo',cargo)
 
         session['idade'] = request.form.get('idade', None)
-        session['sexo'] = request.form.get('sexo', None)
+        session['genero'] = request.form.get('genero', None)
         session['cargo'] = fk_cargo
         session['subarea'] = fk_subarea
         session['gestor'] = fk_gestor
@@ -110,7 +110,7 @@ def entrada():
         session['perguntas_selecionadas'] = []
         session['respostas'] = []
 
-        if None in (session['idade'], session['sexo'], session['cargo'], session['subarea'], session['gestor']):
+        if None in (session['idade'], session['genero'], session['cargo'], session['subarea'], session['gestor']):
             flash("Todos os campos são obrigatórios.", "warning")
         else:
             return redirect(url_for('perguntas'))
@@ -173,7 +173,7 @@ def perguntas():
         gestor = session['gestor'][0]
         cargo = session['cargo'][0]
         idade = session['idade'][0]
-        sexo = session['sexo'][0]
+        genero = session['genero'][0]
 
         if 'pular' in request.form:
             session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': -1, 'sugestao': ''})
@@ -196,16 +196,16 @@ def perguntas():
 
                 for resposta in session['respostas']:
                     cursor.execute('''
-                        INSERT INTO respostas_fato (fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_pergunta, fk_categoria, semana, data, datetime, resposta)
+                        INSERT INTO respostas_fato (fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_pergunta, fk_categoria, semana, data, datetime, resposta)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        ''',  (subarea, gestor, cargo, idade, sexo, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['resposta']))
+                        ''',  (subarea, gestor, cargo, idade, genero, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['resposta']))
                     db.commit()
 
                     if resposta['sugestao']:
                         cursor.execute('''
-                            INSERT INTO sugestoes_fato (id, fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_pergunta, fk_categoria, semana, data, datetime, sugestao, respondido)
+                            INSERT INTO sugestoes_fato (id, fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_pergunta, fk_categoria, semana, data, datetime, sugestao, respondido)
                                 VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                            ''', (id,subarea, gestor, cargo, idade, sexo, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['sugestao'], 0))
+                            ''', (id,subarea, gestor, cargo, idade, genero, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['sugestao'], 0))
                         db.commit()
 
                 session.pop('perguntas_selecionadas', None)
@@ -260,7 +260,7 @@ def sugestao():
         cargo = request.form.get('cargo', None)
         categoria = request.form.get('categoria', None)
         idade = request.form.get('idade', None)
-        sexo = request.form.get('sexo', None)
+        genero = request.form.get('genero', None)
         sugestao = request.form.get('sugestao', None)
 
         fk_subarea = consulta_tabelas('fk_subarea', 'subarea_dim', 'desc_subarea',subarea)[0]
@@ -268,13 +268,13 @@ def sugestao():
         fk_cargo = consulta_tabelas('fk_cargo', 'cargo_dim', 'desc_cargo',cargo)[0]
         fk_categoria = consulta_tabelas('fk_categoria', 'categoria_dim', 'desc_categoria',categoria)[0]
 
-        if None in (subarea, gestor, cargo, categoria, idade, sexo, sugestao):
+        if None in (subarea, gestor, cargo, categoria, idade, genero, sugestao):
             flash("Selecione as opções acima, todos os campos são obrigatórios.", "warning")
         else:
             cursor.execute('''
-                INSERT INTO sugestoes_fato (id, fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_categoria, semana, data, datetime, sugestao, respondido)
+                INSERT INTO sugestoes_fato (id, fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_categoria, semana, data, datetime, sugestao, respondido)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (id, fk_subarea, fk_gestor, fk_cargo, idade, sexo, fk_categoria, semana_atual, data_atual, date_time, sugestao, 0))
+                ''', (id, fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_categoria, semana_atual, data_atual, date_time, sugestao, 0))
             db.commit()
 
             flash("Sugestão enviada com sucesso!", "success")
@@ -301,6 +301,15 @@ def login():
 def logout():
     session.pop('logged_in', None)
     return redirect(url_for('login'))
+
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
+
+def check_admin(username, password):
+    admin_username = ADMIN_USERNAME
+    admin_password_hash = ADMIN_PASSWORD
+    return username == admin_username and password == admin_password_hash
 
 @app.route('/dashboard')
 def dashboard():
@@ -341,8 +350,12 @@ def dashboard():
             cursor.execute(f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = ? and fk_categoria = ? and resposta >= 0',(fk_gestor,fk_categoria,))
         else:     
             cursor.execute(f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = ? and resposta >= 0',(fk_gestor,))        
-        nota_media = cursor.fetchone()[0]
-        nota_media = round(nota_media,2)
+        resultado = cursor.fetchone()
+        
+        if resultado and resultado[0] is not None:
+            nota_media = round(resultado[0], 2)
+        else:
+            nota_media = 0  # Ou outra ação adequada se nenhum resultado for encontrado
         return nota_media
     
     def consulta_min_max(coluna, tabela, fk_gestor, fk_categoria=None, fk_pergunta=None):
@@ -374,8 +387,8 @@ def dashboard():
         return filtros
 
     def gera_filtros(fk_gestor):
+
         fk_cargos = consulta_filtros('fk_cargo','respostas_fato', fk_gestor)
-        print(fk_cargos)
         cargos = []
         for cargo_dict in fk_cargos:
             fk_cargo = cargo_dict['fk_cargo']
@@ -385,13 +398,14 @@ def dashboard():
             cargos.append(cargo)
 
         idades = consulta_filtros('idade','respostas_fato', fk_gestor)
-        sexos = consulta_filtros('sexo','respostas_fato', fk_gestor)
+        generos = consulta_filtros('genero','respostas_fato', fk_gestor)
         grupo_filtros = {
             'cargos': cargos,
             'idades': idades,
-            'sexos':sexos
+            'generos':generos
         }
         return grupo_filtros
+    
     def gera_cards():
         categorias = consulta_categorias()
         cards = []
@@ -454,7 +468,6 @@ def dashboard():
         return grafico
 
     dados_filtros = gera_filtros(id_gestor)
-    print(dados_filtros)
     dados_grafico = gera_grafico(id_gestor)
     fk_gestor = consulta_gestor(id_gestor)[0]
     nome_gestor = consulta_gestor(id_gestor)[1]
@@ -468,14 +481,65 @@ def dashboard():
 
     return render_template('dashboard.html', nome = nome_gestor, qtd_respostas = quantidade_respostas, nota_media = nota_media, size_bar = size_bar, cards=cards, data_min = data_min, data_max = data_max, tabela = tabela, dados_grafico=dados_grafico, filtros=dados_filtros)
 
-@app.route('/settings')
-def settings():
-    return render_template('settings.html')
+@app.route('/detalhes/<int:fk_categoria>')
+def get_detalhes(fk_categoria):
+    id_gestor = session['cargo'][0]
 
-def check_admin(username, password):
-    admin_username = ADMIN_USERNAME
-    admin_password_hash = ADMIN_PASSWORD
-    return username == admin_username and password == admin_password_hash
+    db = get_db()
+    cursor = db.cursor()
+
+    # Descrição da categoria
+    cursor.execute('SELECT desc_categoria FROM categoria_dim WHERE fk_categoria = ?', (fk_categoria,))
+    result = cursor.fetchone()
+    categoria = result[0] if result else None
+
+    if not categoria:
+        return jsonify({
+            "title": "Detalhes não encontrados",
+            "content": "Nenhum detalhe disponível para este card.",
+            "perguntas": []
+        })
+
+    # Perguntas
+    cursor.execute('SELECT fk_pergunta, desc_pergunta FROM pergunta_dim WHERE fk_categoria = ?', (fk_categoria,))
+    dados_perguntas = cursor.fetchall()
+    perguntas = []
+    cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = ? and fk_categoria = ?', (id_gestor, fk_categoria))
+    num_respostas = cursor.fetchone()[0]
+
+    for fk_pergunta, desc_pergunta in dados_perguntas:
+        cursor.execute('SELECT AVG(resposta) FROM respostas_fato WHERE fk_pergunta = ? AND fk_gestor = ?', (fk_pergunta, id_gestor))
+        nota = round(cursor.fetchone()[0], 2)
+        size = nota * 10
+        cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_pergunta = ? AND fk_gestor = ?', (fk_pergunta, id_gestor))
+        respostas = cursor.fetchone()[0]
+        print(respostas)
+        # Dados para o gráfico da pergunta
+        cursor.execute('''
+            SELECT semana, AVG(resposta) as nota_media
+            FROM respostas_fato
+            WHERE fk_gestor = ? AND fk_pergunta = ?
+            GROUP BY semana
+            ORDER BY semana ASC
+        ''', (id_gestor, fk_pergunta))
+        grafico = [{'eixo_x': semana, 'nota': round(nota_media, 2)} for semana, nota_media in cursor.fetchall()]
+
+        perguntas.append({
+            'fk_pergunta': fk_pergunta,
+            'pergunta': desc_pergunta,
+            'nota': nota,
+            'respostas': respostas,
+            'size': size,
+            'grafico': grafico
+        })
+
+    details_data = {
+        "title": categoria,
+        "content": f'Abertura por pergunta da dimensão {categoria}, notas baseada em um total de {num_respostas} respostas.',
+        "perguntas": perguntas
+    }
+
+    return jsonify(details_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
