@@ -85,6 +85,23 @@ def consulta_tabelas(coluna, tabela, col_filtro = None, filtro = None):
         lista.append(item)
     return lista
 
+def nome_meses(mes):
+        meses = {
+            '01': 'Janeiro',
+            '02': 'Fevereiro',
+            '03': 'Março',
+            '04': 'Abril',
+            '05': 'Maio',
+            '06': 'Junho',
+            '07': 'Julho',
+            '08': 'Agosto',
+            '09': 'Setembro',
+            '10': 'Outubro',
+            '11': 'Novembro',
+            '12': 'Dezembro'
+        }
+        return meses[mes]
+
 
 @app.route('/', methods=['GET', 'POST'])
 def entrada():
@@ -326,6 +343,8 @@ def dashboard():
     if testa_id:
         return testa_id
     
+    session['id'] = id_gestor
+    
     #Traz o fk_gestor para verificar quantas respostas do time dele existem
     def consulta_gestor(id_gestor):
         cursor.execute('SELECT fk_gestor, desc_gestor FROM gestor_dim WHERE id = ?',(id_gestor))
@@ -448,19 +467,21 @@ def dashboard():
         return tabela
     
     def gera_grafico(fk_gestor):
-        cursor.execute(f'SELECT DISTINCT semana FROM respostas_fato WHERE fk_gestor = {fk_gestor} ORDER BY semana asc')
-        semanas = cursor.fetchall()
+        cursor.execute(f'''SELECT DISTINCT semana, strftime('%m', data) AS mes FROM respostas_fato WHERE fk_gestor = {fk_gestor} ORDER BY semana asc''')
+        datas = cursor.fetchall()
         grafico = []
 
-        for semana in semanas:
+        for semana in datas:
             num_semana = semana['semana']
+            num_mes = semana['mes']
+            mes = nome_meses(num_mes)
             cursor.execute(f'SELECT AVG(resposta) FROM respostas_fato WHERE fk_gestor = {fk_gestor} and semana = {num_semana}')
             nota = round(cursor.fetchone()[0],2)
             cursor.execute(f'SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = {fk_gestor} and semana = {num_semana}')
             num_respostas = cursor.fetchone()[0]
 
             dados = {
-                'eixo_x': num_semana,
+                'eixo_x': f'Semana: {num_semana} / {mes}',
                 'nota': nota,
                 'num_respostas': num_respostas
             }
@@ -472,19 +493,28 @@ def dashboard():
     fk_gestor = consulta_gestor(id_gestor)[0]
     nome_gestor = consulta_gestor(id_gestor)[1]
     data_min = consulta_min_max('data', 'respostas_fato', fk_gestor)[0]
-    data_max = consulta_min_max('data', 'respostas_fato', fk_gestor)[1]
+    data_max = consulta_min_max('data', 'respostas_fato', fk_gestor)[0]
     quantidade_respostas = consulta_quantidade('respostas_fato',fk_gestor)
     nota_media = round(consulta_media('resposta','respostas_fato',fk_gestor),2)
     size_bar = nota_media * 10 
     cards = gera_cards()
     tabela = gera_tabela()
-
-    return render_template('dashboard.html', nome = nome_gestor, qtd_respostas = quantidade_respostas, nota_media = nota_media, size_bar = size_bar, cards=cards, data_min = data_min, data_max = data_max, tabela = tabela, dados_grafico=dados_grafico, filtros=dados_filtros)
+    dados = [{
+        'nome': consulta_gestor(id_gestor)[1],
+        'qtd_respostas': consulta_quantidade('respostas_fato',fk_gestor),
+        'nota_media': round(consulta_media('resposta','respostas_fato',fk_gestor),2),
+        'size_bar': round(consulta_media('resposta','respostas_fato',fk_gestor),2) * 10,
+        'nota_nps': 10, #Criar lógica de consultar a nota do nps
+        'size_nps': 10 * 10,
+        'data_min':consulta_min_max('data', 'respostas_fato', fk_gestor)[0],
+        'data_max': consulta_min_max('data', 'respostas_fato', fk_gestor)[0]
+    }]
+    print(dados)
+    return render_template('dashboard.html', dados=dados, nome = nome_gestor, qtd_respostas = quantidade_respostas, nota_media = nota_media, size_bar = size_bar, cards=cards, data_min = data_min, data_max = data_max, tabela = tabela, dados_grafico=dados_grafico, filtros=dados_filtros)
 
 @app.route('/detalhes/<int:fk_categoria>')
 def get_detalhes(fk_categoria):
-    id_gestor = session['cargo'][0]
-
+    id_gestor = session['id'][0]
     db = get_db()
     cursor = db.cursor()
 
@@ -513,17 +543,16 @@ def get_detalhes(fk_categoria):
         size = nota * 10
         cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_pergunta = ? AND fk_gestor = ?', (fk_pergunta, id_gestor))
         respostas = cursor.fetchone()[0]
-        print(respostas)
         # Dados para o gráfico da pergunta
         cursor.execute('''
-            SELECT semana, AVG(resposta) as nota_media
+            SELECT semana,  strftime('%m', data) AS mes, AVG(resposta) as nota_media
             FROM respostas_fato
             WHERE fk_gestor = ? AND fk_pergunta = ?
             GROUP BY semana
             ORDER BY semana ASC
         ''', (id_gestor, fk_pergunta))
-        grafico = [{'eixo_x': semana, 'nota': round(nota_media, 2)} for semana, nota_media in cursor.fetchall()]
-
+        
+        grafico = [{'eixo_x':  f'Semana: {semana} / {nome_meses(mes)}', 'nota': round(nota_media, 2)} for semana, mes, nota_media in cursor.fetchall()]
         perguntas.append({
             'fk_pergunta': fk_pergunta,
             'pergunta': desc_pergunta,

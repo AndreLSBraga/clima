@@ -24,22 +24,22 @@
     <div class="main-content">
         <div class="introbar">
             <div class="introbar-text">
-                <h1>Bem-vindo, {{nome}}!</h1>
-                <p>Aqui está o resultado da sua Pulsa 7L. A nota está baseada em {{qtd_respostas}} respostas, entre os dias {{data_min}} e {{data_max}}</p>
+                <h1>Bem-vindo, {{dados[0].nome}}!</h1>
+                <p>Aqui está o resultado da sua Pulsa 7L. A nota está baseada em {{dados[0].qtd_respostas}} respostas, entre os dias {{dados[0].data_min}} e {{dados[0].data_max}}</p>
             </div>
             <div class="introbar-filters">
                 <form id="filtroForm" method="POST" action="/aplicar-filtros">
                     <div class="filtroForm-itens">
                         <label for="intervalo_datas">Intervalo de Datas:</label>
-                        <input type="date" id="data_inicio" name="data_inicio" min="{{ data_min }}" max="{{ data_max }}">
+                        <input type="date" id="data_inicio" name="data_inicio" min="{{ dados[0].data_min }}" max="{{ dados[0].data_max }}">
                         <span>até</span>
-                        <input type="date" id="data_fim" name="data_fim" min="{{ data_min }}" max="{{ data_max }}">
+                        <input type="date" id="data_fim" name="data_fim" min="{{ dados[0].data_min }}" max="{{ dados[0].data_max }}">
                     </div>
         
                     <div class="filtroForm-itens">
                         <label for="cargo">Cargos:</label>
                         <select id="cargo" name="cargo" class="custom-select">
-                            <option value="" disabled selected hidden>Selecione um cargo</option>
+                            <option value="" selected >Todos</option>
                             {% set cargos_existentes = [] %}
                             {% for cargo in filtros.cargos %}
                                 {% if cargo not in cargos_existentes %}
@@ -53,7 +53,7 @@
                     <div class="filtroForm-itens">
                         <label for="idade">Idade:</label>
                         <select id="idade" name="idade" class="custom-select">
-                            <option value="" disabled selected hidden>Selecione uma idade</option>
+                            <option value="" selected >Todos</option>
                             {% set idades_existentes = [] %}
                             {% for idade in filtros.idades %}
                                 {% if idade.idade not in idades_existentes %}
@@ -67,7 +67,7 @@
                     <div class="filtroForm-itens">
                         <label for="genero">Genêro:</label>
                         <select id="genero" name="genero" class="custom-select">
-                            <option value="" disabled selected hidden>Selecione um genero</option>
+                            <option value="" selected >Todos</option>
                             {% set generos_existentes = [] %}
                             {% for genero in filtros.generos %}
                                 {% if genero.genero not in generos_existentes %}
@@ -77,38 +77,54 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <button type="submit" class="buttons" name="limpar"><i class="fas fa-eraser"></i>Limpar Filtros</button>
-                    <button type="submit" class="buttons" name="filtrar"><i class="fas fa-filter"></i>Aplicar Filtros</button>
                 </form>
+                <div class="introbar-botoes">
+                    <button type="submit" class="buttons" name="filtrar"><i class="fas fa-filter"></i>Aplicar Filtros</button>
+                    <button type="submit" class="buttons" name="limpar"><i class="fas fa-eraser"></i>Limpar Filtros</button>
+                </div>
             </div>
         </div>
         <div class="container">
             <div class="container-cards geral">
                 <div class="card" id="card-geral">
                     <div class="bar-container">
-                        <h2><i class="fas fa-star"></i>Nota Geral:</h2>
-                        <div class="bar">
-                            <div class="bar-size">
-                                <div class="bar-value" data-nota="{{ nota_media }}" style="width: {{size_bar}}%;"></div>
-                                <span>{{nota_media}}</span>
-                            </div>
-                        </div>
-                        
-                        <h2><i class="fas fa-thumbs-up"></i>NPS:</h2>
-                        <div class="bar">
-                            <div class="bar-size">
-                                <div class="bar-value" data-nota="{{ nota_media }}" style="width: {{size_bar}}%;"></div>
-                                <span>{{nota_media}}</span>
+
+                        <div class="bar-container-card">
+                            <h2><i class="fas fa-star"></i>Nota Geral:</h2>
+                            <div class="bar">
+                                <div class="bar-size">
+                                    <div class="bar-value" data-nota="{{dados[0].nota_media }}" style="width: {{dados[0].size_bar}}%;"></div>
+                                </div>
+                                <div class="bar-dados">
+                                    <span>{{dados[0].nota_media}}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <h2><i class="fas fa-heart"></i>Segurança Psicológica:</h2>
-                        <div class="bar">
-                            <div class="bar-size">
-                                <div class="bar-value" data-nota="{{ nota_media }}" style="width: {{size_bar}}%;"></div>
-                                <span>{{nota_media}}</span>
+                        <div class="bar-container-card">
+                            <h2><i class="fas fa-thumbs-up"></i>NPS:</h2>
+                            <div class="bar">
+                                <div class="bar-size">
+                                    <div class="bar-value" data-nota="{{ dados[0].nota_nps }}" style="width: {{dados[0].size_nps}}%;"></div>
+                                </div>
+                                <div class="bar-dados">
+                                    <span>{{dados[0].nota_nps}}</span>
+                                </div>
                             </div>
                         </div>
+
+                        <div class="bar-container-card">
+                            <h2><i class="fas fa-heart"></i>Segurança Psicológica:</h2>
+                            <div class="bar">
+                                <div class="bar-size">
+                                    <div class="bar-value" data-nota="{{ dados[0].nota_media }}" style="width: {{dados[0].size_bar}}%;"></div>
+                                </div>
+                                <div class="bar-dados">
+                                    <span>{{dados[0].nota_media}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
                 <div class="card" id="card-grafico">
@@ -126,8 +142,10 @@
                     <div class="bar">
                         <div class="bar-size">
                             <div class="bar-value" data-nota="{{ card.value }}" style="width: {{ card.size }}%;"></div>
-                            <span>{{card.value}}</span>
                         </div>
+                        <div class="bar-dados">
+                            <span>{{card.value}}</span>
+                        </div>                        
                     </div>
                     <div class="info-respostas">
                         <p>Nota baseada em {{card.qtd_respostas}} respostas, entre os dias {{data_min}} e {{data_max}}</p>
@@ -240,7 +258,7 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Semanas do Ano', // Título do eixo x
+                            text: 'Semana do ano / Mês', // Título do eixo x
                             color: '#333', // Cor do título do eixo x
                             font: {
                                 size: 16,
