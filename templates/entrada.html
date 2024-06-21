@@ -21,28 +21,28 @@
         <h1>Pulsa 7L</h1>
         <form action="/" method="POST">
             <h4>Selecione sua área:</h4>
-            <select name="area" id="area" class="custom-select">
+            <select name="area" id="area" class="custom-select" required>
                 <option value="" disabled selected hidden>Selecione uma opção</option>
                 {% for area in areas %}
                     <option value="{{ area }}">{{ area }}</option>
                 {% endfor %}
             </select>
             <h4>Selecione seu gestor:</h4>
-            <select name="gestor" id="gestor" class="custom-select">
+            <select name="gestor" id="gestor" class="custom-select" required>
                 <option value="" disabled selected hidden>Selecione uma opção</option>
                 {% for gestor in gestores %}
                     <option value="{{ gestor }}">{{ gestor }}</option>
                 {% endfor %}
             </select>
             <h4>Selecione seu cargo:</h4>
-            <select name="cargo" id="cargo" class="custom-select">
+            <select name="cargo" id="cargo" class="custom-select" required>
                 <option value="" disabled selected hidden>Selecione uma opção</option>
                 {% for cargo in cargos %}
                     <option value="{{ cargo }}">{{ cargo }}</option>
                 {% endfor %}
             </select>
             <h4>Faixa Etária:</h4>
-            <select name="idade" id="idade" class="custom-select" >
+            <select name="idade" id="idade" class="custom-select" required>
                 <option value="" disabled selected hidden>Selecione uma opção</option>
                 <option value="18-24">18-24 anos</option>
                 <option value="25-39">25-39 anos</option>
@@ -50,7 +50,7 @@
                 <option value="55+">55 anos ou mais</option>
             </select>
             <h4>Genêro:</h4>
-            <select name="genero" id="genero" class="custom-select">
+            <select name="genero" id="genero" class="custom-select" required>
                 <option value="" disabled selected hidden>Selecione uma opção</option>
                 <option value="M">Masculino</option>
                 <option value="F">Feminino</option>
@@ -72,4 +72,31 @@
     </div>
     <script src="{{ url_for('static', filename='background.js') }}"></script>
 </body>
+<script>
+    document.getElementById('area').addEventListener('change', function() {
+    var area = this.value;
+        fetch(`/gestores/${area}`)
+            .then(response => response.json())
+            .then(data => {
+                var gestorSelect = document.getElementById('gestor');
+                gestorSelect.innerHTML = '<option value="" disabled selected hidden>Selecione uma opção</option>';
+                data.gestores.forEach(function(gestor) {
+                    var option = document.createElement('option');
+                    option.value = gestor;
+                    option.text = gestor;
+                    gestorSelect.appendChild(option);
+                });
+            });
+    });
+
+    document.getElementById('gestor').addEventListener('change', function() {
+        var gestor = this.value;
+        fetch(`/area/${gestor}`)
+            .then(response => response.json())
+            .then(data => {
+                var areaSelect = document.getElementById('area');
+                areaSelect.value = data.area;  // Define o valor selecionado no select de área
+            });
+    });
+</script>
 </html>

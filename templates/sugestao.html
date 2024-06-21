@@ -47,13 +47,13 @@
                     <h4>Faixa Etária:</h4>
                     <select name="idade" id="idade" class="custom-select" >
                         <option value="" disabled selected hidden>Selecione uma opção</option>
-                        <option value="-24">24 anos ou menos</option>
+                        <option value="18-24">24 anos ou menos</option>
                         <option value="25-39">25-39 anos</option>
                         <option value="40-54">40-54 anos</option>
                         <option value="55+">55 anos ou mais</option>
                     </select>
                     <h4>Sexo:</h4>
-                    <select name="sexo" id="sexo" class="custom-select">
+                    <select name="genero" id="genero" class="custom-select">
                         <option value="" disabled selected hidden>Selecione uma opção</option>
                         <option value="M">Masculino</option>
                         <option value="F">Feminino</option>
@@ -71,7 +71,7 @@
                     <h4>Deixe aqui a sua sugestão:</h4>
                     <div class="suggestion">
                         <div class="suggestion-box">
-                            <textarea name="sugestao" id="sugestao" placeholder="Digite sua sugestão aqui..."></textarea>
+                            <textarea name="sugestao" id="sugestao" placeholder="Digite sua sugestão aqui..." required></textarea>
                         </div>
                     </div>
                 </div>
@@ -92,5 +92,32 @@
         </form>
     </div>
     <script src="{{ url_for('static', filename='background.js') }}"></script>
+    <script>
+        document.getElementById('area').addEventListener('change', function() {
+        var area = this.value;
+            fetch(`/gestores/${area}`)
+                .then(response => response.json())
+                .then(data => {
+                    var gestorSelect = document.getElementById('gestor');
+                    gestorSelect.innerHTML = '<option value="" disabled selected hidden>Selecione uma opção</option>';
+                    data.gestores.forEach(function(gestor) {
+                        var option = document.createElement('option');
+                        option.value = gestor;
+                        option.text = gestor;
+                        gestorSelect.appendChild(option);
+                    });
+                });
+        });
+    
+        document.getElementById('gestor').addEventListener('change', function() {
+            var gestor = this.value;
+            fetch(`/area/${gestor}`)
+                .then(response => response.json())
+                .then(data => {
+                    var areaSelect = document.getElementById('area');
+                    areaSelect.value = data.area;  // Define o valor selecionado no select de área
+                });
+        });
+    </script>
 </body>
 </html>
