@@ -1,21 +1,23 @@
-import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session, g, jsonify
-import sqlite3
+import mysql.connector
 import random
 import datetime
 import hashlib
-from config import ADMIN_USERNAME, ADMIN_PASSWORD
+from config import ADMIN_USERNAME, ADMIN_PASSWORD, MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB, ADMIN_LOGIN, ADMIN_LOGIN_SENHA
 
 app = Flask(__name__)
 app.secret_key = 'batata'
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE = os.path.join(BASE_DIR, 'database', 'clima_organizacional.db')
-
 def get_db():
     if 'db' not in g:
-        g.db = sqlite3.connect(DATABASE)
-        g.db.row_factory = sqlite3.Row
+        g.db = mysql.connector.connect(
+            host=MYSQL_HOST,
+            user=MYSQL_USER,
+            password=MYSQL_PASSWORD,
+            database=MYSQL_DB
+        )
+        cursor = g.db.cursor(dictionary=True)  # Configura o cursor para retornar resultados como dicionários
+        cursor.execute(f"USE {MYSQL_DB}")  # Seleciona o banco de dados desejado
     return g.db
 
 #Fechar o banco quando o app for encerrado
@@ -324,8 +326,8 @@ def settings():
     return render_template('settings.html')
 
 def check_admin(username, password):
-    admin_username = ADMIN_USERNAME
-    admin_password_hash = ADMIN_PASSWORD
+    admin_username = ADMIN_LOGIN
+    admin_password_hash = ADMIN_LOGIN_SENHA
     return username == admin_username and password == admin_password_hash
 
 @app.route('/dashboard')

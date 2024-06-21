@@ -1,6 +1,9 @@
 # Use a imagem base oficial do Python
 FROM python:3.9-slim
 
+# Instale o netcat
+RUN apt-get update && apt-get install -y netcat-openbsd
+
 # Defina o diretório de trabalho
 WORKDIR /app
 
@@ -21,4 +24,4 @@ ENV FLASK_RUN_HOST=0.0.0.0
 EXPOSE 5000
 
 # Comando para rodar a aplicação
-CMD ["flask", "run"]
+CMD ["sh", "start.sh"]

@@ -1,18 +1,30 @@
-import sqlite3
-import os
+import mysql.connector
 import random
 from datetime import datetime, timedelta
-
-# Defina o caminho para o banco de dados
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE = os.path.join(BASE_DIR, 'database', 'clima_organizacional.db')
+from config import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB, ADMIN_LOGIN, ADMIN_LOGIN_SENHA
 
 def get_db():
-    conn = sqlite3.connect(DATABASE)
+    conn = mysql.connector.connect(
+            host=MYSQL_HOST,
+            user=MYSQL_USER,
+            password=MYSQL_PASSWORD
+        )
     return conn, conn.cursor()
+
+def create_db():
+    conn, cursor = get_db()
+    try:
+        cursor.execute(f'CREATE DATABASE IF NOT EXISTS {MYSQL_DB}')  # Cria o banco de dados pulsa se ele não existir
+        conn.commit()
+        print("Banco de dados 'pulsa' criado com sucesso.")
+    except mysql.connector.Error as err:
+        print(f"Erro ao criar o banco de dados 'pulsa': {err}")
+    finally:
+        conn.close()
 
 def drop_tables():
     conn, cursor = get_db()
+    cursor.execute(f"USE {MYSQL_DB}")
     cursor.execute('DROP TABLE IF EXISTS pergunta_dim')
     cursor.execute('DROP TABLE IF EXISTS categoria_dim')
     cursor.execute('DROP TABLE IF EXISTS usuarios_dim')
@@ -29,137 +41,129 @@ def drop_tables():
 
 def create_tables():
     conn, cursor = get_db()
-    # Crie a tabela 'pergunta_dim'
+    cursor.execute(f"USE {MYSQL_DB}")
+    
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS pergunta_dim (
-        fk_pergunta INTEGER PRIMARY KEY,
-        desc_pergunta TEXT,
-        fk_categoria INTEGER,
-        FOREIGN KEY (fk_pergunta) REFERENCES respostas_fato (fk_pergunta)
-    )
-    ''')
-
-    # Crie a tabela 'categoria_dim'
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS categoria_dim (
-        fk_categoria INTEGER PRIMARY KEY,
-        desc_categoria TEXT,
-        FOREIGN KEY (fk_categoria) REFERENCES pergunta_dim (fk_categoria)
-    )
-    ''')
-
-    # Crie a tabela 'usuarios_dim'
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS usuarios_dim (
-        id INTEGER PRIMARY KEY,
-        fk_cargo INTEGER,
-        fk_area INTEGER,
-        fk_subarea INTEGER,
-        fk_gestor INTEGER,
-        data_inicio_companhia DATE,
-        data_inicio_funcao DATE
-    )
-    ''')
-
-    # Crie a tabela 'usuarios_respostas_fato'
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS usuarios_respostas_fato (
-        id INTEGER PRIMARY KEY,
-        data TEXT,
-        datetime TEXT,
-        FOREIGN KEY (id) REFERENCES usuarios_dim (id)
-    )
-    ''')
-
-    # Crie a tabela 'cargo_dim'
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS cargo_dim (
-        fk_cargo INTEGER PRIMARY KEY,
-        desc_cargo TEXT,
-        FOREIGN KEY (fk_cargo) REFERENCES usuarios_dim(fk_cargo)
-    )
-    ''')
-
-    # Crie a tabela 'area_dim'
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS area_dim (
-        fk_area INTEGER PRIMARY KEY,
-        desc_area TEXT,
-        FOREIGN KEY (fk_area) REFERENCES usuarios_dim(fk_area)
-    )
-    ''')
-
-    # Crie a tabela 'subarea_dim'
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS subarea_dim (
-        fk_subarea INTEGER PRIMARY KEY,
-        desc_subarea TEXT,
-        FOREIGN KEY (fk_subarea) REFERENCES usuarios_dim(fk_subarea)
-    )
-    ''')
-
-    # Crie a tabela 'gestor_dim'
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS gestor_dim (
-        fk_gestor INTEGER PRIMARY KEY,
-        desc_gestor TEXT,
-        id INTERGER,
-        FOREIGN KEY (fk_gestor) REFERENCES usuarios_dim(fk_gestor)
-    )
-    ''')
-
-    # Crie a tabela 'respostas_fato'
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS respostas_fato (
-        fk_subarea INTEGER,
-        fk_gestor INTEGER,
-        fk_cargo INTEGER,
-        idade TEXT,
-        genero TEXT,
-        fk_pergunta INTEGER,
-        fk_categoria INTEGER,
-        semana TEXT,
-        data TEXT,
-        datetime TEXT,
-        resposta REAL,
-        FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
-        FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
-        FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
-        FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim (fk_pergunta),
-        FOREIGN KEY (fk_categoria) REFERENCES categoria_dim (fk_categoria)
-    )
-    ''')
+        CREATE TABLE IF NOT EXISTS cargo_dim (
+            fk_cargo INTEGER PRIMARY KEY,
+            desc_cargo TEXT
+        )
+        ''')
 
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS sugestoes_fato (
-        id TEXT,
-        fk_cargo INTEGER,
-        fk_area INTEGER,
-        fk_subarea INTEGER,
-        fk_gestor INTEGER,
-        idade TEXT,
-        genero TEXT,
-        fk_pergunta INTEGER,
-        fk_categoria INTEGER,
-        semana TEXT,
-        data TEXT,
-        datetime TEXT,
-        sugestao TEXT,
-        respondido INTEGER,
-        FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
-        FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
-        FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
-        FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim (fk_pergunta),
-        FOREIGN KEY (fk_categoria) REFERENCES categoria_dim (fk_categoria)
-    )
-    ''')
+        CREATE TABLE IF NOT EXISTS area_dim (
+            fk_area INTEGER PRIMARY KEY,
+            desc_area TEXT
+        )
+        ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS subarea_dim (
+            fk_subarea INTEGER PRIMARY KEY,
+            desc_subarea TEXT
+        )
+        ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS gestor_dim (
+            fk_gestor INTEGER PRIMARY KEY,
+            desc_gestor TEXT,
+            id INTEGER
+        )
+        ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS categoria_dim (
+            fk_categoria INTEGER PRIMARY KEY,
+            desc_categoria TEXT
+        )
+        ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS pergunta_dim (
+            fk_pergunta INTEGER PRIMARY KEY,
+            desc_pergunta TEXT,
+            fk_categoria INTEGER,
+            FOREIGN KEY (fk_categoria) REFERENCES categoria_dim(fk_categoria)
+        )
+        ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios_dim (
+            id INTEGER PRIMARY KEY,
+            fk_cargo INTEGER,
+            fk_area INTEGER,
+            fk_subarea INTEGER,
+            fk_gestor INTEGER,
+            data_inicio_companhia DATE,
+            data_inicio_funcao DATE,
+            FOREIGN KEY (fk_cargo) REFERENCES cargo_dim(fk_cargo),
+            FOREIGN KEY (fk_area) REFERENCES area_dim(fk_area),
+            FOREIGN KEY (fk_subarea) REFERENCES subarea_dim(fk_subarea),
+            FOREIGN KEY (fk_gestor) REFERENCES gestor_dim(fk_gestor)
+        )
+        ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios_respostas_fato (
+            id INTEGER PRIMARY KEY,
+            data TEXT,
+            datetime TEXT,
+            FOREIGN KEY (id) REFERENCES usuarios_dim(id)
+        )
+        ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS respostas_fato (
+            fk_subarea INTEGER,
+            fk_gestor INTEGER,
+            fk_cargo INTEGER,
+            idade TEXT,
+            genero TEXT,
+            fk_pergunta INTEGER,
+            fk_categoria INTEGER,
+            semana TEXT,
+            data TEXT,
+            datetime TEXT,
+            resposta REAL,
+            FOREIGN KEY (fk_cargo) REFERENCES cargo_dim(fk_cargo),
+            FOREIGN KEY (fk_subarea) REFERENCES subarea_dim(fk_subarea),
+            FOREIGN KEY (fk_gestor) REFERENCES gestor_dim(fk_gestor),
+            FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim(fk_pergunta),
+            FOREIGN KEY (fk_categoria) REFERENCES categoria_dim(fk_categoria)
+        )
+        ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS sugestoes_fato (
+            id TEXT,
+            fk_cargo INTEGER,
+            fk_area INTEGER,
+            fk_subarea INTEGER,
+            fk_gestor INTEGER,
+            idade TEXT,
+            genero TEXT,
+            fk_pergunta INTEGER,
+            fk_categoria INTEGER,
+            semana TEXT,
+            data TEXT,
+            datetime TEXT,
+            sugestao TEXT,
+            respondido INTEGER,
+            FOREIGN KEY (fk_cargo) REFERENCES cargo_dim(fk_cargo),
+            FOREIGN KEY (fk_subarea) REFERENCES subarea_dim(fk_subarea),
+            FOREIGN KEY (fk_gestor) REFERENCES gestor_dim(fk_gestor),
+            FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim(fk_pergunta),
+            FOREIGN KEY (fk_categoria) REFERENCES categoria_dim(fk_categoria)
+        )
+        ''')
 
     conn.commit()
     conn.close()
 
 def insert_dados():
     conn, cursor = get_db()
-
+    cursor.execute(f"USE {MYSQL_DB}")
     cargo = [
         (1, 'Analista'),
         (2, 'Assistente'),
@@ -356,11 +360,11 @@ def insert_respostas_fato():
     conn.commit()
     conn.close()
 
-
-# drop_tables()
-# create_tables()
-# insert_dados()
-insert_respostas_fato()
+create_db()
+drop_tables()
+create_tables()
+insert_dados()
+# insert_respostas_fato()
 
 
 # conn, cursor = get_db()
