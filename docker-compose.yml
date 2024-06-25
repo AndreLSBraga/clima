@@ -10,16 +10,16 @@ services:
       - FLASK_ENV=development
       - DATABASE_HOST=db
       - DATABASE_USER=root
-      - DATABASE_PASSWORD=example
+      - DATABASE_PASSWORD=
     volumes:
       - .:/app
 
   db:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_PASSWORD:
     ports:
-      - "3306:3306"
+      - "8080:80"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
