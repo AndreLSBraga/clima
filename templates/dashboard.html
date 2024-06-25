@@ -91,12 +91,17 @@
 
                         <div class="bar-container-card">
                             <h2><i class="fas fa-star"></i>Nota Geral:</h2>
+                            
                             <div class="bar">
                                 <div class="bar-size">
                                     <div class="bar-value" data-nota="{{dados[0].nota_media }}" style="width: {{dados[0].size_bar}}%;"></div>
                                 </div>
                                 <div class="bar-dados">
-                                    <span>{{dados[0].nota_media}}</span>
+                                    {% if nota_media != None %}
+                                        <span>{{dados[0].nota_media}}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -108,7 +113,11 @@
                                     <div class="bar-value" data-nota="{{ dados[0].nota_nps }}" style="width: {{dados[0].size_nps}}%;"></div>
                                 </div>
                                 <div class="bar-dados">
-                                    <span>{{dados[0].nota_nps}}</span>
+                                    {% if nota_nps != None %}
+                                        <span>{{dados[0].nota_nps}}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -120,7 +129,11 @@
                                     <div class="bar-value" data-nota="{{ dados[0].nota_media }}" style="width: {{dados[0].size_bar}}%;"></div>
                                 </div>
                                 <div class="bar-dados">
-                                    <span>{{dados[0].nota_media}}</span>
+                                    {% if nota_media != None %}
+                                        <span>{{dados[0].nota_media}}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -144,7 +157,11 @@
                             <div class="bar-value" data-nota="{{ card.value }}" style="width: {{ card.size }}%;"></div>
                         </div>
                         <div class="bar-dados">
-                            <span>{{card.value}}</span>
+                            {% if card.value != None %}
+                                <span>{{card.value}}</span>
+                            {% else %}
+                                -
+                            {% endif %}
                         </div>                        
                     </div>
                     <div class="info-respostas">
@@ -165,26 +182,30 @@
             </div>
             <h1>Sugestões:</h1>
             <div class="tabela">
-                <table>
-                    <thead class="tb-cabecalho">
-                        <tr>
-                            <th>Data:</th>
-                            <th>Categoria:</th>
-                            <th>Sugestão:</th>
-                            <th>Respondido?</th>
-                        </tr>
-                    </thead>
-                    <tbody class="tb-linhas">
-                        {% for row in tabela %}
-                        <tr>
-                            <td>{{ row.data }}</td>
-                            <td>{{ row.categoria }}</td>
-                            <td>{{ row.sugestao }}</td>
-                            <td><input type="checkbox" {% if row.respondido %} checked {% endif %}></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                {% if tabela %}
+                    <table>
+                        <thead class="tb-cabecalho">
+                            <tr>
+                                <th>Data:</th>
+                                <th>Categoria:</th>
+                                <th>Sugestão:</th>
+                                <th>Respondido?</th>
+                            </tr>
+                        </thead>
+                        <tbody class="tb-linhas">
+                            {% for row in tabela %}
+                            <tr>
+                                <td>{{ row.data }}</td>
+                                <td>{{ row.categoria }}</td>
+                                <td>{{ row.sugestao }}</td>
+                                <td><input type="checkbox" {% if row.respondido %} checked {% endif %}></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Não há sugestões disponíveis no momento.</p>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -339,8 +360,10 @@
                                         <div class="pergunta-bar">
                                             <div class="pergunta-bar-size">
                                                 <div class="pergunta-bar-value" data-nota="${pergunta.nota}" style="width: ${pergunta.size}%;"></div>
-                                                <span>${pergunta.nota}</span>
                                             </div>
+                                            <div class="bar-dados">
+                                                <span>${pergunta.nota !== null ? pergunta.nota : '-'}</span>
+                                            </div>                        
                                         </div>
                                         <div class="info-respostas">
                                             <p>Nota baseada em ${pergunta.respostas} respostas</p>
