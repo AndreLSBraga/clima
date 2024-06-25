@@ -9,15 +9,15 @@ services:
     environment:
       - FLASK_ENV=development
       - DATABASE_HOST=db
-      - DATABASE_USER=root
-      - DATABASE_PASSWORD=
+      - DATABASE_USER=pulsa@localhost
+      - DATABASE_PASSWORD=Pulsa@2024
     volumes:
       - .:/app
 
   db:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD:
+      MYSQL_ROOT_PASSWORD:Pulsa@2024
     ports:
       - "8080:80"
     volumes:
