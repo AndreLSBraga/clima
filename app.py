@@ -170,7 +170,7 @@ def get_area_gestor(gestor):
 @app.route('/perguntas', methods=['GET', 'POST'])
 def perguntas():
     idade = session['idade']
-    # app.logger.debug(f"a idade é: {idade}, o session recebido é: {session}")
+
     def chama_perguntas():
         db = get_db()
         cursor = db.cursor()
@@ -189,20 +189,20 @@ def perguntas():
 
     perguntas = chama_perguntas()
     grupos_perguntas = cria_grupos_perguntas(perguntas)
-
+    
     if 'perguntas_selecionadas' not in session or session['perguntas_selecionadas'] == []:
         perguntas_selecionadas = []
         for grupo in grupos_perguntas.values():
-            selecionadas = random.sample(grupo, min(3, len(grupo)))
+            selecionadas = random.sample(grupo, min(1, len(grupo)))
             perguntas_selecionadas += selecionadas
-        if len(perguntas_selecionadas) >= 15:
-            session['perguntas_selecionadas'] = random.sample(perguntas_selecionadas, 15)
+        if len(perguntas_selecionadas) >= 10:
+            session['perguntas_selecionadas'] = random.sample(perguntas_selecionadas, 10)
         else:
             session['perguntas_selecionadas'] = perguntas_selecionadas
 
-    pergunta_atual = session.get('pergunta_atual', 0)
-    pergunta_atual = int(pergunta_atual)
+    pergunta_atual = int(session.get('pergunta_atual', 0))
     perguntas_selecionadas = session['perguntas_selecionadas']
+    
 
     if pergunta_atual >= len(perguntas_selecionadas):
         return redirect(url_for('final'))
@@ -210,10 +210,12 @@ def perguntas():
     db = get_db()
     cursor = db.cursor()
     num_pergunta = perguntas_selecionadas[pergunta_atual]
+    app.logger.debug(f"O número da pergunta atual é {pergunta_atual}, a pergunta é: {perguntas_selecionadas[pergunta_atual]}, do grupo de perguntas {perguntas_selecionadas}")
     cursor.execute('SELECT desc_pergunta FROM pergunta_dim WHERE fk_pergunta = %s', (num_pergunta,))
     pergunta = cursor.fetchone()[0]
     cursor.execute('SELECT fk_categoria FROM pergunta_dim WHERE fk_pergunta = %s', (num_pergunta,))
     categoria = cursor.fetchone()[0]
+    
     if request.method == 'POST':
         subarea = session['subarea'][0]
         gestor = session['gestor'][0]
@@ -225,33 +227,54 @@ def perguntas():
         semana_atual = datetime.datetime.now().isocalendar()[1]
         id = uuid.uuid4().hex
 
-        if 'pular' in request.form:
-            session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': -1, 'sugestao': ''})
-        else:
+        if 'anterior' in request.form:
+            if pergunta_atual > 0:
+                pergunta_atual -= 1
+                session['pergunta_atual'] = pergunta_atual
+
+        elif 'pular' in request.form or 'pular-inicial' in request.form:
+            if not any(res['pergunta'] == num_pergunta for res in session['respostas']):
+                session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': -1, 'sugestao': ''})
+            if pergunta_atual < len(perguntas_selecionadas) - 1:
+                pergunta_atual += 1
+                session['pergunta_atual'] = pergunta_atual
+
+        elif 'proxima' in request.form or 'enviar-inicial' in request.form:
             resposta = request.form['resposta']
             sugestao = request.form.get('sugestao', '')
-
             try:
                 resposta = float(resposta)
             except ValueError:
-                flash("A resposta deve ser um número entre 0 e 10.","warning")
-                return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=15)
+                flash("A resposta deve ser um número entre 0 e 10.", "warning")
+                return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=10)
 
-            session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': resposta, 'sugestao': sugestao})
-        
-        if 'proxima' in request.form or 'pular' in request.form or 'enviar-final' in request.form:
-            
-            if pergunta_atual < len(perguntas_selecionadas) - 1:
-                session['pergunta_atual'] = pergunta_atual + 1
+            existing_response = next((res for res in session['respostas'] if res['pergunta'] == num_pergunta), None)
+            if existing_response:
+                existing_response['resposta'] = resposta
+                existing_response['sugestao'] = sugestao
             else:
+                session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': resposta, 'sugestao': sugestao})
 
-                for resposta in session['respostas']:
+            if pergunta_atual < len(perguntas_selecionadas) - 1:
+                pergunta_atual += 1
+                session['pergunta_atual'] = pergunta_atual
+
+        if 'enviar-final' in request.form or 'pular-final' in request.form:
+            if 'enviar-final' in request.form:
+                resposta = float(request.form['resposta'])
+                sugestao = request.form.get('sugestao', '')
+                session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': resposta, 'sugestao': sugestao})
+
+            elif 'pular-final' in request.form:
+                session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': -1, 'sugestao': ''})
+        
+            for resposta in session['respostas']:
                     cursor.execute('''
                         INSERT INTO respostas_fato (fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_pergunta, fk_categoria, semana, data, datetime, resposta)
                             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         ''',  (subarea, gestor, cargo, idade, genero, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['resposta']))
                     db.commit()
-                    print(f'Respostas inseridas no banco')
+                    app.logger.debug(f"Resposta: {resposta}, inserida no banco")
 
                     if resposta['sugestao']:
                         cursor.execute('''
@@ -261,27 +284,17 @@ def perguntas():
                         db.commit()
                         print(f'Sugestões inseridos no banco')
 
-                session.pop('perguntas_selecionadas', None)
-                session.pop('pergunta_atual', None)
-                session.pop('respostas', None)
-                
-                flash("Respostas enviadas com sucesso!","success")
-                
-                cursor.close()
-                return redirect(url_for('final'))
-
-        elif 'anterior' in request.form:
-            if pergunta_atual > 0:
-                session['pergunta_atual'] = pergunta_atual - 1
-
-        pergunta_atual = session.get('pergunta_atual', 0)
-        pergunta_atual = int(pergunta_atual)
-        num_pergunta = perguntas_selecionadas[pergunta_atual]
-        cursor.execute('SELECT desc_pergunta FROM pergunta_dim WHERE fk_pergunta = %s', (num_pergunta,))
-        pergunta = cursor.fetchone()[0]
-        cursor.execute('SELECT fk_categoria FROM pergunta_dim WHERE fk_pergunta = %s', (num_pergunta,))
-        categoria = cursor.fetchone()[0]
-    return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=15)
+            session.pop('perguntas_selecionadas', None)
+            session.pop('pergunta_atual', None)
+            session.pop('respostas', None)    
+            flash("Respostas enviadas com sucesso!","success")
+            cursor.close()
+            return redirect(url_for('final'))
+        
+        app.logger.debug(f"A session respostas é {session['respostas']}")
+        app.logger.debug(f"A session é {session}")
+    app.logger.debug(f"Antes do render: O número da pergunta atual é {pergunta_atual}, a pergunta é: {perguntas_selecionadas[pergunta_atual]}, do grupo de perguntas {perguntas_selecionadas}")
+    return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=10)
 
 @app.route('/respondido', methods=['GET', 'POST'])
 def final(): 

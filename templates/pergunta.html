@@ -39,7 +39,7 @@
             <div class="buttons">
                 <button type="submit" name="anterior"><i class="fa-solid fa-angle-left"></i> Anterior</button>
                 {% if pergunta_num == total_perguntas %}
-                    <button type="submit" name="pular" onclick="confirmarEnvio()"> Pular e Enviar<i class="fa-solid fa-paper-plane"></i></button>
+                    <button type="button" name="pular" onclick="confirmarEnvio()"> Pular e Enviar<i class="fa-solid fa-paper-plane"></i></button>
                     <button type="button" name="enviar-inicial" onclick="confirmarEnvio()">Enviar<i class="fa-solid fa-paper-plane"></i></button>
                 {% else %}
                     <button type="submit" name="pular"> Pular<i class="fas fa-forward"></i></button>
@@ -51,8 +51,9 @@
                     <h2>Confirmar Envio</h2>
                     <p type="text">Você tem certeza de que deseja enviar suas respostas?</p>
                     <div class="buttons">
-                        <button name="pular" onclick="fecharModal()">Cancelar</button>
-                        <button type="submit" name="enviar-final"onclick="enviarFormulario()">Enviar<i class="fa-solid fa-paper-plane"></i></button>
+                        <button type="button" name="pular-inicial" onclick="fecharModal()">Cancelar</button>
+                        <button type="submit" name="pular-final"onclick="enviarFormulario()">Pular e Enviar<i class="fa-solid fa-paper-plane"></i></button>
+                        <button type="submit" name="enviar-final"onclick="enviarFormulario()">Responder e Enviar<i class="fa-solid fa-paper-plane"></i></button>
                     </div>
                 </div>
             </div>

@@ -380,6 +380,22 @@ button[name="enviar-inicial"] {
     transition: background-color 0.3s ease;
 }
 
+button[name="pular-inicial"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #DFA801; 
+    color: white; 
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
 button[name="enviar-final"] {
     display: flex;
     align-items: center;
@@ -410,6 +426,10 @@ button[name="pular"]:hover {
 
 button[name="proxima"]:hover {
     background-color: #03C956; 
+}
+
+button[name="pular-inicial"]:hover {
+    background-color: #FECB34; 
 }
 
 button[name="enviar-inicial"]:hover {
