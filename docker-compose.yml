@@ -8,8 +8,8 @@ services:
         condition: service_healthy
     environment:
       - FLASK_ENV=development
-      - DATABASE_HOST=db
-      - DATABASE_USER=pulsa@localhost
+      - DATABASE_HOST=10.3.160.240
+      - DATABASE_USER=root
       - DATABASE_PASSWORD=Pulsa@2024
     volumes:
       - .:/app

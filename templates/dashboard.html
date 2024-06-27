@@ -28,7 +28,7 @@
                 <p>Aqui está o resultado da sua Pulsa 7L. A nota está baseada em {{dados[0].qtd_respostas}} respostas, entre os dias {{dados[0].data_min}} e {{dados[0].data_max}}</p>
             </div>
             <div class="introbar-filters">
-                <form id="filtroForm" method="POST" action="/aplicar-filtros">
+                <!-- <form id="filtroForm" method="POST" action="/aplicar-filtros">
                     <div class="filtroForm-itens">
                         <label for="intervalo_datas">Intervalo de Datas:</label>
                         <input type="date" id="data_inicio" name="data_inicio" min="{{ dados[0].data_min }}" max="{{ dados[0].data_max }}">
@@ -81,7 +81,7 @@
                 <div class="introbar-botoes">
                     <button type="submit" class="buttons" name="filtrar"><i class="fas fa-filter"></i>Aplicar Filtros</button>
                     <button type="submit" class="buttons" name="limpar"><i class="fas fa-eraser"></i>Limpar Filtros</button>
-                </div>
+                </div> -->
             </div>
         </div>
         <div class="container">
@@ -104,6 +104,17 @@
                                     {% endif %}
                                 </div>
                             </div>
+                            <div class="info-respostas">
+                                <div class="info-respostas-dados">
+                                    <i class="fas fa-tasks"></i><p>Nº Respostas: {{dados[0].qtd_respostas}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <i class="fas fa-forward"></i><p>Nº Puladas: {{dados[0].qtd_puladas}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <i class="fas fa-calendar-alt"></i><p>Datas: {{dados[0].data_min}} e {{dados[0].data_max}}</p>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="bar-container-card">
@@ -113,11 +124,22 @@
                                     <div class="bar-value" data-nota="{{ dados[0].nota_nps }}" style="width: {{dados[0].size_nps}}%;"></div>
                                 </div>
                                 <div class="bar-dados">
-                                    {% if nota_nps != None %}
+                                    {% if dados[0].nota_nps != None %}
                                         <span>{{dados[0].nota_nps}}</span>
                                     {% else %}
                                         -
                                     {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-respostas">
+                                <div class="info-respostas-dados">
+                                    <i class="fas fa-tasks"></i><p>Nº Respostas: {{dados[0].qtd_nps}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <i class="fas fa-forward"></i><p>Nº Puladas: {{dados[0].qtd_puladas_nps}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <i class="fas fa-calendar-alt"></i><p>Datas: {{dados[0].data_min_nps}} e {{dados[0].data_max_nps}}</p>
                                 </div>
                             </div>
                         </div>
@@ -126,14 +148,25 @@
                             <h2><i class="fas fa-heart"></i>Segurança Psicológica:</h2>
                             <div class="bar">
                                 <div class="bar-size">
-                                    <div class="bar-value" data-nota="{{ dados[0].nota_media }}" style="width: {{dados[0].size_bar}}%;"></div>
+                                    <div class="bar-value" data-nota="{{ dados[0].nota_psico }}" style="width: {{dados[0].size_psico}}%;"></div>
                                 </div>
                                 <div class="bar-dados">
-                                    {% if nota_media != None %}
-                                        <span>{{dados[0].nota_media}}</span>
+                                    {% if nota_psico != None %}
+                                        <span>{{dados[0].nota_psico}}</span>
                                     {% else %}
                                         -
                                     {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-respostas">
+                                <div class="info-respostas-dados">
+                                    <i class="fas fa-tasks"></i><p>Nº Respostas: {{dados[0].qtd_psico}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <i class="fas fa-forward"></i><p>Nº Puladas: {{dados[0].qtd_puladas_psico}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <i class="fas fa-calendar-alt"></i><p>Datas: {{dados[0].data_min_psico}} e {{dados[0].data_max_psico}}</p>
                                 </div>
                             </div>
                         </div>
@@ -149,7 +182,7 @@
                 {% for card in cards %}
                 <div class="card-detalhe" id="card-{{ card.id }}">
                     <h3>
-                        <i class="{% if card.id == 1 %}fas fa-cloud{% elif card.id == 2 %}fas fa-user-tie{% elif card.id == 3 %}fas fa-tasks{% elif card.id == 4 %}fas fa-chart-line{% elif card.id == 5 %}fas fa-building{% elif card.id == 6 %}fas fa-dollar-sign{% elif card.id == 7 %}fas fa-smile{% elif card.id == 8 %}fas fa-comments{% endif %}"></i>
+                        <i class="{% if card.id == 1 %}fas fa-cloud{% elif card.id == 2 %}fas fa-user-tie{% elif card.id == 3 %}fas fa-tasks{% elif card.id == 4 %}fas fa-chart-line{% elif card.id == 5 %}fas fa-building{% elif card.id == 6 %}fas fa-dollar-sign{% elif card.id == 7 %}fas fa-smile{% elif card.id == 8 %}fas fa-comments{% elif card.id == 9 %}fas fa-tools{% elif card.id == 10 %}fas fa-brain{% endif %}"></i>
                         {{ card.title }}:
                     </h3>
                     <div class="bar">
@@ -164,8 +197,16 @@
                             {% endif %}
                         </div>                        
                     </div>
-                    <div class="info-respostas">
-                        <p>Nota baseada em {{card.qtd_respostas}} respostas, entre os dias {{data_min}} e {{data_max}}</p>
+                    <div class="info-respostas-cards">
+                        <div class="info-respostas-dados-cards">
+                            <i class="fas fa-tasks"></i><p>Nº Respostas: {{card.qtd_respostas}}</p>
+                        </div>
+                        <div class="info-respostas-dados-cards">
+                            <i class="fas fa-forward"></i><p>Nº Puladas: {{card.qtd_puladas}}</p>
+                        </div>
+                        <div class="info-respostas-dados-cards">
+                            <i class="fas fa-calendar-alt"></i><p>Datas: {{card.data_min}} e {{card.data_max}}</p>
+                        </div>
                     </div>
                     <div class="details">
                         <button class="buttons" data-id="{{ card.id }}" name="detalhes"><i class="fas fa-plus"></i> Detalhes</button></i>
@@ -339,6 +380,13 @@
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            function formatarData(data) {
+                const date = new Date(data);
+                const dia = date.getDate().toString().padStart(2, '0');
+                const mes = (date.getMonth() + 1).toString().padStart(2, '0');
+                const ano = date.getFullYear().toString().substr(-2);
+                return `${dia}/${mes}/${ano}`;
+            }
             const modal = document.getElementById("myModal");
             const modalTitle = document.getElementById("modalTitle");
             const modalContent = document.getElementById("modalContent");
@@ -353,7 +401,8 @@
                             modalTitle.textContent = data.title;
                             modalContent.innerHTML = `
                                 <p>${data.content}</p>
-                                ${data.perguntas.map((pergunta, index) => `
+                                ${data.perguntas.map((pergunta, index) =>
+                                `
                                 <div class="pergunta">
                                     <div class="pergunta-info">
                                         <h4>${pergunta.pergunta}</h4>
@@ -366,7 +415,15 @@
                                             </div>                        
                                         </div>
                                         <div class="info-respostas">
-                                            <p>Nota baseada em ${pergunta.respostas} respostas</p>
+                                            <div class="info-respostas-dados">
+                                                <i class="fas fa-tasks"></i><p>Nº Respostas: ${pergunta.respostas}</p>
+                                            </div>
+                                            <div class="info-respostas-dados">
+                                                <i class="fas fa-forward"></i><p>Nº Puladas: ${pergunta.puladas}</p>
+                                            </div>
+                                            <div class="info-respostas-dados">
+                                                <i class="fas fa-calendar-alt"></i><p>Datas: ${pergunta.data_min ? formatarData(pergunta.data_min) : '-'} e ${pergunta.data_max ? formatarData(pergunta.data_max) : '-'}</p>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="pergunta-grafico">

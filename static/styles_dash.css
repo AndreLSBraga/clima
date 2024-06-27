@@ -258,6 +258,33 @@ h1 {
     align-items: center;
 }
 
+.info-respostas {
+    display: flex;
+    justify-content: space-around;
+    width:100%;
+}
+.info-respostas-dados{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.info-respostas p {
+    font-size: 12px;
+}
+
+.info-respostas-cards {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.info-respostas-dados-cards{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.info-respostas-cards p {
+    font-size: 12px;
+}
 
 #card-grafico {
     width: 70%;
@@ -352,17 +379,6 @@ h1 {
     border-radius: 5px;
     white-space: nowrap;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-}
-
-/* .bar-total {
-    width: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-} */
-
-.info-respostas p {
-    font-size: 12px;
 }
 
 .buttons {
