@@ -7,7 +7,7 @@ while ! nc -z db 3306; do
 done
 
 # Executa o script de criação do banco de dados
-# python criar_db.py
+python criar_db.py
 
 # Inicia o servidor Flask
 flask run

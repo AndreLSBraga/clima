@@ -269,7 +269,7 @@ def insert_dados():
         (10,'Quão satisfeito eu estou com as funções desempenhadas no meu dia a dia ?',3),
         (11,'Quanto eu enxergo conexão entre a minha rotina e a estratégia da cervejaria ?',3),
         (12,'Quanto eu me sinto capacitado para realizar meus papéis e responsabilidades ?',3),
-        (13,'Nos últimos 3 meses, eu sento que tenho tempo suficiente para realizar minhas funções ?',3),
+        (13,'Nos últimos 3 meses, eu sinto que tenho tempo suficiente para realizar minhas funções ?',3),
         (14,'Quanto eu sinto que tenho autonomia para executar as minhas tarefas ?',3),
         (15,'Quanto eu tenho interesse em ocupar outros cargos dentro da Cia ?',4),
         (16,'Eu tenho um plano de desenvolvimento individual (PDI) e ele é claro ?',4),

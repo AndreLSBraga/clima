@@ -2,9 +2,9 @@
 ADMIN_USERNAME = 'root'
 ADMIN_PASSWORD = 'teste'
 
-MYSQL_HOST = 'db'
+MYSQL_HOST = '10.3.160.240'
 MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'example'
+MYSQL_PASSWORD = 'Pulsa@2024'
 MYSQL_DB = 'pulsa'
 
 ADMIN_LOGIN = '99772214'
