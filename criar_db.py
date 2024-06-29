@@ -1,7 +1,7 @@
 import mysql.connector
 import random
 from datetime import datetime, timedelta
-from config import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB, ADMIN_LOGIN, ADMIN_LOGIN_SENHA
+from config import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB
 
 def get_db():
     conn = mysql.connector.connect(
@@ -33,7 +33,7 @@ def drop_tables():
     cursor.execute('DROP TABLE IF EXISTS gestor_dim')
     cursor.execute('DROP TABLE IF EXISTS respostas_fato')
     cursor.execute('DROP TABLE IF EXISTS sugestoes_fato')
-
+    cursor.execute('DROP TABLE IF EXISTS usuarios')
     conn.commit()
     conn.close()
 
@@ -147,6 +147,16 @@ def create_tables():
     ''')
     print("Tabela sugestoes_fato criada com sucesso.")
     
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
+            fk_gestor INTEGER PRIMARY KEY,
+            senha VARCHAR(255),
+            tipo_usuario VARCHAR(255),
+            logou INTEGER, 
+            FOREIGN KEY (fk_gestor) REFERENCES gestor_dim(fk_gestor)
+        )
+    ''')
+    print("Tabela gestor_dim criada com sucesso.")
 
     conn.commit()
     conn.close()
@@ -309,6 +319,46 @@ def insert_dados():
     cursor.executemany('INSERT INTO pergunta_dim (fk_pergunta, desc_pergunta, fk_categoria) VALUES (%s, %s, %s)', perguntas)
     print("Insert na tabela pergunta_dim com sucesso.")
     
+    usuarios = [
+        (1,'pulsa7l'),
+        (2,'pulsa7l'),
+        (3,'pulsa7l'),
+        (4,'pulsa7l'),
+        (5,'pulsa7l'),
+        (6,'pulsa7l'),
+        (7,'pulsa7l'),
+        (8,'pulsa7l'),
+        (9,'pulsa7l'),
+        (10,'pulsa7l'),
+        (11,'pulsa7l'),
+        (12,'pulsa7l'),
+        (13,'pulsa7l'),
+        (14,'pulsa7l'),
+        (15,'pulsa7l'),
+        (16,'pulsa7l'),
+        (17,'pulsa7l'),
+        (18,'pulsa7l'),
+        (19,'pulsa7l'),
+        (20,'pulsa7l'),
+        (21,'pulsa7l'),
+        (22,'pulsa7l'),
+        (23,'pulsa7l'),
+        (24,'pulsa7l'),
+        (25,'pulsa7l'),
+        (26,'pulsa7l'),
+        (27,'pulsa7l'),
+        (28,'pulsa7l'),
+        (29,'pulsa7l'),
+        (30,'pulsa7l'),
+        (31,'pulsa7l'),
+        (32,'pulsa7l'),
+        (33,'pulsa7l'),
+        (34,'pulsa7l'),
+        (35,'pulsa7l')
+    ]
+    cursor.executemany('INSERT INTO usuarios (fk_gestor, senha) VALUES (%s, %s)', usuarios)
+    print("Insert na tabela usuarios com sucesso.")
+
     conn.commit()
     conn.close()
 

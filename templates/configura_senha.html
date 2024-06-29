@@ -14,19 +14,23 @@
             <h2>Pulsa 7L - Gestor</h2>
         </div>
     </nav>
-    <form action="{{ url_for('login') }}" method="POST">
+    <form action="{{ url_for('configura_senha') }}" method="POST">
         <div class="container">
-            <div class="text"><h3>Login</h3></div>
+            <div class="text">Configuração Senha</div>
             <div class="input-group">
-                <label for="username">Usuário:</label>
-                <input type="text" name="username" id="username" placeholder="Digite seu id..." required>
+                <label for="password">Senha Anterior:</label>
+                <input type="password" name="password" id="password"  placeholder="Digite a senha padrão" required>
             </div>
             <div class="input-group">
-                <label for="password">Password:</label>
-                <input type="password" name="password" id="password"  placeholder="Digite sua senha..." required>
+                <label for="username">Nova Senha:</label>
+                <input type="text" name="username" id="username" placeholder="Digite a nova senha" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Confirme a nova Senha:</label>
+                <input type="password" name="password" id="password"  placeholder="Confirme sua nova senha" required>
             </div>
             <div class="buttons">
-                <button type="submit" name="login">Login</button>
+                <button type="submit" name="login">Redifinir Senha</button>
             </div>
             <div class="alerts">
                 {% with messages = get_flashed_messages(with_categories=true) %}

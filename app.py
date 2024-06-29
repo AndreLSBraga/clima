@@ -6,6 +6,8 @@ import hashlib
 from config import ADMIN_USERNAME, ADMIN_PASSWORD, MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB, ADMIN_LOGIN, ADMIN_SENHA
 import uuid
 import logging
+import bcrypt
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -41,6 +43,9 @@ def id_existe(user_id):
     return result > 0
 
 def resposta_existe_esta_semana(user_id):
+    db = get_db()
+    cursor = db.cursor()
+
     semana_atual = datetime.datetime.now().isocalendar()[1]
     ano_atual = datetime.datetime.now().year
     
@@ -225,7 +230,7 @@ def perguntas():
         date_time = datetime.datetime.now()
         data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
         semana_atual = datetime.datetime.now().isocalendar()[1]
-        id = uuid.uuid4().hex
+        id_sugestao = uuid.uuid4().hex
 
         if 'anterior' in request.form:
             if pergunta_atual > 0:
@@ -278,9 +283,9 @@ def perguntas():
 
                     if resposta['sugestao']:
                         cursor.execute('''
-                            INSERT INTO sugestoes_fato (id, fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_pergunta, fk_categoria, semana, data, datetime, sugestao, respondido)
+                            INSERT INTO sugestoes_fato (id_sugestao, fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_pergunta, fk_categoria, semana, data, datetime, sugestao, respondido)
                                 VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                            ''', (id,subarea, gestor, cargo, idade, genero, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['sugestao'], 0))
+                            ''', (id_sugestao,subarea, gestor, cargo, idade, genero, resposta['pergunta'], resposta['categoria'], semana_atual, data_atual, date_time, resposta['sugestao'], 0))
                         db.commit()
                         print(f'Sugestões inseridos no banco')
 
@@ -321,7 +326,7 @@ def sugestao():
     gestores = consulta_tabelas('desc_gestor','gestor_dim')
     categorias = consulta_tabelas('desc_categoria','categoria_dim')
     if request.method == 'POST':
-        id = uuid.uuid4().hex
+        id_sugestao = uuid.uuid4().hex
         subarea = request.form.get('area', None)
         session['subarea'] = subarea
         gestor = request.form.get('gestor', None)
@@ -340,9 +345,9 @@ def sugestao():
             flash("Selecione as opções acima, todos os campos são obrigatórios.", "warning")
         else:
             cursor.execute('''
-                INSERT INTO sugestoes_fato (id, fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_categoria, semana, data, datetime, sugestao, respondido)
+                INSERT INTO sugestoes_fato (id_sugestao, fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_categoria, semana, data, datetime, sugestao, respondido)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ''', (id, fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_categoria, semana_atual, data_atual, date_time, sugestao, 0))
+                ''', (id_sugestao, fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_categoria, semana_atual, data_atual, date_time, sugestao, 0))
             db.commit()
             cursor.close()
             flash("Sugestão enviada com sucesso!", "success")
@@ -351,26 +356,77 @@ def sugestao():
     return render_template('sugestao.html', areas=subareas, gestores=gestores, cargos=cargos, categorias=categorias)
 
 def check_admin(username, password):
-    admin_username = ADMIN_LOGIN
-    admin_password_hash = ADMIN_SENHA
-    return username == admin_username and password == admin_password_hash
-
+    if(username == ADMIN_LOGIN and password == ADMIN_SENHA):
+        return True
+    else:
+        return False
+    
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+
+def login():   
+    # Função para gerar o hash da senha
+    def codifica_senha(senha_login):
+        # Gera um salt
+        salt = bcrypt.gensalt()
+        # Gera o hash da senha com o salt
+        senha_codificada = bcrypt.hashpw(senha_login.encode('utf-8'), salt)
+        return senha_codificada
+
+    def valida_login(usuario, senha_login):
+        db = get_db()
+        cursor = db.cursor()
+        
+        if not usuario.isdigit():
+            flash("Digite apenas números no ID","error")
+            return redirect(url_for('login'))
+        
+        #Consulta fk_gestor
+        cursor.execute('SELECT fk_gestor FROM gestor_dim WHERE id_gestor = %s',(usuario,))
+        fk_gestor = cursor.fetchone()[0]
+        
+        if not fk_gestor:
+            flash("Id não encontrado na base de gestores","error")
+            return redirect(url_for('login'))
+
+
+        cursor.execute('SELECT senha, logou FROM usuarios WHERE fk_gestor = %s',(fk_gestor,))
+        dados_usuarios = cursor.fetchone()
+        
+        app.logger.debug(f'Dados login: {dados_usuarios}')
+
+        senha_db = dados_usuarios[0]
+        logou = dados_usuarios[1]
+        
+        if not logou:
+            return redirect(url_for('configura_senha'))
+
+        if senha_login != senha_db:
+            flash("Senha incorreta. Digite a senha correta")
+            return redirect(url_for('login'))
+        cursor.close()
+        return True
+
+    
     if request.method == 'POST':
         usuario = request.form['username']
         senha = request.form['password']
-    
-        if check_admin(usuario, senha):
+
+        if check_admin(usuario, senha) == True:
             session['logged_in'] = True
             session['admin'] = True
             session['id'] = usuario
             return redirect(url_for('dashboard'))
+        
         else:
-            session.clear()
-            flash('Login inválido. Tente novamente.', 'error')
-
+            testa_id = valida_login(usuario, senha)
+            if testa_id:
+                return testa_id
+            
     return render_template('login.html')
+
+@app.route('/configura_senha', methods=['GET', 'POST'])
+def configura_senha():
+    return render_template('configura_senha.html')
 
 @app.route('/logout')
 def logout():
@@ -417,11 +473,6 @@ def dashboard():
     nome_gestor = consulta_gestor(usuario)[1]
     session['id_gestor'] = id_gestor
 
-    # if 'admin' not in session:
-    #     testa_id = valida_id(id_gestor,'login')
-    #     if testa_id:
-    #         return testa_id      
-    
     #Retorna caso não tenha respostas
     quantidade_respostas = consulta_quantidade('respostas_fato',id_gestor)
     
@@ -520,10 +571,10 @@ def dashboard():
             operation = f'SELECT * FROM sugestoes_fato WHERE fk_gestor = %s ORDER BY respondido ASC, datetime DESC'
             params = (fk_gestor,) 
         db = get_db()
-        cursor = db.cursor()
+        cursor = db.cursor(dictionary=True)
         cursor.execute(operation, params)
         resultado = cursor.fetchall()
-        
+        app.logger.debug(f'Resultados Sugestões:{resultado}')
         cursor.close()
         sugestoes = []
         
@@ -604,6 +655,7 @@ def dashboard():
         db = get_db()
         cursor = db.cursor()
         sugestoes = consulta_sugestoes('sugestoes_fato', id_gestor)
+        
         if sugestoes == None:
             return None
         
@@ -613,12 +665,12 @@ def dashboard():
             fk_categoria = sugestao['fk_categoria']
             cursor.execute(f'SELECT desc_categoria FROM categoria_dim WHERE fk_categoria = {fk_categoria}')
             categoria = cursor.fetchone()[0]
-            sugestao = sugestao['sugestao']
+            texto_sugestao = sugestao['sugestao']
             respondido = sugestao['respondido']
             row = {
                 'data': data,
                 'categoria': categoria,
-                'sugestao': sugestao,
+                'sugestao': texto_sugestao,
                 'respondido': respondido
             }
             tabela.append(row)
@@ -766,5 +818,3 @@ def get_detalhes(fk_categoria):
 
 if __name__ == '__main__':
     app.run(debug=True)
-    db = get_db()
-    cursor = db.cursor()
