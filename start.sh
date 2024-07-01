@@ -10,4 +10,4 @@ done
 #python criar_db.py
 
 # Inicia o servidor Flask
-flask run --host=0.0.0.0
+flask run

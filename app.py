@@ -174,8 +174,7 @@ def get_area_gestor(gestor):
     
 @app.route('/perguntas', methods=['GET', 'POST'])
 def perguntas():
-    idade = session['idade']
-
+    
     def chama_perguntas():
         db = get_db()
         cursor = db.cursor()
@@ -197,6 +196,7 @@ def perguntas():
     
     if 'perguntas_selecionadas' not in session or session['perguntas_selecionadas'] == []:
         perguntas_selecionadas = []
+        session['pergunta_atual'] = 0
         for grupo in grupos_perguntas.values():
             selecionadas = random.sample(grupo, min(1, len(grupo)))
             perguntas_selecionadas += selecionadas
@@ -205,22 +205,25 @@ def perguntas():
         else:
             session['perguntas_selecionadas'] = perguntas_selecionadas
 
-    pergunta_atual = int(session.get('pergunta_atual', 0))
+    pergunta_atual = session['pergunta_atual']
     perguntas_selecionadas = session['perguntas_selecionadas']
+    num_pergunta = perguntas_selecionadas[pergunta_atual]
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT fk_categoria FROM pergunta_dim WHERE fk_pergunta = %s', (num_pergunta,))
+    categoria = cursor.fetchone()[0]
+    cursor.execute('SELECT desc_pergunta FROM pergunta_dim WHERE fk_pergunta = %s', (num_pergunta,))
+    texto_pergunta = cursor.fetchone()[0]
     
+    
+    # pergunta_atual = int(session.get('pergunta_atual', 0))
+    
+    
+    # app.logger.debug(f"O número da pergunta atual é {pergunta_atual}, a pergunta é: {perguntas_selecionadas[pergunta_atual]}, do grupo de perguntas {perguntas_selecionadas}")
 
     if pergunta_atual >= len(perguntas_selecionadas):
         return redirect(url_for('final'))
 
-    db = get_db()
-    cursor = db.cursor()
-    num_pergunta = perguntas_selecionadas[pergunta_atual]
-    app.logger.debug(f"O número da pergunta atual é {pergunta_atual}, a pergunta é: {perguntas_selecionadas[pergunta_atual]}, do grupo de perguntas {perguntas_selecionadas}")
-    cursor.execute('SELECT desc_pergunta FROM pergunta_dim WHERE fk_pergunta = %s', (num_pergunta,))
-    pergunta = cursor.fetchone()[0]
-    cursor.execute('SELECT fk_categoria FROM pergunta_dim WHERE fk_pergunta = %s', (num_pergunta,))
-    categoria = cursor.fetchone()[0]
-    
     if request.method == 'POST':
         subarea = session['subarea'][0]
         gestor = session['gestor'][0]
@@ -234,24 +237,24 @@ def perguntas():
 
         if 'anterior' in request.form:
             if pergunta_atual > 0:
-                pergunta_atual -= 1
+                pergunta_atual = pergunta_atual - 1
                 session['pergunta_atual'] = pergunta_atual
 
-        elif 'pular' in request.form or 'pular-inicial' in request.form:
+        if 'pular' in request.form or 'pular-inicial' in request.form:
             if not any(res['pergunta'] == num_pergunta for res in session['respostas']):
                 session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': -1, 'sugestao': ''})
             if pergunta_atual < len(perguntas_selecionadas) - 1:
-                pergunta_atual += 1
+                pergunta_atual = pergunta_atual +  1
                 session['pergunta_atual'] = pergunta_atual
 
-        elif 'proxima' in request.form or 'enviar-inicial' in request.form:
+        if 'proxima' in request.form or 'enviar-inicial' in request.form:
             resposta = request.form['resposta']
             sugestao = request.form.get('sugestao', '')
             try:
                 resposta = float(resposta)
             except ValueError:
                 flash("A resposta deve ser um número entre 0 e 10.", "warning")
-                return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=10)
+                return render_template('pergunta.html', pergunta=texto_pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=10)
 
             existing_response = next((res for res in session['respostas'] if res['pergunta'] == num_pergunta), None)
             if existing_response:
@@ -261,8 +264,10 @@ def perguntas():
                 session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': resposta, 'sugestao': sugestao})
 
             if pergunta_atual < len(perguntas_selecionadas) - 1:
-                pergunta_atual += 1
+                pergunta_atual = pergunta_atual +  1
+                # app.logger.debug(f'o novo valor atribuido de pergunta atual é: {pergunta_atual}')
                 session['pergunta_atual'] = pergunta_atual
+                # app.logger.debug(f'Session de novo: {session}')
 
         if 'enviar-final' in request.form or 'pular-final' in request.form:
             if 'enviar-final' in request.form:
@@ -295,11 +300,16 @@ def perguntas():
             flash("Respostas enviadas com sucesso!","success")
             cursor.close()
             return redirect(url_for('final'))
-        
-        app.logger.debug(f"A session respostas é {session['respostas']}")
-        app.logger.debug(f"A session é {session}")
-    app.logger.debug(f"Antes do render: O número da pergunta atual é {pergunta_atual}, a pergunta é: {perguntas_selecionadas[pergunta_atual]}, do grupo de perguntas {perguntas_selecionadas}")
-    return render_template('pergunta.html', pergunta=pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=10)
+    
+    pergunta_atual = session['pergunta_atual']
+    perguntas_selecionadas = session['perguntas_selecionadas']
+    num_pergunta = perguntas_selecionadas[pergunta_atual]
+    cursor.execute('SELECT fk_categoria FROM pergunta_dim WHERE fk_pergunta = %s', (num_pergunta,))
+    categoria = cursor.fetchone()[0]
+    cursor.execute('SELECT desc_pergunta FROM pergunta_dim WHERE fk_pergunta = %s', (num_pergunta,))
+    texto_pergunta = cursor.fetchone()[0]
+
+    return render_template('pergunta.html', pergunta=texto_pergunta, pergunta_num=pergunta_atual + 1, total_perguntas=10)
 
 @app.route('/respondido', methods=['GET', 'POST'])
 def final(): 
@@ -352,6 +362,7 @@ def sugestao():
             cursor.close()
             flash("Sugestão enviada com sucesso!", "success")
             return redirect(url_for('final'))
+        
 
     return render_template('sugestao.html', areas=subareas, gestores=gestores, cargos=cargos, categorias=categorias)
 
@@ -426,6 +437,9 @@ def login():
 
 @app.route('/configura_senha', methods=['GET', 'POST'])
 def configura_senha():
+
+    if request.method == 'POST':
+        print('a')
     return render_template('configura_senha.html')
 
 @app.route('/logout')
@@ -817,4 +831,4 @@ def get_detalhes(fk_categoria):
     return jsonify(details_data)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

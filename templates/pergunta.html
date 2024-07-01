@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pulsa 7L - Perguntas</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -37,13 +35,13 @@
             </div>
             <div class="question-number">Pergunta {{ pergunta_num }} de {{ total_perguntas }}</div>
             <div class="buttons">
-                <button type="submit" name="anterior"><i class="fa-solid fa-angle-left"></i> Anterior</button>
+                <button type="submit" name="anterior"><img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/esquerda.svg') }}"> Anterior</button>
                 {% if pergunta_num == total_perguntas %}
-                    <button type="button" name="pular" onclick="confirmarEnvio()"> Pular e Enviar<i class="fa-solid fa-paper-plane"></i></button>
-                    <button type="button" name="enviar-inicial" onclick="confirmarEnvio()">Enviar<i class="fa-solid fa-paper-plane"></i></button>
+                    <button type="button" name="pular" onclick="confirmarEnvio()"> Pular e Enviar<img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/enviar.svg') }}"></button>
+                    <button type="button" name="enviar-inicial" onclick="confirmarEnvio()">Responder e Enviar<img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/enviar.svg') }}"></button>
                 {% else %}
-                    <button type="submit" name="pular"> Pular<i class="fas fa-forward"></i></button>
-                    <button type="submit" name="proxima">Próxima<i class="fa-solid fa-angle-right"></i></button>
+                    <button type="submit" name="pular"> Pular<img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}"></i></button>
+                    <button type="submit" name="proxima">Próxima<img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/direita.svg') }}"></i></button>
                 {% endif %}
             </div>      
             <div id="myModal" class="modal">
@@ -52,8 +50,8 @@
                     <p type="text">Você tem certeza de que deseja enviar suas respostas?</p>
                     <div class="buttons">
                         <button type="button" name="pular-inicial" onclick="fecharModal()">Cancelar</button>
-                        <button type="submit" name="pular-final"onclick="enviarFormulario()">Pular e Enviar<i class="fa-solid fa-paper-plane"></i></button>
-                        <button type="submit" name="enviar-final"onclick="enviarFormulario()">Responder e Enviar<i class="fa-solid fa-paper-plane"></i></button>
+                        <button type="submit" name="pular-final"onclick="enviarFormulario()">Pular e Enviar<img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/enviar.svg') }}"></i></button>
+                        <button type="submit" name="enviar-final"onclick="enviarFormulario()">Responder e Enviar<img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/enviar.svg') }}"></i></button>
                     </div>
                 </div>
             </div>

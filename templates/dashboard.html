@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Pulsa 7L</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Exo:wght@100..900&family=Titillium+Web:wght@200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles_dash.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/build/chartjs-plugin-datalabels.min.js"></script>
@@ -90,8 +88,7 @@
                     <div class="bar-container">
 
                         <div class="bar-container-card">
-                            <h2><i class="fas fa-star"></i>Nota Geral:</h2>
-                            
+                            <h2><i><img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/nota_geral.svg') }}"></i>Nota Geral:</h2>
                             <div class="bar">
                                 <div class="bar-size">
                                     <div class="bar-value" data-nota="{{dados[0].nota_media }}" style="width: {{dados[0].size_bar}}%;"></div>
@@ -106,19 +103,19 @@
                             </div>
                             <div class="info-respostas">
                                 <div class="info-respostas-dados">
-                                    <i class="fas fa-tasks"></i><p>Nº Respostas: {{dados[0].qtd_respostas}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}"><p>Nº Respostas: {{dados[0].qtd_respostas}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <i class="fas fa-forward"></i><p>Nº Puladas: {{dados[0].qtd_puladas}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}"><p>Nº Puladas: {{dados[0].qtd_puladas}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <i class="fas fa-calendar-alt"></i><p>Datas: {{dados[0].data_min}} e {{dados[0].data_max}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}"><p>Datas: {{dados[0].data_min}} e {{dados[0].data_max}}</p>
                                 </div>
                             </div>
                         </div>
 
                         <div class="bar-container-card">
-                            <h2><i class="fas fa-thumbs-up"></i>NPS:</h2>
+                            <h2><i><img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/nps.svg') }}"></i>NPS:</h2>
                             <div class="bar">
                                 <div class="bar-size">
                                     <div class="bar-value" data-nota="{{ dados[0].nota_nps }}" style="width: {{dados[0].size_nps}}%;"></div>
@@ -133,19 +130,19 @@
                             </div>
                             <div class="info-respostas">
                                 <div class="info-respostas-dados">
-                                    <i class="fas fa-tasks"></i><p>Nº Respostas: {{dados[0].qtd_nps}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}"><p>Nº Respostas: {{dados[0].qtd_nps}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <i class="fas fa-forward"></i><p>Nº Puladas: {{dados[0].qtd_puladas_nps}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}"><p>Nº Puladas: {{dados[0].qtd_puladas_nps}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <i class="fas fa-calendar-alt"></i><p>Datas: {{dados[0].data_min_nps}} e {{dados[0].data_max_nps}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}"><p>Datas: {{dados[0].data_min_nps}} e {{dados[0].data_max_nps}}</p>
                                 </div>
                             </div>
                         </div>
 
                         <div class="bar-container-card">
-                            <h2><i class="fas fa-heart"></i>Segurança Psicológica:</h2>
+                            <h2><img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/seguranca.svg') }}">Segurança Psicológica:</h2>
                             <div class="bar">
                                 <div class="bar-size">
                                     <div class="bar-value" data-nota="{{ dados[0].nota_psico }}" style="width: {{dados[0].size_psico}}%;"></div>
@@ -160,13 +157,13 @@
                             </div>
                             <div class="info-respostas">
                                 <div class="info-respostas-dados">
-                                    <i class="fas fa-tasks"></i><p>Nº Respostas: {{dados[0].qtd_psico}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}"><p>Nº Respostas: {{dados[0].qtd_psico}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <i class="fas fa-forward"></i><p>Nº Puladas: {{dados[0].qtd_puladas_psico}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}"><p>Nº Puladas: {{dados[0].qtd_puladas_psico}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <i class="fas fa-calendar-alt"></i><p>Datas: {{dados[0].data_min_psico}} e {{dados[0].data_max_psico}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}"><p>Datas: {{dados[0].data_min_psico}} e {{dados[0].data_max_psico}}</p>
                                 </div>
                             </div>
                         </div>
@@ -181,10 +178,32 @@
             <div class="container-cards detalhado">
                 {% for card in cards %}
                 <div class="card-detalhe" id="card-{{ card.id }}">
-                    <h3>
-                        <i class="{% if card.id == 1 %}fas fa-cloud{% elif card.id == 2 %}fas fa-user-tie{% elif card.id == 3 %}fas fa-tasks{% elif card.id == 4 %}fas fa-chart-line{% elif card.id == 5 %}fas fa-building{% elif card.id == 6 %}fas fa-dollar-sign{% elif card.id == 7 %}fas fa-smile{% elif card.id == 8 %}fas fa-comments{% elif card.id == 9 %}fas fa-tools{% elif card.id == 10 %}fas fa-brain{% endif %}"></i>
-                        {{ card.title }}:
-                    </h3>
+                    <div class="titulo-cards">
+                        {% if card.id == 1 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/clima.svg') }}" alt="Cloud">
+                        {% elif card.id == 2 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/lideranca.svg') }}" alt="User Tie">
+                        {% elif card.id == 3 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/funcoes.svg') }}" alt="Tasks">
+                        {% elif card.id == 4 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/carreira.svg') }}" alt="Chart Line">
+                        {% elif card.id == 5 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/ambiente.svg') }}" alt="Building">
+                        {% elif card.id == 6 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/salario.svg') }}" alt="Dollar Sign">
+                        {% elif card.id == 7 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/feedback.svg') }}" alt="Smile">
+                        {% elif card.id == 8 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/comunicacao.svg') }}" alt="Comments">
+                        {% elif card.id == 9 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/servicos.svg') }}" alt="Tools">
+                        {% elif card.id == 10 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/seguranca.svg') }}" alt="Brain">
+                        {% endif %}
+                        <h3>
+                            {{ card.title }}:
+                        </h3>
+                    </div>
                     <div class="bar">
                         <div class="bar-size">
                             <div class="bar-value" data-nota="{{ card.value }}" style="width: {{ card.size }}%;"></div>
@@ -199,13 +218,13 @@
                     </div>
                     <div class="info-respostas-cards">
                         <div class="info-respostas-dados-cards">
-                            <i class="fas fa-tasks"></i><p>Nº Respostas: {{card.qtd_respostas}}</p>
+                            <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}"><p>Nº Respostas: {{card.qtd_respostas}}</p>
                         </div>
                         <div class="info-respostas-dados-cards">
-                            <i class="fas fa-forward"></i><p>Nº Puladas: {{card.qtd_puladas}}</p>
+                            <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}"><p>Nº Puladas: {{card.qtd_puladas}}</p>
                         </div>
                         <div class="info-respostas-dados-cards">
-                            <i class="fas fa-calendar-alt"></i><p>Datas: {{card.data_min}} e {{card.data_max}}</p>
+                            <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}"><p>Datas: {{card.data_min}} e {{card.data_max}}</p>
                         </div>
                     </div>
                     <div class="details">
@@ -416,13 +435,13 @@
                                         </div>
                                         <div class="info-respostas">
                                             <div class="info-respostas-dados">
-                                                <i class="fas fa-tasks"></i><p>Nº Respostas: ${pergunta.respostas}</p>
+                                                <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}"></i><p>Nº Respostas: ${pergunta.respostas}</p>
                                             </div>
                                             <div class="info-respostas-dados">
-                                                <i class="fas fa-forward"></i><p>Nº Puladas: ${pergunta.puladas}</p>
+                                                <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}"></i><p>Nº Puladas: ${pergunta.puladas}</p>
                                             </div>
                                             <div class="info-respostas-dados">
-                                                <i class="fas fa-calendar-alt"></i><p>Datas: ${pergunta.data_min ? formatarData(pergunta.data_min) : '-'} e ${pergunta.data_max ? formatarData(pergunta.data_max) : '-'}</p>
+                                                <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}"></i><p>Datas: ${pergunta.data_min ? formatarData(pergunta.data_min) : '-'} e ${pergunta.data_max ? formatarData(pergunta.data_max) : '-'}</p>
                                             </div>
                                         </div>
                                     </div>

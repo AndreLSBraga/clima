@@ -419,40 +419,16 @@ def insert_respostas_fato():
     conn.commit()
     conn.close()
 
-create_db()
-drop_tables()
-create_tables()
-insert_dados()
+# create_db()
+# drop_tables()
+# create_tables()
+# insert_dados()
 # insert_respostas_fato()
 
 
-# conn, cursor = get_db()
-# # cursor.execute('DROP TABLE IF EXISTS sugestoes_fato')
-# # # Crie a tabela 'usuarios_respostas_fato'
-# # cursor.execute('''
-# #     CREATE TABLE IF NOT EXISTS sugestoes_fato (
-# #         id TEXT,
-# #         fk_cargo INTEGER,
-# #         fk_area INTEGER,
-# #         fk_subarea INTEGER,
-# #         fk_gestor INTEGER,
-# #         idade TEXT,
-# #         genero TEXT,
-# #         fk_pergunta INTEGER,
-# #         fk_categoria INTEGER,
-# #         semana TEXT,
-# #         data TEXT,
-# #         datetime TEXT,
-# #         sugestao TEXT,
-# #         respondido INTEGER,
-# #         FOREIGN KEY (fk_cargo) REFERENCES cargo_dim (fk_cargo),
-# #         FOREIGN KEY (fk_subarea) REFERENCES subarea_dim (fk_subarea),
-# #         FOREIGN KEY (fk_gestor) REFERENCES gestor_dim (fk_gestor),
-# #         FOREIGN KEY (fk_pergunta) REFERENCES pergunta_dim (fk_pergunta),
-# #         FOREIGN KEY (fk_categoria) REFERENCES categoria_dim (fk_categoria)
-# #     )
-# #     ''')
-
-# cursor.execute('INSERT into categoria_dim (fk_categoria, desc_categoria) values(%s, %s)', (10, "Serviços Gerais"))
-# conn.commit()
-# conn.close()
+conn, cursor = get_db()
+cursor.execute('select distinct fk_gestor from respostas_fato')
+gestor = cursor.fetchall()
+print(f'Gestor: {gestor}')
+conn.commit()
+conn.close()

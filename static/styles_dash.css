@@ -1,3 +1,19 @@
+@font-face {
+    font-family: 'Exo';
+    src: url("{{ url_for('static', filename='fonts/Exo/Exo-Regular.ttf') }}") format('ttf'),
+         url("{{ url_for('static', filename='fonts/Exo/Exo-Regular.ttf') }}") format('ttf');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    src: url("{{ url_for('static', filename='fonts/Titillium/TitilliumWeb-Regular.ttf') }}") format('ttf'),
+         url("{{ url_for('static', filename='fonts/Titillium/TitilliumWeb-Regular.ttf') }}") format('ttf');
+    font-weight: 400;
+    font-style: normal;
+}
+
 body, html {
     width: 100%;
     height: 100%;
@@ -258,6 +274,39 @@ h1 {
     align-items: center;
 }
 
+.titulo-cards {
+    display: flex;
+    align-items: center; /* Alinha verticalmente no centro */
+    justify-content: flex-start; /* Alinha horizontalmente no centro */
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.imagem-categorias {
+    width: 24px;  /* Ajuste conforme necessário */
+    height: 24px; /* Ajuste conforme necessário */
+    margin-right: 8px; /* Espaço entre a imagem e o texto */
+    display: inline-block;
+    vertical-align: middle; /* Garante alinhamento vertical */
+}
+
+.titulo-cards h3 {
+    display: inline-block;
+    margin: 0;
+    line-height: 24px; /* Ajuste para alinhar com a altura da imagem */
+    vertical-align: middle;
+}
+
+.imagem {
+    width: 20px;  /* Ajuste a largura conforme necessário */
+    height: auto;  /* Mantém a proporção da imagem */
+}
+
+.imagem-inicio {
+    width: 30px;  /* Ajuste a largura conforme necessário */
+    height: auto;  /* Mantém a proporção da imagem */
+}
+
 .info-respostas {
     display: flex;
     justify-content: space-around;
@@ -302,7 +351,6 @@ h1 {
 
 .container-cards.detalhado h3{
     margin-top: 0;
-    margin-bottom: 10px;
     font-size: 15px; 
 }
 
