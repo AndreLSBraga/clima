@@ -117,6 +117,17 @@ def nome_meses(mes):
         }
         return meses[mes]
 
+def codifica_senha(senha):
+        # Gera um salt
+        salt = bcrypt.gensalt()
+        # Gera o hash da senha com o salt
+        senha_codificada = bcrypt.hashpw(senha.encode('utf-8'), salt)
+        return senha_codificada
+
+def decodifica_senha(senha_digitada, senha_codificada):
+    return bcrypt.checkpw(senha_digitada.encode('utf-8'), senha_codificada.encode('utf-8'))
+
+
 @app.route('/', methods=['GET', 'POST'])
 def entrada():
     subareas = consulta_tabelas('desc_subarea','subarea_dim')
@@ -313,9 +324,7 @@ def perguntas():
 
 @app.route('/respondido', methods=['GET', 'POST'])
 def final(): 
-    if 'subarea' not in session:
-        return redirect(url_for('entrada'))
-    #Limpa os dados da sessão
+    
     session.clear()
     if request.method == 'POST':
         if 'enviar_sugestao' in request.form:
@@ -375,71 +384,83 @@ def check_admin(username, password):
 @app.route('/login', methods=['GET', 'POST'])
 
 def login():   
-    # Função para gerar o hash da senha
-    def codifica_senha(senha_login):
-        # Gera um salt
-        salt = bcrypt.gensalt()
-        # Gera o hash da senha com o salt
-        senha_codificada = bcrypt.hashpw(senha_login.encode('utf-8'), salt)
-        return senha_codificada
 
-    def valida_login(usuario, senha_login):
-        db = get_db()
-        cursor = db.cursor()
-        
-        if not usuario.isdigit():
-            flash("Digite apenas números no ID","error")
-            return redirect(url_for('login'))
-        
-        #Consulta fk_gestor
-        cursor.execute('SELECT fk_gestor FROM gestor_dim WHERE id_gestor = %s',(usuario,))
-        fk_gestor = cursor.fetchone()[0]
-        
-        if not fk_gestor:
-            flash("Id não encontrado na base de gestores","error")
-            return redirect(url_for('login'))
-
-
-        cursor.execute('SELECT senha, logou FROM usuarios WHERE fk_gestor = %s',(fk_gestor,))
-        dados_usuarios = cursor.fetchone()
-        
-        app.logger.debug(f'Dados login: {dados_usuarios}')
-
-        senha_db = dados_usuarios[0]
-        logou = dados_usuarios[1]
-        
-        if not logou:
-            return redirect(url_for('configura_senha'))
-
-        if senha_login != senha_db:
-            flash("Senha incorreta. Digite a senha correta")
-            return redirect(url_for('login'))
-        cursor.close()
-        return True
-
-    
     if request.method == 'POST':
         usuario = request.form['username']
         senha = request.form['password']
 
         if check_admin(usuario, senha) == True:
-            session['logged_in'] = True
             session['admin'] = True
+            session['logged_in'] = True
             session['id'] = usuario
             return redirect(url_for('dashboard'))
+        if not usuario.isdigit():
+            flash("Digite apenas números no ID","error")
+            return redirect(url_for('login'))
         
-        else:
-            testa_id = valida_login(usuario, senha)
-            if testa_id:
-                return testa_id
+        db = get_db()
+        cursor = db.cursor()
+        #Consulta fk_gestor
+        cursor.execute('SELECT fk_gestor FROM gestor_dim WHERE id_gestor = %s',(usuario,))
+        dados_gestor = cursor.fetchone()
+
+        if not dados_gestor:
+            flash("Id não encontrado na base de gestores","error")
+            return redirect(url_for('login'))
+        else:            
+            fk_gestor = dados_gestor[0]
+            session['fk_gestor'] = fk_gestor
+
+        cursor.execute('SELECT senha, tipo_usuario , logou FROM usuarios WHERE fk_gestor = %s',(fk_gestor,))
+        dados_usuarios = cursor.fetchone()
+        cursor.close()
+        senha_db = dados_usuarios[0]
+        perfil = dados_usuarios[1]
+        logou = dados_usuarios[2]
+                
+        if not logou:
+            if senha != 'pulsa7l':
+                flash("Senha incorreta. Digite a senha correta","error")
+                return redirect(url_for('login'))
+            return redirect(url_for('configura_senha'))
+        
+        check_senha = decodifica_senha(senha, senha_db)
+        if not check_senha:
+            flash("Senha incorreta. Digite a senha correta","error")
+            return redirect(url_for('login'))
+        
+        session['logged_in'] = True
+        session['id'] = usuario
+        session['perfil'] = perfil
+            
+        return redirect(url_for('dashboard'))
             
     return render_template('login.html')
 
 @app.route('/configura_senha', methods=['GET', 'POST'])
 def configura_senha():
-
+    fk_gestor = session['fk_gestor']
     if request.method == 'POST':
-        print('a')
+        senha_anterior = request.form['past_password']
+        senha_nova = request.form['new_password']
+        senha_confirmacao = request.form['confirmed_password']
+
+        if(senha_anterior != 'pulsa7l'):
+            flash("A senha anterior está incorreta", "error")
+            return render_template('configura_senha.html')
+        
+        if(senha_nova != senha_confirmacao):
+            flash("A senha nova e a confirmação estão diferentes", "error")
+            return render_template('configura_senha.html')
+        
+        senha_codificada = codifica_senha(senha_nova)
+        db = get_db()
+        cursor = db.cursor()
+        #Atualiza senha nova no banco
+        cursor.execute('UPDATE usuarios SET senha = %s, logou = 1 WHERE fk_gestor = %s',(senha_codificada, fk_gestor))
+        db.commit()
+        flash('Senha nova cadastrada, faça o login novamente',"success")
+        return redirect(url_for('login'))
     return render_template('configura_senha.html')
 
 @app.route('/logout')
@@ -454,6 +475,7 @@ def settings():
 @app.route('/dashboard')
 def dashboard():
     if 'logged_in' not in session:
+        flash('É necessário fazer login primeiro',"warning")
         return redirect(url_for('login'))
     
     def consulta_gestor(id_gestor):
@@ -490,9 +512,9 @@ def dashboard():
     #Retorna caso não tenha respostas
     quantidade_respostas = consulta_quantidade('respostas_fato',id_gestor)
     
-    if quantidade_respostas == 0:
-        flash('Você ainda não tem respostas para avaliar', "warning")
-        return render_template('login.html')
+    # if quantidade_respostas == 0:
+    #     flash('Você ainda não tem respostas para avaliar', "warning")
+    #     return render_template('login.html')
     
     def consulta_puladas(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None):
         db = get_db()

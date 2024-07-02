@@ -23,7 +23,7 @@
         <div class="introbar">
             <div class="introbar-text">
                 <h1>Bem-vindo, {{dados[0].nome}}!</h1>
-                <p>Aqui está o resultado da sua Pulsa 7L. A nota está baseada em {{dados[0].qtd_respostas}} respostas, entre os dias {{dados[0].data_min}} e {{dados[0].data_max}}</p>
+                <p>Nota baseada em {{dados[0].qtd_respostas}} respostas, entre os dias {{dados[0].data_min}} e {{dados[0].data_max}}</p>
             </div>
             <div class="introbar-filters">
                 <!-- <form id="filtroForm" method="POST" action="/aplicar-filtros">
@@ -88,7 +88,11 @@
                     <div class="bar-container">
 
                         <div class="bar-container-card">
-                            <h2><i><img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/nota_geral.svg') }}"></i>Nota Geral:</h2>
+                            <div class="titulo-cards">
+                                <img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/nota_geral.svg') }}">
+                                <h2>Nota Geral:</h2>
+                            </div>
+                            
                             <div class="bar">
                                 <div class="bar-size">
                                     <div class="bar-value" data-nota="{{dados[0].nota_media }}" style="width: {{dados[0].size_bar}}%;"></div>
@@ -103,19 +107,25 @@
                             </div>
                             <div class="info-respostas">
                                 <div class="info-respostas-dados">
-                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}"><p>Nº Respostas: {{dados[0].qtd_respostas}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}">
+                                    <p>Nº Respostas: {{dados[0].qtd_respostas}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}"><p>Nº Puladas: {{dados[0].qtd_puladas}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}">
+                                    <p>Nº Puladas: {{dados[0].qtd_puladas}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}"><p>Datas: {{dados[0].data_min}} e {{dados[0].data_max}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}">
+                                    <p>Datas: {{dados[0].data_min}} e {{dados[0].data_max}}</p>
                                 </div>
                             </div>
                         </div>
 
                         <div class="bar-container-card">
-                            <h2><i><img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/nps.svg') }}"></i>NPS:</h2>
+                            <div class="titulo-cards">
+                                <img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/nps.svg') }}">
+                                <h2>NPS:</h2>
+                            </div>
                             <div class="bar">
                                 <div class="bar-size">
                                     <div class="bar-value" data-nota="{{ dados[0].nota_nps }}" style="width: {{dados[0].size_nps}}%;"></div>
@@ -130,19 +140,26 @@
                             </div>
                             <div class="info-respostas">
                                 <div class="info-respostas-dados">
-                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}"><p>Nº Respostas: {{dados[0].qtd_nps}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}">
+                                    <p>Nº Respostas: {{dados[0].qtd_nps}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}"><p>Nº Puladas: {{dados[0].qtd_puladas_nps}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}">
+                                    <p>Nº Puladas: {{dados[0].qtd_puladas_nps}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}"><p>Datas: {{dados[0].data_min_nps}} e {{dados[0].data_max_nps}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}">
+                                    <p>Datas: {{dados[0].data_min_nps}} e {{dados[0].data_max_nps}}</p>
                                 </div>
                             </div>
                         </div>
 
                         <div class="bar-container-card">
-                            <h2><img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/seguranca.svg') }}">Segurança Psicológica:</h2>
+                            <div class="titulo-cards">
+                                <img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/seguranca.svg') }}">
+                                <h2>Segurança Psicológica:</h2>
+                            </div>
+                            
                             <div class="bar">
                                 <div class="bar-size">
                                     <div class="bar-value" data-nota="{{ dados[0].nota_psico }}" style="width: {{dados[0].size_psico}}%;"></div>
@@ -157,13 +174,16 @@
                             </div>
                             <div class="info-respostas">
                                 <div class="info-respostas-dados">
-                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}"><p>Nº Respostas: {{dados[0].qtd_psico}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}">
+                                    <p>Nº Respostas: {{dados[0].qtd_psico}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}"><p>Nº Puladas: {{dados[0].qtd_puladas_psico}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}">
+                                    <p>Nº Puladas: {{dados[0].qtd_puladas_psico}}</p>
                                 </div>
                                 <div class="info-respostas-dados">
-                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}"><p>Datas: {{dados[0].data_min_psico}} e {{dados[0].data_max_psico}}</p>
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}">
+                                    <p>Datas: {{dados[0].data_min_psico}} e {{dados[0].data_max_psico}}</p>
                                 </div>
                             </div>
                         </div>

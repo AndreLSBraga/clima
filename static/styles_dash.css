@@ -290,6 +290,21 @@ h1 {
     vertical-align: middle; /* Garante alinhamento vertical */
 }
 
+.imagem-inicio {
+    width: 24px;  /* Ajuste conforme necessário */
+    height: 24px; /* Ajuste conforme necessário */
+    margin-right: 8px; /* Espaço entre a imagem e o texto */
+    display: inline-block;
+    vertical-align: middle; /* Garante alinhamento vertical */
+}
+
+.titulo-cards h2 {
+    display: inline-block;
+    margin: 0;
+    line-height: 24px; /* Ajuste para alinhar com a altura da imagem */
+    vertical-align: middle;
+}
+
 .titulo-cards h3 {
     display: inline-block;
     margin: 0;
@@ -371,16 +386,10 @@ h1 {
     box-sizing: border-box;
 }
 
-
 .bar-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
-}
-
-.bar-container h2{
-    margin-top: 0;
-    margin-bottom: 10px;
 }
 
 .bar-container h2 i {
@@ -388,6 +397,16 @@ h1 {
     color: #333; /* Cor do ícone */
     font-size: 32px; /* Tamanho do ícone */
 }
+
+.titulo{
+    display: flex;
+}
+
+.titulo h2{
+    margin-left: 10px;
+    align-content: center;
+}
+
 
 .bar {
     display:flex;

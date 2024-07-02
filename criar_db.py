@@ -123,7 +123,7 @@ def create_tables():
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS sugestoes_fato (
-            id VARCHAR(255) PRIMARY KEY,
+            id_sugestao VARCHAR(255) PRIMARY KEY,
             fk_cargo INTEGER,
             fk_area INTEGER,
             fk_subarea INTEGER,

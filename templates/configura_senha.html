@@ -14,20 +14,21 @@
             <h2>Pulsa 7L - Gestor</h2>
         </div>
     </nav>
+
     <form action="{{ url_for('configura_senha') }}" method="POST">
         <div class="container">
             <div class="text">Configuração Senha</div>
             <div class="input-group">
-                <label for="password">Senha Anterior:</label>
-                <input type="password" name="password" id="password"  placeholder="Digite a senha padrão" required>
+                <label for="past_password">Senha Anterior:</label>
+                <input type="password" name="past_password" id="past_password"  placeholder="Digite a senha padrão" required>
             </div>
             <div class="input-group">
-                <label for="username">Nova Senha:</label>
-                <input type="text" name="username" id="username" placeholder="Digite a nova senha" required>
+                <label for="new_password">Nova Senha:</label>
+                <input type="password" name="new_password" id="new_password" placeholder="Digite a nova senha" required>
             </div>
             <div class="input-group">
-                <label for="password">Confirme a nova Senha:</label>
-                <input type="password" name="password" id="password"  placeholder="Confirme sua nova senha" required>
+                <label for="confirmed_password">Confirme a nova Senha:</label>
+                <input type="password" name="confirmed_password" id="confirmed_password"  placeholder="Confirme sua nova senha" required>
             </div>
             <div class="buttons">
                 <button type="submit" name="login">Redifinir Senha</button>
