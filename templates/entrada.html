@@ -10,7 +10,7 @@
 <body>
     <nav class="navbar">
         <div class="navbar-logo">
-            <h2>Pulsa 7L</h2>
+            <img class="logo" src="{{ url_for('static', filename='images/logo_completa.svg') }}">
         </div>
         <ul class="navbar-menu">
             <li><a href="{{ url_for('entrada') }}" class="active">Responder</a></li>
@@ -18,7 +18,7 @@
         </ul>
     </nav>
     <div class="container">
-        <h1>Pulsa 7L</h1>
+        <img class="logo" src="{{ url_for('static', filename='images/logo_completa.svg') }}">
         <form action="/" method="POST">
             <h4>Selecione sua área:</h4>
             <select name="area" id="area" class="custom-select" required>

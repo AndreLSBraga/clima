@@ -26,7 +26,7 @@ body, html {
     justify-content: center;
     align-items: center;
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 .background-image-container {
@@ -62,12 +62,13 @@ body, html {
     z-index: 1000;
 }
 
-.navbar-logo h2 {
-    margin: 0;
-    color: #2AB7CA;
-    font-family: "Exo", sans-serif;
-    font-size: 32px;
-    margin-right: 20px; /* Espaçamento entre o título e as opções */
+.navbar-logo .logo {
+    /* Dimensionando a imagem */
+    width: 100%; /* A imagem terá a largura da div */
+    height: auto; /* A altura será ajustada proporcionalmente */
+    max-width: 100px; /* Limite máximo da largura */
+    max-height: 100px; /* Limite máximo da altura */
+    margin-right: 20px;
 }
 
 .navbar-menu {
@@ -125,6 +126,14 @@ body, html {
     max-width: 800px;  
     min-width: 300px;  
     min-height: 400px;  
+}
+
+.container .logo {
+    /* Dimensionando a imagem */
+    width: 100%; /* A imagem terá a largura da div */
+    height: auto; /* A altura será ajustada proporcionalmente */
+    max-width: 400px; /* Limite máximo da largura */
+    max-height: 400px; /* Limite máximo da altura */
 }
 
 .panel{
