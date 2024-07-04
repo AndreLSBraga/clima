@@ -9,18 +9,23 @@
 <body>
     <nav class="navbar">
         <div class="navbar-logo">
-            <h2>Pulsa 7L - Gestor</h2>
+            <img class="logo" src="{{ url_for('static', filename='images/logo_completa.svg') }}">
         </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('entrada') }}" >Responder</a></li>
+            <li><a href="{{ url_for('sugestao') }}">Sugestões</a></li>
+            <li><a href="{{ url_for('login') }}" class="active">Gestor</a></li>
+        </ul>
     </nav>
     <form action="{{ url_for('login') }}" method="POST">
         <div class="container">
-            <div class="text">Pulsa 7L</div>
+            <img class="logo" src="{{ url_for('static', filename='images/Gestor.svg') }}">
             <div class="input-group">
                 <label for="username">Usuário:</label>
                 <input type="text" name="username" id="username" placeholder="Digite seu id..." required>
             </div>
             <div class="input-group">
-                <label for="password">Password:</label>
+                <label for="password">Senha:</label>
                 <input type="password" name="password" id="password"  placeholder="Digite sua senha..." required>
             </div>
             <div class="buttons">

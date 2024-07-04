@@ -60,15 +60,7 @@ body, html {
     position: fixed;
     top: 0;
     z-index: 1000;
-}
-
-.navbar-logo .logo {
-    /* Dimensionando a imagem */
-    width: 100%; /* A imagem terá a largura da div */
-    height: auto; /* A altura será ajustada proporcionalmente */
-    max-width: 100px; /* Limite máximo da largura */
-    max-height: 100px; /* Limite máximo da altura */
-    margin-right: 20px;
+    height: 40px;
 }
 
 .navbar-menu {
@@ -123,17 +115,19 @@ body, html {
     background-color: #F4F4F8;
     z-index: 1;
     width: 80%;
-    max-width: 800px;  
+    height: auto;
+    max-width: 900px;  
     min-width: 300px;  
-    min-height: 400px;  
+    min-height: 200px;
+    margin-top: 70px; /* Ajuste conforme a altura da navbar + um pouco de espaço */
 }
 
 .container .logo {
     /* Dimensionando a imagem */
     width: 100%; /* A imagem terá a largura da div */
     height: auto; /* A altura será ajustada proporcionalmente */
-    max-width: 400px; /* Limite máximo da largura */
-    max-height: 400px; /* Limite máximo da altura */
+    max-width: 300px; /* Limite máximo da largura */
+    max-height: 300px; /* Limite máximo da altura */
 }
 
 .panel{
@@ -597,4 +591,12 @@ input[type="password"]:focus {
     width: 20px;  /* Ajuste a largura conforme necessário */
     height: auto;  /* Mantém a proporção da imagem */
     filter: brightness(0) invert(1);
+}
+
+.input-group {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 15px;
 }

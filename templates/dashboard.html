@@ -11,18 +11,18 @@
 <body>
     <div class="sidebar">
         <div class="sidebar-logo">
-            <h2>Pulsa 7L</h2>
+            <img class="logo" src="{{ url_for('static', filename='images/logo_completa.svg') }}">
         </div>
         <ul class="sidebar-menu">
             <li><a href="{{ url_for('dashboard') }}" class="active">Dashboard</a></li>
             <li><a href="{{ url_for('settings') }}">Settings</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            <li><a href="{{ url_for('logout') }}">Sair</a></li>
         </ul>
     </div>
     <div class="main-content">
         <div class="introbar">
             <div class="introbar-text">
-                <h1>Bem-vindo, {{dados[0].nome}}!</h1>
+                <h1>Olá, {{dados[0].nome}}!</h1>
                 <p>Nota baseada em {{dados[0].qtd_respostas}} respostas, entre os dias {{dados[0].data_min}} e {{dados[0].data_max}}</p>
             </div>
             <div class="introbar-filters">

@@ -75,11 +75,12 @@ h1 {
     z-index: 1000;
 }
 
-.sidebar-logo h2 {
+.sidebar-logo .logo {
     margin: 0;
-    color: #2AB7CA;
-    font-family: "Exo", sans-serif;
-    font-size: 24px;
+    width: 100%; /* A imagem terá a largura da div */
+    height: auto; /* A altura será ajustada proporcionalmente */
+    max-width: 150px; /* Limite máximo da largura */
+    max-height: 100px; /* Limite máximo da altura */
     margin-bottom: 20px; /* Espaçamento entre o título e as opções */
 }
 
