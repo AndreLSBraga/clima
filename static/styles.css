@@ -63,6 +63,15 @@ body, html {
     height: 40px;
 }
 
+.navbar-logo .logo {
+    /* Dimensionando a imagem */
+    width: 100%; /* A imagem terá a largura da div */
+    height: auto; /* A altura será ajustada proporcionalmente */
+    max-width: 100px; /* Limite máximo da largura */
+    max-height: 40px; /* Limite máximo da altura */
+    margin-right: 20px;
+}
+
 .navbar-menu {
     list-style: none;
     display: flex;
@@ -599,4 +608,8 @@ input[type="password"]:focus {
     flex-wrap: wrap;
     width: 100%;
     margin-top: 15px;
+}
+
+.login{
+    height: 100%;
 }

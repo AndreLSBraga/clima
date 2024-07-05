@@ -71,7 +71,7 @@ def valida_id(user_id, destino):
         return redirect(url_for(destino))
 
     if not id_existe(user_id):
-        flash("O Id não foi encontrado. Digite um Id válido","error")
+        flash("O Id não foi encontrado","error")
         return redirect(url_for(destino))
 
     return None
@@ -637,6 +637,9 @@ def dashboard():
 
     def gera_filtros(fk_gestor):
         fk_cargos = consulta_filtros('fk_cargo','respostas_fato', fk_gestor)
+        
+        if not fk_cargos:
+            return None
         
         cargos = []
         for fk_cargo in fk_cargos:
