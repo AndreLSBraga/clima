@@ -14,8 +14,14 @@
             <img class="logo" src="{{ url_for('static', filename='images/logo_completa.svg') }}">
         </div>
         <ul class="sidebar-menu">
-            <li><a href="{{ url_for('dashboard') }}" class="active">Dashboard</a></li>
-            <li><a href="{{ url_for('settings') }}">Settings</a></li>
+            <li><a href="{{ url_for('dashboard') }}" class="active">Time</a></li>
+            {% if perfil == 'admin' or perfil == 'gerente_fabril' or perfil == gerente %}
+                <li><a href="{{ url_for('settings') }}">Liderados</a></li>
+            {% endif %}
+            {% if perfil == 'admin' or perfil == 'gerente_fabril' %}
+                <li><a href="{{ url_for('settings') }}">Lideranças</a></li>
+                <li><a href="{{ url_for('settings') }}">Configurações</a></li>
+            {% endif %}
             <li><a href="{{ url_for('logout') }}">Sair</a></li>
         </ul>
     </div>

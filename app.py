@@ -244,7 +244,7 @@ def perguntas():
         date_time = datetime.datetime.now()
         data_atual = datetime.datetime.now().strftime("%Y-%m-%d")
         semana_atual = datetime.datetime.now().isocalendar()[1]
-        id_sugestao = uuid.uuid4().hex
+        
 
         if 'anterior' in request.form:
             if pergunta_atual > 0:
@@ -252,8 +252,13 @@ def perguntas():
                 session['pergunta_atual'] = pergunta_atual
 
         if 'pular' in request.form or 'pular-inicial' in request.form:
-            if not any(res['pergunta'] == num_pergunta for res in session['respostas']):
+            existing_response = next((res for res in session['respostas'] if res['pergunta'] == num_pergunta), None)
+            if existing_response:
+                existing_response['resposta'] = -1
+                existing_response['sugestao'] = ' '
+            else:
                 session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': -1, 'sugestao': ''})
+
             if pergunta_atual < len(perguntas_selecionadas) - 1:
                 pergunta_atual = pergunta_atual +  1
                 session['pergunta_atual'] = pergunta_atual
@@ -276,15 +281,18 @@ def perguntas():
 
             if pergunta_atual < len(perguntas_selecionadas) - 1:
                 pergunta_atual = pergunta_atual +  1
-                # app.logger.debug(f'o novo valor atribuido de pergunta atual é: {pergunta_atual}')
                 session['pergunta_atual'] = pergunta_atual
-                # app.logger.debug(f'Session de novo: {session}')
 
         if 'enviar-final' in request.form or 'pular-final' in request.form:
             if 'enviar-final' in request.form:
                 resposta = float(request.form['resposta'])
                 sugestao = request.form.get('sugestao', '')
-                session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': resposta, 'sugestao': sugestao})
+                existing_response = next((res for res in session['respostas'] if res['pergunta'] == num_pergunta), None)
+                if existing_response:
+                    existing_response['resposta'] = resposta
+                    existing_response['sugestao'] = sugestao
+                else:
+                    session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': resposta, 'sugestao': sugestao})
 
             elif 'pular-final' in request.form:
                 session['respostas'].append({'categoria': categoria, 'pergunta': num_pergunta, 'resposta': -1, 'sugestao': ''})
@@ -298,6 +306,7 @@ def perguntas():
                     app.logger.debug(f"Resposta: {resposta}, inserida no banco")
 
                     if resposta['sugestao']:
+                        id_sugestao = uuid.uuid4().hex
                         cursor.execute('''
                             INSERT INTO sugestoes_fato (id_sugestao, fk_subarea, fk_gestor, fk_cargo, idade, genero, fk_pergunta, fk_categoria, semana, data, datetime, sugestao, respondido)
                                 VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -390,10 +399,11 @@ def login():
         senha = request.form['password']
 
         if check_admin(usuario, senha) == True:
-            session['admin'] = True
+            session['perfil'] = 'admin'
             session['logged_in'] = True
             session['id'] = usuario
             return redirect(url_for('dashboard'))
+        
         if not usuario.isdigit():
             flash("Digite apenas números no ID","error")
             return redirect(url_for('login'))
@@ -459,7 +469,7 @@ def configura_senha():
         #Atualiza senha nova no banco
         cursor.execute('UPDATE usuarios SET senha = %s, logou = 1 WHERE fk_gestor = %s',(senha_codificada, fk_gestor))
         db.commit()
-        flash('Senha nova cadastrada, faça o login novamente',"success")
+        flash('Senha nova cadastrada',"success")
         return redirect(url_for('login'))
     return render_template('configura_senha.html')
 
@@ -481,71 +491,78 @@ def dashboard():
     def consulta_gestor(id_gestor):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT fk_gestor, nome FROM gestor_dim WHERE id_gestor = %s',(id_gestor,))
+        cursor.execute('SELECT fk_gestor, nome, fk_area FROM gestor_dim WHERE id_gestor = %s',(id_gestor,))
         dados = cursor.fetchone()
         fk_gestor = dados[0]
         nome_gestor = dados[1]
+        fk_area = dados[2]
         cursor.close()
-        return fk_gestor, nome_gestor
+        return fk_gestor, nome_gestor, fk_area
     
     def consulta_quantidade(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None):
+        
+        query = f'SELECT COUNT(*) FROM {tabela} WHERE resposta >= 0'
+        params = []
+
+        if fk_gestor is not None:
+            query += ' AND fk_gestor = %s'
+            params.append(fk_gestor)
+        if fk_categoria is not None:
+            query += ' AND fk_categoria = %s'
+            params.append(fk_categoria)
+        if fk_pergunta is not None:
+            query += ' AND fk_pergunta = %s'
+            params.append(fk_pergunta)
+
         db = get_db()
         cursor = db.cursor()
-        if fk_categoria and fk_pergunta:
-            cursor.execute(f'SELECT COUNT(*) FROM {tabela} WHERE fk_gestor = %s and fk_categoria = %s and fk_pergunta = %s and resposta >= 0',(fk_gestor,fk_categoria, fk_pergunta))
-        elif fk_categoria:
-            cursor.execute(f'SELECT COUNT(*) FROM {tabela} WHERE fk_gestor = %s and fk_categoria = %s and resposta >= 0',(fk_gestor,fk_categoria,))
-        elif fk_gestor:     
-            cursor.execute(f'SELECT COUNT(*) FROM {tabela} WHERE fk_gestor = %s and resposta >= 0',(fk_gestor,))
-        else:
-            cursor.execute(f'SELECT COUNT(*) FROM {tabela}')
-
+        cursor.execute(query, tuple(params))
         num_respostas = cursor.fetchone()[0]
         cursor.close()
         return num_respostas
-    
-    usuario = session['id']
-    id_gestor = consulta_gestor(usuario)[0]
-    nome_gestor = consulta_gestor(usuario)[1]
-    session['id_gestor'] = id_gestor
-
-    #Retorna caso não tenha respostas
-    quantidade_respostas = consulta_quantidade('respostas_fato',id_gestor)
-    
-    # if quantidade_respostas == 0:
-    #     flash('Você ainda não tem respostas para avaliar', "warning")
-    #     return render_template('login.html')
     
     def consulta_puladas(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None):
+
+        query = f'SELECT COUNT(*) FROM {tabela} WHERE resposta < 0'
+        params = []
+
+        if fk_gestor is not None:
+            query += ' AND fk_gestor = %s'
+            params.append(fk_gestor)
+        if fk_categoria is not None:
+            query += ' AND fk_categoria = %s'
+            params.append(fk_categoria)
+        if fk_pergunta is not None:
+            query += ' AND fk_pergunta = %s'
+            params.append(fk_pergunta)
+        
+        app.logger.debug(f'params: {params}, query: {query}, tuple: {tuple(params)}')
         db = get_db()
         cursor = db.cursor()
-        if fk_categoria and fk_pergunta:
-            cursor.execute(f'SELECT COUNT(*) FROM {tabela} WHERE fk_gestor = %s and fk_categoria = %s and fk_pergunta = %s and resposta < 0',(fk_gestor,fk_categoria, fk_pergunta))
-        elif fk_categoria:
-            cursor.execute(f'SELECT COUNT(*) FROM {tabela} WHERE fk_gestor = %s and fk_categoria = %s and resposta < 0',(fk_gestor,fk_categoria,))
-        elif fk_gestor:     
-            cursor.execute(f'SELECT COUNT(*) FROM {tabela} WHERE fk_gestor = %s and resposta < 0',(fk_gestor,))
-        else:
-            cursor.execute(f'SELECT COUNT(*) FROM {tabela}')
-
+        cursor.execute(query, tuple(params))
         num_respostas = cursor.fetchone()[0]
         cursor.close()
         return num_respostas
     
-    def consulta_media(coluna, tabela, fk_gestor, fk_categoria=None, fk_pergunta=None):
+    def consulta_media(coluna, tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None):
         try:
-            if fk_categoria and fk_pergunta:
-                operation = f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = %s and fk_categoria = %s and fk_pergunta = %s and resposta >= %s'
-                params = (fk_gestor,fk_categoria, fk_pergunta,0)
-            elif fk_categoria:
-                operation = f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = %s and fk_categoria = %s and resposta >= %s'
-                params = (fk_gestor, fk_categoria,0)
-            else:     
-                operation = f'SELECT AVG({coluna}) FROM {tabela} WHERE fk_gestor = %s and resposta >= %s'
-                params =   (fk_gestor,0)
+            query = f'SELECT AVG({coluna}) FROM {tabela} WHERE resposta >=0'
+            params = []
+
+            if fk_gestor is not None:
+                query += ' AND fk_gestor = %s'
+                params.append(fk_gestor)
+            if fk_categoria is not None:
+                query += ' AND fk_categoria = %s'
+                params.append(fk_categoria)
+            if fk_pergunta is not None:
+                query += ' AND fk_pergunta = %s'
+                params.append(fk_pergunta)
+
+            
             db = get_db()
             cursor = db.cursor()
-            cursor.execute(operation, params)
+            cursor.execute(query, tuple(params))
             resultado = cursor.fetchone()[0]
             cursor.close()
             
@@ -555,38 +572,38 @@ def dashboard():
             else:
                 nota_media = None
                 size_bar = None
-            app.logger.debug(f'Dados respostas, {nota_media,size_bar, fk_categoria,fk_pergunta}')
+            
             return nota_media, size_bar
             
         except mysql.connector.Error as err:
             print(f"Error Consulta Média: {err}", flush=True)
             return None
-        
-    
-    def consulta_min_max(fk_gestor, fk_categoria=None, fk_pergunta=None):
+   
+    def consulta_min_max(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None):
         try:
-            if fk_categoria and fk_pergunta:
-                operation = 'SELECT min(data), max(data) FROM respostas_fato WHERE fk_gestor = %s and fk_categoria = %s and fk_pergunta = %s'
-                params = (fk_gestor, fk_categoria, fk_pergunta)
- 
-            elif fk_categoria:
-                operation = 'SELECT min(data), max(data) FROM respostas_fato WHERE fk_gestor = %s and fk_categoria = %s'
-                params =  (fk_gestor, fk_categoria)
+            query = f'SELECT min(data), max(data) FROM {tabela} WHERE resposta >= 0'
+            params = []
 
-            else:
-                operation = 'SELECT min(data), max(data) FROM respostas_fato WHERE fk_gestor = %s'
-                params = (fk_gestor,)
+            if fk_gestor is not None:
+                query += ' AND fk_gestor = %s'
+                params.append(fk_gestor)
+            if fk_categoria is not None:
+                query += ' AND fk_categoria = %s'
+                params.append(fk_categoria)
+            if fk_pergunta is not None:
+                query += ' AND fk_pergunta = %s'
+                params.append(fk_pergunta)
 
             db = get_db()
             cursor = db.cursor()
-            cursor.execute(operation, params)
+            cursor.execute(query, tuple(params))
             resultado = cursor.fetchone()
             cursor.close()
+
             if resultado and resultado[0] and resultado[1]:
                 data_min, data_max = resultado
                 data_min = data_min.strftime("%d-%m-%y")
                 data_max = data_max.strftime("%d-%m-%y")
-                app.logger.debug(f'Datas:{data_min, data_max}')
             else:
                 data_min, data_max = None, None
 
@@ -596,21 +613,28 @@ def dashboard():
             print(f"Error: {err}", flush=True)
             return None, None
 
-    def consulta_sugestoes( tabela, fk_gestor, coluna=None , fk_categoria=None, fk_pergunta=None):
-        if fk_categoria and fk_pergunta:
-            operation = f'SELECT {coluna} FROM {tabela} WHERE fk_gestor = %s and fk_categoria = %s and fk_pergunta = %s ORDER BY respondido ASC, datetime ASC'
-            params = (fk_gestor,fk_categoria, fk_pergunta)
-        elif fk_categoria:
-            operation = f'SELECT {coluna} FROM {tabela} WHERE fk_gestor = %s and fk_categoria = %s ORDER BY respondido ASC, datetime DESC'
-            params = (fk_gestor,fk_categoria)
-        else:
-            operation = f'SELECT * FROM sugestoes_fato WHERE fk_gestor = %s ORDER BY respondido ASC, datetime DESC'
-            params = (fk_gestor,) 
+    def consulta_sugestoes(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None, fk_area=None):
+        query = f'SELECT * FROM {tabela}'
+        params = []
+        conditions = []
+
+        if fk_gestor is not None:
+            conditions.append('fk_gestor = %s')
+            params.append(fk_gestor)
+        if fk_categoria is not None:
+            conditions.append('fk_categoria = %s')
+            params.append(fk_categoria)
+        if fk_pergunta is not None:
+            conditions.append('fk_pergunta = %s')
+            params.append(fk_pergunta)
+        
+        if conditions:
+            query += ' WHERE ' + ' AND '.join(conditions)
+            
         db = get_db()
         cursor = db.cursor(dictionary=True)
-        cursor.execute(operation, params)
+        cursor.execute(query, tuple(params))
         resultado = cursor.fetchall()
-        app.logger.debug(f'Resultados Sugestões:{resultado}')
         cursor.close()
         sugestoes = []
         
@@ -621,10 +645,22 @@ def dashboard():
                 sugestoes.append(row)
             return sugestoes
     
-    def consulta_filtros(coluna_procurada, tabela, fk_gestor):
+    def consulta_filtros(coluna_procurada, tabela, fk_gestor=None):
+
+        query = f'SELECT DISTINCT {coluna_procurada} FROM {tabela}'
+        params = []
+        conditions = []
+
+        if fk_gestor is not None:
+            conditions.append('fk_gestor = %s')
+            params.append(fk_gestor)
+        
+        if conditions:
+            query += ' WHERE ' + ' AND '.join(conditions)
+            
         db = get_db()
         cursor = db.cursor()
-        cursor.execute(f'SELECT DISTINCT {coluna_procurada} FROM {tabela} WHERE fk_gestor = %s', (fk_gestor,))
+        cursor.execute(query, tuple(params))
         dados = cursor.fetchall()
         cursor.close()
         filtros = []
@@ -635,7 +671,8 @@ def dashboard():
                 filtros.append(row)
             return filtros
 
-    def gera_filtros(fk_gestor):
+    def gera_filtros(fk_gestor=None):
+
         fk_cargos = consulta_filtros('fk_cargo','respostas_fato', fk_gestor)
         
         if not fk_cargos:
@@ -659,23 +696,35 @@ def dashboard():
         cursor.close()
         return grupo_filtros
     
-    def gera_cards():
+    def gera_cards(fk_gestor=None):
+
         db = get_db()
         cursor = db.cursor()
         cursor.execute('SELECT fk_categoria, desc_categoria FROM categoria_dim')
         categorias = cursor.fetchall()
         cards = []
+
         for fk_categoria, desc_categoria in categorias:
-            valor = consulta_media('resposta','respostas_fato', id_gestor, fk_categoria)[0]
-            size_bar = consulta_media('resposta','respostas_fato', id_gestor, fk_categoria)[1]
-            quantidade_respostas = consulta_quantidade('respostas_fato',id_gestor,fk_categoria)
-            quantidade_puladas = consulta_puladas('respostas_fato',id_gestor,fk_categoria)
-            dados_datas = consulta_min_max(id_gestor, fk_categoria)
-            
+            # if perfil == 'gestor':
+            valor = consulta_media('resposta','respostas_fato', fk_gestor, fk_categoria)[0]
+            size_bar = consulta_media('resposta','respostas_fato', fk_gestor, fk_categoria)[1]
+            quantidade_respostas = consulta_quantidade('respostas_fato',fk_gestor,fk_categoria)
+            quantidade_puladas = consulta_puladas('respostas_fato',fk_gestor,fk_categoria)
+            dados_datas = consulta_min_max('respostas_fato',fk_gestor, fk_categoria)
             data_min = dados_datas[0]
             data_max = dados_datas[1]
             
+            # elif perfil == 'gente_gestao':
+            #     valor = consulta_media('resposta','respostas_fato', None, fk_categoria)[0]
+            #     size_bar = consulta_media('resposta','respostas_fato', None, fk_categoria)[1]
+            #     quantidade_respostas = consulta_quantidade('respostas_fato',None,fk_categoria)
+            #     quantidade_puladas = consulta_puladas('respostas_fato',None,fk_categoria)
+            #     dados_datas = consulta_min_max('respostas_fato',None, fk_categoria)
+            #     data_min = dados_datas[0]
+            #     data_max = dados_datas[1]
+            
             card = {
+
                 'id': fk_categoria,
                 'title': desc_categoria,
                 'size': size_bar,
@@ -690,16 +739,20 @@ def dashboard():
         cursor.close()
         return cards
     
-    def gera_tabela():
+    def gera_tabela(fk_gestor=None):
+
         db = get_db()
         cursor = db.cursor()
-        sugestoes = consulta_sugestoes('sugestoes_fato', id_gestor)
         
+        sugestoes = consulta_sugestoes('sugestoes_fato', fk_gestor)
+
         if sugestoes == None:
             return None
         
+        app.logger.debug(f'Sugestoes: {sugestoes}')
         tabela = []
         for sugestao in sugestoes:
+            
             data = sugestao['data']
             fk_categoria = sugestao['fk_categoria']
             cursor.execute(f'SELECT desc_categoria FROM categoria_dim WHERE fk_categoria = {fk_categoria}')
@@ -716,10 +769,22 @@ def dashboard():
         cursor.close()
         return tabela
     
-    def gera_grafico(fk_gestor):
+    def gera_grafico(fk_gestor=None):
+
+        query = f'''SELECT DISTINCT semana, DATE_FORMAT(data, '%m')AS mes FROM respostas_fato '''
+        params = []
+        conditions = []
+
+        if fk_gestor is not None:
+            conditions.append('fk_gestor = %s')
+            params.append(fk_gestor)
+        
+        if conditions:
+            query += ' WHERE ' + ' AND '.join(conditions)
+        
         db = get_db()
         cursor = db.cursor()
-        cursor.execute(f'''SELECT DISTINCT semana, DATE_FORMAT(data, '%m') AS mes FROM respostas_fato WHERE fk_gestor = {fk_gestor} ORDER BY semana asc''')
+        cursor.execute(query, tuple(params))
         datas = cursor.fetchall()
         grafico = []
        
@@ -727,10 +792,23 @@ def dashboard():
             num_semana = semana
             num_mes = mes
             mes = nome_meses(num_mes)
-            cursor.execute(f'SELECT AVG(resposta) FROM respostas_fato WHERE fk_gestor = {fk_gestor} and semana = {num_semana} and resposta >=0')
+
+            query_nota = f'SELECT AVG(resposta) FROM respostas_fato WHERE resposta >= 0 AND semana = {num_semana}'
+            query_qtd = f'SELECT COUNT(*) FROM respostas_fato WHERE resposta >= 0 AND semana = {num_semana}'
+            params = []
+
+            if fk_gestor is not None:
+                query_nota += ' AND fk_gestor = %s'
+                query_qtd += ' AND fk_gestor = %s'
+                params.append(fk_gestor)
+
+            
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute(query_nota, params)
             nota = round(cursor.fetchone()[0],1)
-            cursor.execute(f'SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = {fk_gestor} and semana = {num_semana}')
-            num_respostas = cursor.fetchone()[0]
+            cursor.execute(query_qtd, tuple(params))
+            num_respostas = cursor.fetchone()[0]           
 
             dados = {
                 'eixo_x': f'Semana: {num_semana} / {mes}',
@@ -740,40 +818,72 @@ def dashboard():
             grafico.append(dados)
         cursor.close()
         return grafico
+    
+    usuario = session['id']
+    perfil = session['perfil']
+    
+    if perfil == 'gestor':
+        id_gestor = consulta_gestor(usuario)[0]
+        nome_gestor = consulta_gestor(usuario)[1]
+        fk_area = consulta_gestor(usuario)[2]
 
-    dados_filtros = gera_filtros(id_gestor)
-    dados_grafico = gera_grafico(id_gestor)
-    cards = gera_cards()
-    tabela = gera_tabela()
+        session['id_gestor'] = id_gestor
+        dados_filtros = gera_filtros(id_gestor)
+        dados_grafico = gera_grafico(id_gestor)
+        cards = gera_cards(id_gestor)
+        tabela = gera_tabela(id_gestor)
 
-    dados = [{
-        'nome': nome_gestor,
+        dados = [{
+            'nome': nome_gestor,
+            'qtd_respostas': consulta_quantidade('respostas_fato',id_gestor),
+            'qtd_puladas': consulta_puladas('respostas_fato',id_gestor),
+            'nota_media': consulta_media('resposta','respostas_fato',id_gestor)[0],
+            'size_bar': consulta_media('resposta','respostas_fato',id_gestor)[1],
+            'data_min':consulta_min_max('respostas_fato',id_gestor)[0],
+            'data_max': consulta_min_max('respostas_fato',id_gestor)[1],
+            'qtd_nps':consulta_quantidade('respostas_fato',id_gestor,7,29),
+            'qtd_puladas_nps': consulta_puladas('respostas_fato',id_gestor,7,29),
+            'nota_nps': consulta_media('resposta','respostas_fato',id_gestor,7,29)[0],
+            'size_nps': consulta_media('resposta','respostas_fato',id_gestor,7,29)[1],
+            'data_min_nps':consulta_min_max('respostas_fato',id_gestor,7,29)[0],
+            'data_max_nps': consulta_min_max('respostas_fato',id_gestor,7,29)[1],
+            'qtd_psico':consulta_quantidade('respostas_fato',id_gestor,10),
+            'qtd_puladas_psico': consulta_puladas('respostas_fato',id_gestor,10),
+            'nota_psico':consulta_media('resposta','respostas_fato',id_gestor,10)[0],
+            'size_psico':consulta_media('resposta','respostas_fato',id_gestor,10)[1],
+            'data_min_psico':consulta_min_max('respostas_fato',id_gestor,10)[0],
+            'data_max_psico': consulta_min_max('respostas_fato',id_gestor,10)[1]
+        }]
 
-        'qtd_respostas': consulta_quantidade('respostas_fato',id_gestor),
-        'qtd_puladas': consulta_puladas('respostas_fato',id_gestor),
-        'nota_media': consulta_media('resposta','respostas_fato',id_gestor)[0],
-        'size_bar': consulta_media('resposta','respostas_fato',id_gestor)[1],
-        'data_min':consulta_min_max(id_gestor)[0],
-        'data_max': consulta_min_max(id_gestor)[1],
+    elif perfil == 'admin':
+        nome_gestor = 'Administrador'
+        dados_filtros = gera_filtros()
+        dados_grafico = gera_grafico()
+        cards = gera_cards()
+        tabela = gera_tabela()
 
-        'qtd_nps':consulta_quantidade('respostas_fato',id_gestor,7,29),
-        'qtd_puladas_nps': consulta_puladas('respostas_fato',id_gestor,7,29),
-        'nota_nps': consulta_media('resposta','respostas_fato',id_gestor,7,29)[0],
-        'size_nps': consulta_media('resposta','respostas_fato',id_gestor,7,29)[1],
-        'data_min_nps':consulta_min_max(id_gestor,7,29)[0],
-        'data_max_nps': consulta_min_max(id_gestor,7,29)[1],
-
-        'qtd_psico':consulta_quantidade('respostas_fato',id_gestor,10),
-        'qtd_puladas_psico': consulta_puladas('respostas_fato',id_gestor,10),
-        'nota_psico':consulta_media('resposta','respostas_fato',id_gestor,10)[0],
-        'size_psico':consulta_media('resposta','respostas_fato',id_gestor,10)[1],
-        'data_min_psico':consulta_min_max(id_gestor,10)[0],
-        'data_max_psico': consulta_min_max(id_gestor,10)[1]
-        
-    }]
-
-    app.logger.debug(f'Dados:{dados}')
-    return render_template('dashboard.html', dados=dados, cards=cards, tabela = tabela, dados_grafico=dados_grafico, filtros=dados_filtros)
+        dados = [{
+            'nome': nome_gestor,
+            'qtd_respostas': consulta_quantidade('respostas_fato'),
+            'qtd_puladas': consulta_puladas('respostas_fato'),
+            'nota_media': consulta_media('resposta','respostas_fato')[0],
+            'size_bar': consulta_media('resposta','respostas_fato')[1],
+            'data_min':consulta_min_max('respostas_fato')[0],
+            'data_max': consulta_min_max('respostas_fato')[1],
+            'qtd_nps':consulta_quantidade('respostas_fato',None,7,29),
+            'qtd_puladas_nps': consulta_puladas('respostas_fato',None,7,29),
+            'nota_nps': consulta_media('resposta','respostas_fato',None,7,29)[0],
+            'size_nps': consulta_media('resposta','respostas_fato',None,7,29)[1],
+            'data_min_nps':consulta_min_max('respostas_fato',None,7,29)[0],
+            'data_max_nps': consulta_min_max('respostas_fato',None,7,29)[1],
+            'qtd_psico':consulta_quantidade('respostas_fato',None,10),
+            'qtd_puladas_psico': consulta_puladas('respostas_fato',None,10),
+            'nota_psico':consulta_media('resposta','respostas_fato',None,10)[0],
+            'size_psico':consulta_media('resposta','respostas_fato',None,10)[1],
+            'data_min_psico':consulta_min_max('respostas_fato',None,10)[0],
+            'data_max_psico': consulta_min_max('respostas_fato',None,10)[1]
+        }]
+    return render_template('dashboard.html', perfil=perfil, dados=dados, cards=cards, tabela = tabela, dados_grafico=dados_grafico, filtros=dados_filtros)
 
 @app.route('/detalhes/<int:fk_categoria>')            
 def get_detalhes(fk_categoria):
