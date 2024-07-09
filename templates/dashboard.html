@@ -272,19 +272,27 @@
                     <table>
                         <thead class="tb-cabecalho">
                             <tr>
-                                <th>Data:</th>
-                                <th>Categoria:</th>
-                                <th>Sugestão:</th>
-                                <th>Respondido?</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Categoria</th>
+                                <th>Pergunta</th>
+                                <th>Sugestão</th>
+                                <th>Respondido</th>
                             </tr>
                         </thead>
                         <tbody class="tb-linhas">
                             {% for row in tabela %}
                             <tr>
                                 <td>{{ row.data }}</td>
+                                <td>
+                                    <span class="status {{ row.status | lower }}">{{ row.status }}</span>
+                                </td>
                                 <td>{{ row.categoria }}</td>
+                                <td>{{ row.pergunta }}</td>
                                 <td>{{ row.sugestao }}</td>
-                                <td><input type="checkbox" {% if row.respondido %} checked {% endif %}></td>
+                                <td>
+                                    <input type="checkbox" {% if row.respondido %} checked {% endif %}>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -442,11 +450,11 @@
                     const cardId = this.getAttribute("data-id");
                     fetch(`/detalhes/${cardId}`)
                         .then(response => response.json())
-                        .then(data => {
-                            modalTitle.textContent = data.title;
+                        .then(dados_detalhes   => {
+                            modalTitle.textContent = dados_detalhes.title;
                             modalContent.innerHTML = `
-                                <p>${data.content}</p>
-                                ${data.perguntas.map((pergunta, index) =>
+                                <p>${dados_detalhes.content}</p>
+                                ${dados_detalhes.perguntas.map((pergunta, index) =>
                                 `
                                 <div class="pergunta">
                                     <div class="pergunta-info">
@@ -486,7 +494,7 @@
                             });
     
                             // Gerar gráficos para cada pergunta
-                            data.perguntas.forEach((pergunta, index) => {
+                            dados_detalhes.perguntas.forEach((pergunta, index) => {
                                 const ctx = document.getElementById(`chart-${index}`).getContext('2d');
                                 const labels = pergunta.grafico.map(dado => `${dado.eixo_x}`);
                                 const notaData = pergunta.grafico.map(dado => dado.nota);
@@ -565,7 +573,7 @@
                                     }
                                 });
                             });
-    
+                            console.log("Dados recebidos:", dados_detalhes);
                             modal.style.display = "block";
                         });
                 });

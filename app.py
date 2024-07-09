@@ -671,6 +671,32 @@ def dashboard():
                 filtros.append(row)
             return filtros
 
+    def consulta_categoria(fk_categoria):
+        db = get_db()
+        cursor = db.cursor()
+        query = 'SELECT desc_categoria FROM categoria_dim WHERE fk_categoria = %s'
+        params = (fk_categoria,)
+        cursor.execute(query, params)
+        resultado = cursor.fetchone()
+
+        if resultado is not None:
+            return resultado[0]
+        else:
+            return None
+        
+    def consulta_pergunta(fk_pergunta):
+        db = get_db()
+        cursor = db.cursor()
+        query = 'SELECT desc_pergunta FROM pergunta_dim WHERE fk_pergunta = %s'
+        params = (fk_pergunta,)
+        cursor.execute(query, params)
+        resultado = cursor.fetchone()
+
+        if resultado is not None:
+            return resultado[0]
+        else:
+            return None
+        
     def gera_filtros(fk_gestor=None):
 
         fk_cargos = consulta_filtros('fk_cargo','respostas_fato', fk_gestor)
@@ -740,33 +766,39 @@ def dashboard():
         return cards
     
     def gera_tabela(fk_gestor=None):
-
-        db = get_db()
-        cursor = db.cursor()
-        
+       
         sugestoes = consulta_sugestoes('sugestoes_fato', fk_gestor)
 
         if sugestoes == None:
             return None
-        
-        app.logger.debug(f'Sugestoes: {sugestoes}')
+    
         tabela = []
         for sugestao in sugestoes:
             
             data = sugestao['data']
             fk_categoria = sugestao['fk_categoria']
-            cursor.execute(f'SELECT desc_categoria FROM categoria_dim WHERE fk_categoria = {fk_categoria}')
-            categoria = cursor.fetchone()[0]
+            fk_pergunta = sugestao['fk_pergunta']
+            fk_subarea = sugestao['fk_subarea'] 
             texto_sugestao = sugestao['sugestao']
             respondido = sugestao['respondido']
+
+            if respondido == 1:
+                status = 'Respondida'
+            else:
+                status = 'Pendente'
+            categoria = consulta_categoria(fk_categoria)
+            pergunta = consulta_pergunta(fk_pergunta)
+
             row = {
+                'status': status,
                 'data': data,
                 'categoria': categoria,
+                'pergunta': pergunta,
                 'sugestao': texto_sugestao,
                 'respondido': respondido
             }
             tabela.append(row)
-        cursor.close()
+        
         return tabela
     
     def gera_grafico(fk_gestor=None):
@@ -855,8 +887,13 @@ def dashboard():
             'data_max_psico': consulta_min_max('respostas_fato',id_gestor,10)[1]
         }]
 
-    elif perfil == 'admin':
-        nome_gestor = 'Administrador'
+    elif perfil == 'admin' or perfil == 'gerente_fabril':
+        if perfil == 'admin':
+            nome_gestor = 'Administrador'
+        else:
+            id_gestor = consulta_gestor(usuario)[0]
+            nome_gestor = consulta_gestor(usuario)[1]
+
         dados_filtros = gera_filtros()
         dados_grafico = gera_grafico()
         cards = gera_cards()
@@ -887,83 +924,192 @@ def dashboard():
 
 @app.route('/detalhes/<int:fk_categoria>')            
 def get_detalhes(fk_categoria):
-    id_gestor = session['id_gestor']
-    db = get_db()
-    cursor = db.cursor()
-
-    # Descrição da categoria
-    cursor.execute('SELECT desc_categoria FROM categoria_dim WHERE fk_categoria = %s', (fk_categoria,))
-    result = cursor.fetchone()
-    categoria = result[0] if result else None
-
-    if not categoria:
-        return jsonify({
+       
+    def consulta_categorias():
+        query = 'SELECT desc_categoria FROM categoria_dim WHERE fk_categoria = %s'
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, (fk_categoria,))
+        dados = cursor.fetchone()
+        cursor.close()
+        if dados is not None:
+            resultado = dados[0]
+            return resultado
+        else:
+            return jsonify({
             "title": "Detalhes não encontrados",
             "content": "Nenhum detalhe disponível para este card.",
             "perguntas": []
         })
-
-    # Perguntas
-    cursor.execute('SELECT fk_pergunta, desc_pergunta FROM pergunta_dim WHERE fk_categoria = %s', (fk_categoria,))
-    dados_perguntas = cursor.fetchall()
-    perguntas = []
-    cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_gestor = %s and fk_categoria = %s', (id_gestor, fk_categoria))
-    num_respostas = cursor.fetchone()[0]
-
-    for fk_pergunta, desc_pergunta in dados_perguntas:
-        operation = f'SELECT AVG(resposta) FROM respostas_fato WHERE fk_pergunta = %s and fk_gestor = %s and resposta >= 0'
-        params =   (fk_pergunta, id_gestor)
-        cursor.execute(operation, params)
-        resultado = cursor.fetchone()[0]
-        
-        if resultado is not None:
-            nota = round(resultado, 1)
-            size = nota * 10
+    
+    def consulta_perguntas(fk_categoria):
+        query = 'SELECT fk_pergunta, desc_pergunta FROM pergunta_dim WHERE fk_categoria = %s'
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, (fk_categoria,))
+        dados = cursor.fetchall()
+        cursor.close()
+        if dados is not None:
+            return dados
         else:
-            nota = None
-            size = None
+            return None
         
-
-        cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_pergunta = %s AND fk_gestor = %s AND resposta >= 0', (fk_pergunta, id_gestor))
-        respostas = cursor.fetchone()[0]
-
-        cursor.execute('SELECT COUNT(*) FROM respostas_fato WHERE fk_pergunta = %s AND fk_gestor = %s AND resposta < 0', (fk_pergunta, id_gestor))
-        puladas = cursor.fetchone()[0]
-
-        cursor.execute('SELECT min(data), max(data) FROM respostas_fato WHERE fk_pergunta = %s and fk_gestor = %s',(fk_pergunta, id_gestor))
-        datas = cursor.fetchone()
-        app.logger.debug(f'Datas Debug: {datas}')
-        data_min = datas[0]
-        data_max = datas[1]
-        # Dados para o gráfico da pergunta
-        cursor.execute('''
-            SELECT semana,  DATE_FORMAT(data, '%m') AS mes, AVG(resposta) as nota
-            FROM respostas_fato
-            WHERE fk_pergunta = %s and fk_gestor = %s and resposta >= 0
-            GROUP BY semana, mes
-            ORDER BY semana ASC
-        ''', (fk_pergunta, id_gestor))
+    def consulta_quantidade(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None, operador = None):
         
-        grafico = [{'eixo_x':  f'Semana: {semana} / {nome_meses(mes)}', 'nota': round(nota, 1)} for semana, mes, nota in cursor.fetchall()]
-        perguntas.append({
-            'fk_pergunta': fk_pergunta,
-            'pergunta': desc_pergunta,
-            'nota': nota,
-            'respostas': respostas,
-            'puladas': puladas,
-            'size': size,
-            'grafico': grafico,
-            'data_min': data_min,
-            'data_max': data_max
-        })
+        query = f'SELECT COUNT(*) FROM {tabela} WHERE resposta {operador} 0'
+        params = []
 
-    details_data = {
-        "title": categoria,
-        "content": f'Abertura por pergunta da dimensão {categoria}, notas baseada em um total de {num_respostas} respostas.',
-        "perguntas": perguntas
-    }
-    cursor.close()
-    return jsonify(details_data)
+        if fk_gestor is not None:
+            query += ' AND fk_gestor = %s'
+            params.append(fk_gestor)
+        if fk_categoria is not None:
+            query += ' AND fk_categoria = %s'
+            params.append(fk_categoria)
+        if fk_pergunta is not None:
+            query += ' AND fk_pergunta = %s'
+            params.append(fk_pergunta)
+
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, tuple(params))
+        num_respostas = cursor.fetchone()[0]
+        cursor.close()
+        return num_respostas
+    
+    def consulta_nota(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None):
+        query = f'SELECT AVG(resposta) FROM {tabela} WHERE resposta >= 0'
+        params = []
+
+        if fk_gestor is not None:
+            query += ' AND fk_gestor = %s'
+            params.append(fk_gestor)
+        if fk_categoria is not None:
+            query += ' AND fk_categoria = %s'
+            params.append(fk_categoria)
+        if fk_pergunta is not None:
+            query += ' AND fk_pergunta = %s'
+            params.append(fk_pergunta)
+
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, tuple(params))
+        resultado = cursor.fetchone()[0]
+        cursor.close()
+        if resultado is not None:
+            nota = round(resultado,1)
+            size = nota * 10
+            return nota, size
+        else:
+            return None, None
+        
+    def consulta_datas(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None):
+        query = f'SELECT Min(data), Max(data) FROM {tabela} WHERE resposta >= 0'
+        params = []
+
+        if fk_gestor is not None:
+            query += ' AND fk_gestor = %s'
+            params.append(fk_gestor)
+        if fk_categoria is not None:
+            query += ' AND fk_categoria = %s'
+            params.append(fk_categoria)
+        if fk_pergunta is not None:
+            query += ' AND fk_pergunta = %s'
+            params.append(fk_pergunta)
+
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, tuple(params))
+        resultado = cursor.fetchone()
+        cursor.close()
+        if resultado:
+            data_min = resultado[0]
+            data_max = resultado[1]
+            return data_min, data_max
+        else:
+            return None, None
+    
+    def gera_dados_grafico(fk_gestor=None, fk_pergunta=None):
+        query = '''
+        SELECT
+            semana,
+            DATE_FORMAT(data, '%m') as mes,
+            AVG(resposta) as nota
+        FROM
+            respostas_fato
+        WHERE 
+            resposta >=0
+        '''
+        params = []
+
+        if fk_gestor is not None:
+            query += ' AND fk_gestor = %s'
+            params.append(fk_gestor)
+        if fk_pergunta is not None:
+            query += ' AND fk_pergunta = %s'
+            params.append(fk_pergunta)
+
+        query += ' GROUP BY semana, mes ORDER BY semana ASC'
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, tuple(params))
+        dados = cursor.fetchall()
+        cursor.close()
+        
+        return dados
+
+    def gera_cards_perguntas(dados_perguntas,fk_gestor=None):
+        perguntas = []
+        for fk_pergunta, desc_pergunta in dados_perguntas:
+            
+            resultado_nota = consulta_nota('respostas_fato',fk_gestor,None,fk_pergunta)
+            nota = resultado_nota[0]
+            size = resultado_nota[1]
+            
+            respostas = consulta_quantidade('respostas_fato',fk_gestor,None,fk_pergunta,'>=')
+            puladas = consulta_quantidade('respostas_fato',fk_gestor,None,fk_pergunta,'<')
+
+            resultado_datas = consulta_datas('respostas_fato',fk_gestor, None, fk_pergunta)
+            data_min = resultado_datas[0]
+            data_max = resultado_datas[1]
+            
+            dados_graficos = gera_dados_grafico(fk_gestor, fk_pergunta)
+            app.logger.debug(f'Dados Grafico: {dados_graficos}, Resultado Nota: {resultado_nota}, fk_pergunta: {fk_pergunta}')
+            grafico = [{'eixo_x':  f'Semana: {semana} / {nome_meses(mes)}', 'nota': round(nota, 1)} for semana, mes, nota in gera_dados_grafico(fk_gestor, fk_pergunta)]
+            
+            perguntas.append({
+                'fk_pergunta': fk_pergunta,
+                'pergunta': desc_pergunta,
+                'nota': nota,
+                'respostas': respostas,
+                'puladas': puladas,
+                'size': size,
+                'grafico': grafico,
+                'data_min': data_min,
+                'data_max': data_max
+            })
+        
+        dados_detalhes = {
+            "title": categoria,
+            "content": f'Abertura por pergunta da dimensão {categoria}, notas baseada em um total de {respostas} respostas.',
+            "perguntas": perguntas
+        }
+
+        return dados_detalhes
+
+    perfil = session['perfil']
+    id_gestor = session['id']
+
+    # Categorias
+    categoria = consulta_categorias()       
+    # Perguntas
+    dados_perguntas = consulta_perguntas(fk_categoria)
+
+    if perfil == 'gestor':
+        dados_detalhes = gera_cards_perguntas(dados_perguntas, id_gestor)
+    elif perfil == 'admin' or perfil == 'gerente_fabril':
+        dados_detalhes = gera_cards_perguntas(dados_perguntas)
+    # app.logger.debug(f'Dados detalhes: {dados_detalhes}')
+    return jsonify(dados_detalhes)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

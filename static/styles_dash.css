@@ -483,41 +483,74 @@ table {
     border-collapse: collapse;
     margin: 10px;
     margin-bottom: 30px;
-    padding: 20px;
+    padding: 10px;
     background-color: #FFFFFF;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
     border-radius: 8px;
     overflow: hidden;
 }
+
 table th, table td {
-    padding: 12px 15px;
+    padding: 12px 5px;
     text-align: center;
-    border: 1px solid #ceced1;
+    border-bottom: 1px solid #ceced1;
+    border-right: 1px solid #ceced1;
 }
+
 table th {
-    background-color: #F4F4F8;
+    background-color: #F9FAFB;
     font-weight: 600;
-    color: #4A4A4A;
+    color: #6B7280;
     font-size: 14px;
+    text-transform: uppercase;
 }
+
 table td {
     font-family: "Titillium Web", sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     color: #4A4A4A;
+    text-align:center;
 }
+
 table td input[type="checkbox"] {
     margin: 0 auto;
     display: block;
 }
-table th:nth-child(3), table td:nth-child(3) {
-    width: 50%;
-}
+
+/* Estilo das Linhas */
 table tr:nth-child(even) {
     background-color: #FAFAFA;
 }
+
 table tr:hover {
     background-color: #F1F1F1;
     cursor: pointer;
+}
+
+/* Estilo do Status */
+.status {
+    display: inline-block;
+    padding: 5px 5px;
+    border-radius: 20px;
+    font-size: 12px;
+    text-align: center;
+    color: #FFF;
+    font-weight: 600;
+}
+
+.status.respondida {
+    background-color: #10B981;
+}
+
+.status.pendente {
+    background-color: #EF4444;
+}
+
+/* Estilo dos Cabeçalhos */
+.tb-cabecalho th {
+    text-align: center;
+    color: #fff;
+    background-color: #023047;
 }
 
 .modal {
