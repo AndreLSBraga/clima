@@ -471,11 +471,33 @@ h1 {
     font-size: 18px; /* Tamanho do ícone */
 }
 
+.sugesotes-botoes {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.botoes-filtro {
+    background-color: #f5f5f5;
+    border: none;
+    color: #333;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.botoes-filtro.active {
+    background-color: #e0e0e0;
+    color: #000;
+}
+
 .tabela {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     width: 100%;
+    max-height: 400px; /* Altura fixa da tabela */
+    overflow-y: auto; /* Permite a rolagem vertical */    
 }
 
 table {
@@ -487,7 +509,14 @@ table {
     background-color: #FFFFFF;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
     border-radius: 8px;
-    overflow: hidden;
+    
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #023047;
 }
 
 table th, table td {
@@ -503,6 +532,9 @@ table th {
     color: #6B7280;
     font-size: 14px;
     text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 1; /* Garante que o cabeçalho ficará sobre as linhas da tabela */
 }
 
 table td {

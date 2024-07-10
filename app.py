@@ -521,6 +521,39 @@ def dashboard():
         cursor.close()
         return num_respostas
     
+    def consulta_quantidade_sugestoes(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None, respondido = None):
+        
+        query = f'SELECT COUNT(*) FROM {tabela}'
+        params = []
+        conditions = []
+
+        if fk_gestor is not None:
+            conditions.append('fk_gestor = %s')
+            params.append(fk_gestor)
+        if fk_categoria is not None:
+            conditions.append('fk_categoria = %s')
+            params.append(fk_categoria)
+        if fk_pergunta is not None:
+            conditions.append('fk_pergunta = %s')
+            params.append(fk_pergunta)
+        if respondido is not None:
+            conditions.append('respondido = %s')
+            params.append(respondido)
+        
+        if conditions:
+            query += ' WHERE ' + ' AND '.join(conditions)
+            
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, tuple(params))
+        resultado = cursor.fetchone()[0]
+        app.logger.debug(f'Query quantidade sugestoes: {query}')
+        cursor.close()
+        if resultado is not None:
+            return resultado
+        else:
+            return None
+    
     def consulta_puladas(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None):
 
         query = f'SELECT COUNT(*) FROM {tabela} WHERE resposta < 0'
@@ -631,6 +664,7 @@ def dashboard():
         if conditions:
             query += ' WHERE ' + ' AND '.join(conditions)
             
+        query += ' ORDER BY respondido ASC,datetime ASC'
         db = get_db()
         cursor = db.cursor(dictionary=True)
         cursor.execute(query, tuple(params))
@@ -739,15 +773,6 @@ def dashboard():
             dados_datas = consulta_min_max('respostas_fato',fk_gestor, fk_categoria)
             data_min = dados_datas[0]
             data_max = dados_datas[1]
-            
-            # elif perfil == 'gente_gestao':
-            #     valor = consulta_media('resposta','respostas_fato', None, fk_categoria)[0]
-            #     size_bar = consulta_media('resposta','respostas_fato', None, fk_categoria)[1]
-            #     quantidade_respostas = consulta_quantidade('respostas_fato',None,fk_categoria)
-            #     quantidade_puladas = consulta_puladas('respostas_fato',None,fk_categoria)
-            #     dados_datas = consulta_min_max('respostas_fato',None, fk_categoria)
-            #     data_min = dados_datas[0]
-            #     data_max = dados_datas[1]
             
             card = {
 
@@ -884,7 +909,10 @@ def dashboard():
             'nota_psico':consulta_media('resposta','respostas_fato',id_gestor,10)[0],
             'size_psico':consulta_media('resposta','respostas_fato',id_gestor,10)[1],
             'data_min_psico':consulta_min_max('respostas_fato',id_gestor,10)[0],
-            'data_max_psico': consulta_min_max('respostas_fato',id_gestor,10)[1]
+            'data_max_psico': consulta_min_max('respostas_fato',id_gestor,10)[1],
+            'qtd_sugestoes': consulta_quantidade_sugestoes('sugestoes_fato',id_gestor),
+            'qtd_sugestoes_respondidas': consulta_quantidade_sugestoes('sugestoes_fato',id_gestor, None, None, 1),
+            'qtd_sugestoes_pendentes': consulta_quantidade_sugestoes('sugestoes_fato',id_gestor, None, None, 0)
         }]
 
     elif perfil == 'admin' or perfil == 'gerente_fabril':
@@ -918,7 +946,10 @@ def dashboard():
             'nota_psico':consulta_media('resposta','respostas_fato',None,10)[0],
             'size_psico':consulta_media('resposta','respostas_fato',None,10)[1],
             'data_min_psico':consulta_min_max('respostas_fato',None,10)[0],
-            'data_max_psico': consulta_min_max('respostas_fato',None,10)[1]
+            'data_max_psico': consulta_min_max('respostas_fato',None,10)[1],
+            'qtd_sugestoes': consulta_quantidade_sugestoes('sugestoes_fato'),
+            'qtd_sugestoes_respondidas': consulta_quantidade_sugestoes('sugestoes_fato',None, None, None, 1),
+            'qtd_sugestoes_pendentes': consulta_quantidade_sugestoes('sugestoes_fato',None, None, None, 0)
         }]
     return render_template('dashboard.html', perfil=perfil, dados=dados, cards=cards, tabela = tabela, dados_grafico=dados_grafico, filtros=dados_filtros)
 
