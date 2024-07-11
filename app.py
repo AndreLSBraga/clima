@@ -33,7 +33,7 @@ def close_db(e=None):
     if db is not None:
         db.close()
 
-
+#Funções
 def id_existe(user_id):
     db = get_db()
     cursor = db.cursor()
@@ -127,6 +127,73 @@ def codifica_senha(senha):
 def decodifica_senha(senha_digitada, senha_codificada):
     return bcrypt.checkpw(senha_digitada.encode('utf-8'), senha_codificada.encode('utf-8'))
 
+def check_admin(username, password):
+    if(username == ADMIN_LOGIN and password == ADMIN_SENHA):
+        return True
+    else:
+        return False
+
+def consulta_sugestoes(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None, fk_area=None, respondido=None):
+        query = f'SELECT * FROM {tabela}'
+        params = []
+        conditions = []
+
+        if fk_gestor is not None:
+            conditions.append('fk_gestor = %s')
+            params.append(fk_gestor)
+        if fk_categoria is not None:
+            conditions.append('fk_categoria = %s')
+            params.append(fk_categoria)
+        if fk_pergunta is not None:
+            conditions.append('fk_pergunta = %s')
+            params.append(fk_pergunta)
+        if respondido is not None:
+            conditions.append('respondido = %s')
+            params.append(respondido)
+        
+        if conditions:
+            query += ' WHERE ' + ' AND '.join(conditions)
+            
+        query += ' ORDER BY respondido ASC,datetime ASC'
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute(query, tuple(params))
+        resultado = cursor.fetchall()
+        cursor.close()
+        sugestoes = []
+        
+        if not resultado:
+            return None
+        else:
+            for row in resultado:
+                sugestoes.append(row)
+            return sugestoes
+
+def consulta_categoria(fk_categoria):
+    db = get_db()
+    cursor = db.cursor()
+    query = 'SELECT desc_categoria FROM categoria_dim WHERE fk_categoria = %s'
+    params = (fk_categoria,)
+    cursor.execute(query, params)
+    resultado = cursor.fetchone()
+
+    if resultado is not None:
+        return resultado[0]
+    else:
+        return None
+    
+def consulta_pergunta(fk_pergunta):
+    db = get_db()
+    cursor = db.cursor()
+    query = 'SELECT desc_pergunta FROM pergunta_dim WHERE fk_pergunta = %s'
+    params = (fk_pergunta,)
+    cursor.execute(query, params)
+    resultado = cursor.fetchone()
+
+    if resultado is not None:
+        return resultado[0]
+    else:
+        return None
 
 @app.route('/', methods=['GET', 'POST'])
 def entrada():
@@ -341,7 +408,6 @@ def final():
     return render_template('final.html')
 
 @app.route('/sugestao', methods=['GET', 'POST'])
-
 def sugestao():
     db = get_db()
     cursor = db.cursor()
@@ -383,15 +449,8 @@ def sugestao():
         
 
     return render_template('sugestao.html', areas=subareas, gestores=gestores, cargos=cargos, categorias=categorias)
-
-def check_admin(username, password):
-    if(username == ADMIN_LOGIN and password == ADMIN_SENHA):
-        return True
-    else:
-        return False
-    
+   
 @app.route('/login', methods=['GET', 'POST'])
-
 def login():   
 
     if request.method == 'POST':
@@ -481,7 +540,7 @@ def logout():
 @app.route('/settings')
 def settings():
     return render_template('settings.html')
-
+        
 @app.route('/dashboard')
 def dashboard():
     if 'logged_in' not in session:
@@ -491,13 +550,14 @@ def dashboard():
     def consulta_gestor(id_gestor):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT fk_gestor, nome, fk_area FROM gestor_dim WHERE id_gestor = %s',(id_gestor,))
+        cursor.execute('SELECT fk_gestor, nome, fk_area, desc_gestor FROM gestor_dim WHERE id_gestor = %s',(id_gestor,))
         dados = cursor.fetchone()
         fk_gestor = dados[0]
         nome_gestor = dados[1]
         fk_area = dados[2]
+        desc_gestor = dados[3]
         cursor.close()
-        return fk_gestor, nome_gestor, fk_area
+        return fk_gestor, nome_gestor, fk_area, desc_gestor
     
     def consulta_quantidade(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None):
         
@@ -645,39 +705,6 @@ def dashboard():
         except mysql.connector.Error as err:
             print(f"Error: {err}", flush=True)
             return None, None
-
-    def consulta_sugestoes(tabela, fk_gestor=None, fk_categoria=None, fk_pergunta=None, fk_area=None):
-        query = f'SELECT * FROM {tabela}'
-        params = []
-        conditions = []
-
-        if fk_gestor is not None:
-            conditions.append('fk_gestor = %s')
-            params.append(fk_gestor)
-        if fk_categoria is not None:
-            conditions.append('fk_categoria = %s')
-            params.append(fk_categoria)
-        if fk_pergunta is not None:
-            conditions.append('fk_pergunta = %s')
-            params.append(fk_pergunta)
-        
-        if conditions:
-            query += ' WHERE ' + ' AND '.join(conditions)
-            
-        query += ' ORDER BY respondido ASC,datetime ASC'
-        db = get_db()
-        cursor = db.cursor(dictionary=True)
-        cursor.execute(query, tuple(params))
-        resultado = cursor.fetchall()
-        cursor.close()
-        sugestoes = []
-        
-        if not resultado:
-            return None
-        else:
-            for row in resultado:
-                sugestoes.append(row)
-            return sugestoes
     
     def consulta_filtros(coluna_procurada, tabela, fk_gestor=None):
 
@@ -704,32 +731,6 @@ def dashboard():
             for row in dados:
                 filtros.append(row)
             return filtros
-
-    def consulta_categoria(fk_categoria):
-        db = get_db()
-        cursor = db.cursor()
-        query = 'SELECT desc_categoria FROM categoria_dim WHERE fk_categoria = %s'
-        params = (fk_categoria,)
-        cursor.execute(query, params)
-        resultado = cursor.fetchone()
-
-        if resultado is not None:
-            return resultado[0]
-        else:
-            return None
-        
-    def consulta_pergunta(fk_pergunta):
-        db = get_db()
-        cursor = db.cursor()
-        query = 'SELECT desc_pergunta FROM pergunta_dim WHERE fk_pergunta = %s'
-        params = (fk_pergunta,)
-        cursor.execute(query, params)
-        resultado = cursor.fetchone()
-
-        if resultado is not None:
-            return resultado[0]
-        else:
-            return None
         
     def gera_filtros(fk_gestor=None):
 
@@ -806,16 +807,19 @@ def dashboard():
             fk_subarea = sugestao['fk_subarea'] 
             texto_sugestao = sugestao['sugestao']
             respondido = sugestao['respondido']
+            fk_gestor = sugestao['fk_gestor']
 
             if respondido == 1:
                 status = 'Respondida'
             else:
                 status = 'Pendente'
+
             categoria = consulta_categoria(fk_categoria)
             pergunta = consulta_pergunta(fk_pergunta)
-
+            gestor = consulta_tabelas('desc_gestor','gestor_dim','fk_gestor',fk_gestor)[0]
             row = {
                 'status': status,
+                'gestor': gestor,
                 'data': data,
                 'categoria': categoria,
                 'pergunta': pergunta,
@@ -875,7 +879,7 @@ def dashboard():
             grafico.append(dados)
         cursor.close()
         return grafico
-    
+
     usuario = session['id']
     perfil = session['perfil']
     
@@ -952,6 +956,66 @@ def dashboard():
             'qtd_sugestoes_pendentes': consulta_quantidade_sugestoes('sugestoes_fato',None, None, None, 0)
         }]
     return render_template('dashboard.html', perfil=perfil, dados=dados, cards=cards, tabela = tabela, dados_grafico=dados_grafico, filtros=dados_filtros)
+
+@app.route('/filtro_tabela')
+def filtro_tabela():
+
+    status = request.args.get('status')
+    perfil = session['perfil']
+    fk_gestor = session['fk_gestor']
+    
+    if perfil == 'gestor':
+        if status == 'todos':
+            dados = consulta_sugestoes('sugestoes_fato',fk_gestor)
+        elif status == 'respondidas':
+            dados = consulta_sugestoes('sugestoes_fato',fk_gestor,None,None,None,1)
+        elif status == 'pendentes':
+            dados = consulta_sugestoes('sugestoes_fato',fk_gestor,None,None,None,0)
+        else:
+            dados = []
+    else:
+        if status == 'todos':
+            dados = consulta_sugestoes('sugestoes_fato',None)
+        elif status == 'respondidas':
+            dados = consulta_sugestoes('sugestoes_fato',None,None,None,None,1)
+        elif status == 'pendentes':
+            dados = consulta_sugestoes('sugestoes_fato',None,None,None,None,0)
+        else:
+            dados = []
+
+    dados_formatados = []
+    for sugestao in dados:
+        data = sugestao['data'].strftime('%Y-%m-%d')
+        fk_categoria = sugestao['fk_categoria']
+        fk_pergunta = sugestao['fk_pergunta']
+        fk_subarea = sugestao['fk_subarea'] 
+        texto_sugestao = sugestao['sugestao']
+        respondido = sugestao['respondido']
+        fk_gestor = sugestao['fk_gestor']
+
+        if respondido == 1:
+            status = 'Respondida'
+        else:
+            status = 'Pendente'
+
+        categoria = consulta_categoria(fk_categoria)
+        pergunta = consulta_pergunta(fk_pergunta)
+        gestor = consulta_tabelas('desc_gestor','gestor_dim','fk_gestor',fk_gestor)[0]
+
+        dado_formatado = {
+            'id_sugestao': sugestao['id_sugestao'],
+            'gestor': gestor,
+            'status': status,
+            'data': data,
+            'categoria': categoria, 
+            'pergunta': pergunta,
+            'sugestao': texto_sugestao,
+            'respondido': respondido
+        }
+        dados_formatados.append(dado_formatado)
+
+    
+    return jsonify(tabela=dados_formatados)
 
 @app.route('/detalhes/<int:fk_categoria>')            
 def get_detalhes(fk_categoria):

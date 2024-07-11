@@ -254,7 +254,9 @@
                         </div>
                     </div>
                     <div class="details">
-                        <button class="buttons" data-id="{{ card.id }}" name="detalhes"><i class="fas fa-plus"></i> Detalhes</button></i>
+                        <button class="buttons" data-id="{{ card.id }}" name="detalhes">
+                            <img class="details-imagem" src="{{ url_for('static', filename='images/awesome_fonts/detalhes.svg') }}">
+                            </i> Detalhes</button></i>
                     </div>
                 </div>
                 {% endfor %}
@@ -269,9 +271,11 @@
             <h1>Sugestões:</h1>
             <p>Quantidade total de sugestões: {{dados[0].qtd_sugestoes}}. Sugestões respondidas: {{dados[0].qtd_sugestoes_respondidas}}. Sugestões sem respostas: {{dados[0].qtd_sugestoes_pendentes}}</p>
             <div class="sugesotes-botoes">
-                <button class="botoes-filtro active">Todas</button>
-                <button class="botoes-filtro">Respondidas</button>
-                <button class="botoes-filtro">Não Respondidas</button>
+                
+                    <button type="submit" class="buttons filtro ativo" name="filtro" value="todas" onclick="carregarTabela('todos')">Todas</button>
+                    <button type="submit" class="buttons filtro" name="filtro" value="respondidas" onclick="carregarTabela('respondidas')">Respondidas</button>
+                    <button type="submit" class="buttons filtro" name="filtro" value="pendentes" onclick="carregarTabela('pendentes')">Pendentes</button>
+                
             </div>
             <div class="tabela">
                 {% if tabela %}
@@ -279,17 +283,19 @@
                         <thead class="tb-cabecalho">
                             <tr>
                                 <th>Data</th>
+                                <th>Gestor</th>
                                 <th>Status</th>
                                 <th>Categoria</th>
                                 <th>Pergunta</th>
                                 <th>Sugestão</th>
-                                <th>Respondido</th>
+                                <th>Resposta</th>
                             </tr>
                         </thead>
                         <tbody class="tb-linhas">
                             {% for row in tabela %}
                             <tr>
                                 <td>{{ row.data }}</td>
+                                <td>{{ row.gestor }}</td>
                                 <td>
                                     <span class="status {{ row.status | lower }}">{{ row.status }}</span>
                                 </td>
@@ -297,7 +303,17 @@
                                 <td>{{ row.pergunta }}</td>
                                 <td>{{ row.sugestao }}</td>
                                 <td>
-                                    <input type="checkbox" {% if row.respondido %} checked {% endif %}>
+                                    {% if row.respondido == 0 %}
+                                        <button class="buttons" name="responder" onclick="responderSugestao('{{ row.id_sugestao }}')">
+                                            Responder
+                                            <img class="details-imagem" src="{{ url_for('static', filename='images/awesome_fonts/responder.svg') }}">
+                                        </button>
+                                    {% elif row.respondido == 1 %}
+                                        <button class="buttons" name="resposta" onclick="verResposta('{{ row.id_sugestao }}')">
+                                            Resposta
+                                            <img class="details-imagem" src="{{ url_for('static', filename='images/awesome_fonts/resposta.svg') }}">    
+                                        </button>
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% endfor %}
@@ -437,7 +453,7 @@
             });
         });
     </script>
-    <script>
+    <script>//Cria aba detalhes e gráfico
         document.addEventListener("DOMContentLoaded", function() {
             function formatarData(data) {
                 const date = new Date(data);
@@ -605,6 +621,110 @@
             } else {
                 return '#2AC96A';  // Verde para notas maiores ou iguais a 8
             }
+        }
+    </script>
+    <script>//Colore botões dos filtros
+        document.querySelectorAll('.buttons.filtro').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.buttons.filtro').forEach(btn => btn.classList.remove('ativo'));
+                this.classList.add('ativo');
+            });
+        });
+    </script>
+    <script>
+        function carregarTabela(filtro) {
+            fetch(`/filtro_tabela?status=${filtro}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);  // Verificar os dados recebidos no console
+    
+                    let tbody = document.querySelector('.tb-linhas');
+                    tbody.innerHTML = '';
+    
+                    if (data.tabela.length > 0) {
+                        data.tabela.forEach(row => {
+                            let tr = document.createElement('tr');
+    
+                            // Coluna Data
+                            let tdData = document.createElement('td');
+                            tdData.textContent = row.data;
+                            tr.appendChild(tdData);
+    
+                            // Coluna Status
+                            let tdStatus = document.createElement('td');
+                            let spanStatus = document.createElement('span');
+                            spanStatus.classList.add('status', row.status.toLowerCase());
+                            spanStatus.textContent = row.status;
+                            tdStatus.appendChild(spanStatus);
+                            tr.appendChild(tdStatus);
+
+                            // Coluna gestor
+                            let tdGestor = document.createElement('td');
+                            tdGestor.textContent = row.gestor;
+                            tr.appendChild(tdGestor);
+    
+                            // Coluna Categoria
+                            let tdCategoria = document.createElement('td');
+                            tdCategoria.textContent = row.categoria;
+                            tr.appendChild(tdCategoria);
+    
+                            // Coluna Pergunta
+                            let tdPergunta = document.createElement('td');
+                            tdPergunta.textContent = row.pergunta;
+                            tr.appendChild(tdPergunta);
+    
+                            // Coluna Sugestão
+                            let tdSugestao = document.createElement('td');
+                            tdSugestao.textContent = row.sugestao;
+                            tr.appendChild(tdSugestao);
+    
+                            // Coluna Ação (Botão)
+                            let tdResposta = document.createElement('td');
+                            let button = document.createElement('button');
+                            button.classList.add('buttons');
+                            button.name = row.respondido == 0 ? 'responder' : 'resposta';
+                            button.textContent = row.respondido == 0 ? 'Responder' : 'Resposta';
+                            button.onclick = function() {
+                                if (row.respondido == 0) {
+                                    responderSugestao(row.id_sugestao);
+                                } else {
+                                    verResposta(row.id_sugestao);
+                                }
+                            };
+
+                            // Adicionar a imagem dentro do botão
+                            let img = document.createElement('img');
+                            img.classList.add('details-imagem');
+                            img.src = row.respondido == 0 ? '/static/images/awesome_fonts/responder.svg' : '/static/images/awesome_fonts/resposta.svg';
+                            img.alt = row.respondido == 0 ? 'Responder' : 'Resposta';
+                            button.appendChild(img);
+
+                            tdResposta.appendChild(button);
+                            tr.appendChild(tdResposta);
+    
+                            tbody.appendChild(tr);
+                        });
+                    } else {
+                        // Caso não haja sugestões disponíveis
+                        let tr = document.createElement('tr');
+                        let td = document.createElement('td');
+                        td.colSpan = 6;
+                        td.textContent = 'Não há sugestões disponíveis no momento.';
+                        tr.appendChild(td);
+                        tbody.appendChild(tr);
+                    }
+                })
+                .catch(error => console.error('Erro:', error));
+        }
+    
+        function responderSugestao(idSugestao) {
+            // Implemente a lógica para responder a sugestão
+            alert(`Responder sugestão com ID ${idSugestao}`);
+        }
+    
+        function verResposta(idSugestao) {
+            // Implemente a lógica para ver a resposta da sugestão
+            alert(`Ver resposta da sugestão com ID ${idSugestao}`);
         }
     </script>
 </body>
