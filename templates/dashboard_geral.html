@@ -14,9 +14,9 @@
             <img class="logo" src="{{ url_for('static', filename='images/logo_completa.svg') }}">
         </div>
         <ul class="sidebar-menu">
-            <li><a href="{{ url_for('dashboard') }}" class="active">Time</a></li>
+            <li><a href="{{ url_for('dashboard') }}" >Time</a></li>
             {% if perfil == 'admin' or perfil == 'gerente_fabril' %}
-                <li><a href="{{ url_for('dashboard_geral') }}" >Geral</a></li>
+                <li><a href="{{ url_for('dashboard_geral') }}" class="active">Geral</a></li>
             {% endif %}
             <li><a href="{{ url_for('logout') }}">Sair</a></li>
         </ul>
@@ -25,7 +25,7 @@
         <div class="introbar">
             <div class="introbar-text">
                 <h1>Olá, {{dados[0].nome}}!</h1>
-                <p>Este é o resultado em que o seu time respondeu para você.</p>	
+                <p>Este é o resultado geral de todas as respostas.</p>	
                 <p>Sua nota está baseada em {{dados[0].qtd_respostas}} respostas, entre os dias {{dados[0].data_min}} e {{dados[0].data_max}}.</p>
             </div>
             <div class="introbar-filters">
@@ -342,13 +342,14 @@
                             <button type="button" id="enviar_resposta">Enviar resposta</button>
                         </div>
                     </form>
+                    
                     <div id="mensagemResposta"></div>
                     <h3>Respostas Enviadas:</h3>
                     <div id="respostasEnviadas" class="respostas-enviadas"></div>
                 </div>
             </div>            
         </div>
-    </div>
+    </div>       
     <script> // Cria gráfico
     
         function calcularCor(nota) {
@@ -656,8 +657,8 @@
         });
     </script>
     <script>//Gera filtros da tabela
-        function carregarTabela(filtro) {
-        fetch(`/filtro_tabela?status=${filtro}`)
+        function carregarTabela(filtro, origem) {
+        fetch(`/filtro_tabela_geral?status=${filtro}&origem=${origem}`)
             .then(response => response.json())
             .then(data => {
                 console.log(data);  // Verificar os dados recebidos no console
@@ -874,5 +875,6 @@
             mensagemElement.innerHTML = `<div class="alert alert-${status}">${message}</div>`;
         }
     </script>
+    
 </body>
 </html>

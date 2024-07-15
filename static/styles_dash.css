@@ -281,6 +281,7 @@ h1 {
     justify-content: flex-start; /* Alinha horizontalmente no centro */
     text-align: center;
     margin-bottom: 10px;
+    height: 50px;
 }
 
 .imagem-categorias {
@@ -514,7 +515,7 @@ h1 {
     background-color: #186C77; /* Cor de fundo ao passar o mouse */
 }
 
-.sugesotes-botoes {
+.sugestoes-botoes {
     display: flex;
     justify-content:start;
     margin-bottom: 10px;
@@ -735,4 +736,115 @@ table tr:hover {
 .pergunta-grafico canvas {
     height: 250px !important; /* Defina a altura desejada */
     width: 100%; /* Opcional: ajuste a largura para preencher o contêiner */
+}
+
+.modal-content h2,
+.modal-content h3 {
+    text-align: center;
+}
+
+blockquote {
+    font-style: italic;
+    margin: 20px 0;
+}
+
+.modal-content p {
+    margin-bottom: 10px;
+}
+
+.sugestao-enviada {
+    font-size:18px;
+    display: flex;
+    justify-content: center;
+}
+.sugestao-info {
+    display: flex;
+    justify-content: space-around;
+    font-size: 14px;
+}
+
+.caixa-texto-resposta{
+    width: 100%;
+    font-size: 14px;
+    flex:1;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.caixa-texto-resposta textarea {
+    width: 100%;
+    font-size: 14px;
+    margin: 0;
+    height: 100px;
+    resize: vertical;
+    margin-bottom: 10px;
+    border: 2px solid #000000; 
+    border-radius: 5px; 
+    font-size: 16px; 
+    background-color: #E6E6EA; 
+    color: #333; 
+    transition: border-color 0.3s ease; 
+    box-sizing: border-box;
+}
+
+.caixa-texto-resposta textarea:focus{
+    border-color: #2AB7CA; 
+    outline: none; 
+}
+
+.resposta-botao {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 0px;
+}
+
+button {
+    background-color: #023047;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2AB7CA;
+}
+
+.alert {
+    margin-top: 10px;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.alert.alert-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.respostas-enviadas {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.resposta-card {
+    background-color: #F4F4F8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.resposta-info {
+    display: flex;
+    justify-content: space-around;
+    gap:10px;
 }
