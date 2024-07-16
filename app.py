@@ -904,41 +904,74 @@ def dashboard():
     usuario = session['id']
     perfil = session['perfil']
     
-    id_gestor = consulta_gestor(usuario)[0]
-    nome_gestor = consulta_gestor(usuario)[1]
-    
+    if perfil == 'admin':
+        nome_gestor = 'Administrador'
+        dados_filtros = gera_filtros()
+        dados_grafico = gera_grafico()
+        cards = gera_cards()
+        tabela = gera_tabela()
 
-    session['id_gestor'] = id_gestor
-    dados_filtros = gera_filtros(id_gestor)
-    dados_grafico = gera_grafico(id_gestor)
-    cards = gera_cards(id_gestor)
-    tabela = gera_tabela(id_gestor)
+        dados = [{
+            'nome': nome_gestor,
+            'qtd_respostas': consulta_quantidade('respostas_fato'),
+            'qtd_puladas': consulta_puladas('respostas_fato'),
+            'nota_media': consulta_media('resposta','respostas_fato')[0],
+            'size_bar': consulta_media('resposta','respostas_fato')[1],
+            'data_min':consulta_min_max('respostas_fato')[0],
+            'data_max': consulta_min_max('respostas_fato')[1],
+            'qtd_nps':consulta_quantidade('respostas_fato',None,7,29),
+            'qtd_puladas_nps': consulta_puladas('respostas_fato',None,7,29),
+            'nota_nps': consulta_media('resposta','respostas_fato',None,7,29)[0],
+            'size_nps': consulta_media('resposta','respostas_fato',None,7,29)[1],
+            'data_min_nps':consulta_min_max('respostas_fato',None,7,29)[0],
+            'data_max_nps': consulta_min_max('respostas_fato',None,7,29)[1],
+            'qtd_psico':consulta_quantidade('respostas_fato',None,10),
+            'qtd_puladas_psico': consulta_puladas('respostas_fato',None,10),
+            'nota_psico':consulta_media('resposta','respostas_fato',None,10)[0],
+            'size_psico':consulta_media('resposta','respostas_fato',None,10)[1],
+            'data_min_psico':consulta_min_max('respostas_fato',None,10)[0],
+            'data_max_psico': consulta_min_max('respostas_fato',None,10)[1],
+            'qtd_sugestoes': consulta_quantidade_sugestoes('sugestoes_fato'),
+            'qtd_sugestoes_respondidas': consulta_quantidade_sugestoes('sugestoes_fato',None, None, None, 1),
+            'qtd_sugestoes_pendentes': consulta_quantidade_sugestoes('sugestoes_fato',None, None, None, 0)
+        }]
+        return render_template('dashboard.html', perfil=perfil, dados=dados, cards=cards, tabela = tabela, dados_grafico=dados_grafico, filtros=dados_filtros)
+    else:
+        id_gestor = consulta_gestor(usuario)[0]
+        nome_gestor = consulta_gestor(usuario)[1]
+        session['id_gestor'] = id_gestor
 
-    dados = [{
-        'nome': nome_gestor,
-        'qtd_respostas': consulta_quantidade('respostas_fato',id_gestor),
-        'qtd_puladas': consulta_puladas('respostas_fato',id_gestor),
-        'nota_media': consulta_media('resposta','respostas_fato',id_gestor)[0],
-        'size_bar': consulta_media('resposta','respostas_fato',id_gestor)[1],
-        'data_min':consulta_min_max('respostas_fato',id_gestor)[0],
-        'data_max': consulta_min_max('respostas_fato',id_gestor)[1],
-        'qtd_nps':consulta_quantidade('respostas_fato',id_gestor,7,29),
-        'qtd_puladas_nps': consulta_puladas('respostas_fato',id_gestor,7,29),
-        'nota_nps': consulta_media('resposta','respostas_fato',id_gestor,7,29)[0],
-        'size_nps': consulta_media('resposta','respostas_fato',id_gestor,7,29)[1],
-        'data_min_nps':consulta_min_max('respostas_fato',id_gestor,7,29)[0],
-        'data_max_nps': consulta_min_max('respostas_fato',id_gestor,7,29)[1],
-        'qtd_psico':consulta_quantidade('respostas_fato',id_gestor,10),
-        'qtd_puladas_psico': consulta_puladas('respostas_fato',id_gestor,10),
-        'nota_psico':consulta_media('resposta','respostas_fato',id_gestor,10)[0],
-        'size_psico':consulta_media('resposta','respostas_fato',id_gestor,10)[1],
-        'data_min_psico':consulta_min_max('respostas_fato',id_gestor,10)[0],
-        'data_max_psico': consulta_min_max('respostas_fato',id_gestor,10)[1],
-        'qtd_sugestoes': consulta_quantidade_sugestoes('sugestoes_fato',id_gestor),
-        'qtd_sugestoes_respondidas': consulta_quantidade_sugestoes('sugestoes_fato',id_gestor, None, None, 1),
-        'qtd_sugestoes_pendentes': consulta_quantidade_sugestoes('sugestoes_fato',id_gestor, None, None, 0)
-    }]
-    return render_template('dashboard.html', perfil=perfil, dados=dados, cards=cards, tabela = tabela, dados_grafico=dados_grafico, filtros=dados_filtros)
+        dados_filtros = gera_filtros(id_gestor)
+        dados_grafico = gera_grafico(id_gestor)
+        cards = gera_cards(id_gestor)
+        tabela = gera_tabela(id_gestor)
+
+        dados = [{
+            'nome': nome_gestor,
+            'qtd_respostas': consulta_quantidade('respostas_fato',id_gestor),
+            'qtd_puladas': consulta_puladas('respostas_fato',id_gestor),
+            'nota_media': consulta_media('resposta','respostas_fato',id_gestor)[0],
+            'size_bar': consulta_media('resposta','respostas_fato',id_gestor)[1],
+            'data_min':consulta_min_max('respostas_fato',id_gestor)[0],
+            'data_max': consulta_min_max('respostas_fato',id_gestor)[1],
+            'qtd_nps':consulta_quantidade('respostas_fato',id_gestor,7,29),
+            'qtd_puladas_nps': consulta_puladas('respostas_fato',id_gestor,7,29),
+            'nota_nps': consulta_media('resposta','respostas_fato',id_gestor,7,29)[0],
+            'size_nps': consulta_media('resposta','respostas_fato',id_gestor,7,29)[1],
+            'data_min_nps':consulta_min_max('respostas_fato',id_gestor,7,29)[0],
+            'data_max_nps': consulta_min_max('respostas_fato',id_gestor,7,29)[1],
+            'qtd_psico':consulta_quantidade('respostas_fato',id_gestor,10),
+            'qtd_puladas_psico': consulta_puladas('respostas_fato',id_gestor,10),
+            'nota_psico':consulta_media('resposta','respostas_fato',id_gestor,10)[0],
+            'size_psico':consulta_media('resposta','respostas_fato',id_gestor,10)[1],
+            'data_min_psico':consulta_min_max('respostas_fato',id_gestor,10)[0],
+            'data_max_psico': consulta_min_max('respostas_fato',id_gestor,10)[1],
+            'qtd_sugestoes': consulta_quantidade_sugestoes('sugestoes_fato',id_gestor),
+            'qtd_sugestoes_respondidas': consulta_quantidade_sugestoes('sugestoes_fato',id_gestor, None, None, 1),
+            'qtd_sugestoes_pendentes': consulta_quantidade_sugestoes('sugestoes_fato',id_gestor, None, None, 0)
+        }]
+        
+        return render_template('dashboard.html', perfil=perfil, dados=dados, cards=cards, tabela = tabela, dados_grafico=dados_grafico, filtros=dados_filtros)
 
 @app.route('/dashboard_geral')
 def dashboard_geral():
