@@ -550,7 +550,7 @@ def gera_grafico(fk_gestor=None):
         dados = {
             'eixo_x': f'Semana: {num_semana} / {mes}',
             'nota': nota,
-            'num_respostas': num_respostas
+            'num_respostas': round(num_respostas/10,0)
         }
         grafico.append(dados)
     cursor.close()
