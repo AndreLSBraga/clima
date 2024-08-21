@@ -1,0 +1,850 @@
+@font-face {
+    font-family: 'Exo';
+    src: url("{{ url_for('static', filename='fonts/Exo/Exo-Regular.ttf') }}") format('ttf'),
+         url("{{ url_for('static', filename='fonts/Exo/Exo-Regular.ttf') }}") format('ttf');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    src: url("{{ url_for('static', filename='fonts/Titillium/TitilliumWeb-Regular.ttf') }}") format('ttf'),
+         url("{{ url_for('static', filename='fonts/Titillium/TitilliumWeb-Regular.ttf') }}") format('ttf');
+    font-weight: 400;
+    font-style: normal;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: "Titillium Web", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow-y: auto;
+}
+
+h1 {
+    margin: 0 auto;
+    font-family: "Exo", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 42px;
+    margin-bottom: 10px;
+    color: #000;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.background-image-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 50px); /* Ajuste o minmax conforme necessário */
+    grid-auto-rows: 50px; /* Ajuste conforme necessário */
+    z-index: -1; /* Certifique-se de que o container de imagem de fundo está atrás de tudo */
+}
+
+.background-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.sidebar {
+    width: 150px; /* Ajuste conforme necessário */
+    height: 100vh;
+    background-color: #E6E6EA;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza o conteúdo horizontalmente */
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+}
+
+.sidebar-logo .logo {
+    margin: 0;
+    width: 100%; /* A imagem terá a largura da div */
+    height: auto; /* A altura será ajustada proporcionalmente */
+    max-width: 150px; /* Limite máximo da largura */
+    max-height: 100px; /* Limite máximo da altura */
+    margin-bottom: 20px; /* Espaçamento entre o título e as opções */
+}
+
+.sidebar-menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column; /* Organiza os itens verticalmente */
+    align-items: center; /* Centraliza os itens horizontalmente */
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-menu li {
+    width: 100%;
+    text-align: center;
+}
+
+.sidebar-menu li a {
+    text-decoration: none;
+    color: #000000;
+    font-family: "Titillium Web", sans-serif;
+    font-size: 18px;
+    padding: 10px 20px;
+    display: block; /* Faz o link ocupar toda a área do item da lista */
+    position: relative;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+.sidebar-menu li a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 3px;
+    background-color: #FE4A49;
+    transition: width 0.3s;
+}
+
+.sidebar-menu li a:hover::after,
+.sidebar-menu li a.active::after {
+    width: 100%;
+}
+
+.sidebar-menu li a:hover {
+    color: #ffffff;
+    background-color: #FE4A49;
+}
+
+.main-content {
+    margin-left: 150px; /* Espaço para a barra lateral */
+    padding-left: 25px;
+    width: 100%; /* Ajuste conforme necessário */
+    height: 100vh;
+    overflow-y: auto;
+    box-sizing: border-box; /* Inclui o padding e o border no cálculo do width e height */
+    background-color: #F4F4F8;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    min-width: 300px;
+    min-height: 400px;
+}
+
+
+.introbar {
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+}
+
+.introbar h1 {
+    margin-bottom: 0;
+}
+
+.introbar p {
+    margin: 0;
+    padding: 0;
+}
+.introbar-text {
+    flex: 1;
+    margin: 10px;
+    max-width: 50%; /* Ajuste conforme necessário */
+}
+
+.introbar h1 {
+    margin-bottom: 0;
+}
+
+.introbar p {
+    margin: 0;
+    padding: 0;
+}
+
+.introbar-filters {
+    margin: 10px;
+    width: 50%; /* Ajuste conforme necessário */
+    display: flex;
+    flex-direction: column;
+    margin:20px;
+}
+
+.introbar-filters form {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.introbar-filters label {
+    display: block;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.introbar-filters input[type="date"], 
+.introbar-filters select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    flex: 1;
+    min-width: 100px;
+}
+
+.introbar-filters span {
+    align-self: center;
+    font-size: 16px;
+    color: #666;
+}
+
+.introbar-filters button[name="filtrar"] {
+    background-color: #023047;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.introbar-filters button:hover {
+    background-color: #2AB7CA;
+}
+
+.introbar-filters button[name="limpar"] {
+    background-color: #a6a6a7;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.introbar-filters button:hover {
+    background-color: #2AB7CA;
+}
+
+.introbar-botoes {
+    display: flex;
+    justify-content: flex-end;
+    margin: 10px;
+    gap: 10px
+}
+
+.container {
+    display: absolute;
+    height: 100%;
+}
+
+.container-cards.geral {
+    display: flex;
+    width: 100%;
+}
+
+.card {
+    background-color: #F4F4F8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#card-geral {
+    width: 30%;
+    align-items: center;
+}
+
+.titulo-cards {
+    display: flex;
+    align-items: center; /* Alinha verticalmente no centro */
+    justify-content: flex-start; /* Alinha horizontalmente no centro */
+    text-align: center;
+    margin-bottom: 10px;
+    height: 50px;
+}
+
+.imagem-categorias {
+    width: 24px;  /* Ajuste conforme necessário */
+    height: 24px; /* Ajuste conforme necessário */
+    margin-right: 8px; /* Espaço entre a imagem e o texto */
+    display: inline-block;
+    vertical-align: middle; /* Garante alinhamento vertical */
+}
+
+.imagem-inicio {
+    width: 24px;  /* Ajuste conforme necessário */
+    height: 24px; /* Ajuste conforme necessário */
+    margin-right: 8px; /* Espaço entre a imagem e o texto */
+    display: inline-block;
+    vertical-align: middle; /* Garante alinhamento vertical */
+}
+
+.titulo-cards h2 {
+    display: inline-block;
+    margin: 0;
+    line-height: 24px; /* Ajuste para alinhar com a altura da imagem */
+    vertical-align: middle;
+}
+
+.titulo-cards h3 {
+    display: inline-block;
+    margin: 0;
+    line-height: 24px; /* Ajuste para alinhar com a altura da imagem */
+    vertical-align: middle;
+}
+
+.imagem {
+    width: 20px;  /* Ajuste a largura conforme necessário */
+    height: auto;  /* Mantém a proporção da imagem */
+}
+
+.imagem-inicio {
+    width: 30px;  /* Ajuste a largura conforme necessário */
+    height: auto;  /* Mantém a proporção da imagem */
+}
+
+.info-respostas {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.info-respostas-dados{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.info-respostas p {
+    font-size: 12px;
+}
+
+.info-respostas-cards {
+    display: flex;
+    flex-direction: column;
+}
+.info-respostas-dados-cards{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.info-respostas-cards p {
+    font-size: 12px;
+}
+
+#card-grafico {
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-cards.detalhado {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.container-cards.detalhado h3{
+    margin-top: 0;
+    font-size: 15px; 
+}
+
+.container-cards.detalhado h3 i {
+    margin-right: 5px; /* Espaço entre o ícone e o texto */
+    color: #333; /* Cor do ícone */
+    font-size: 18px; /* Tamanho do ícone */
+}
+
+.card-detalhe {
+    width: calc(20% - 20px); /* Calcula o width de forma responsiva */
+    background-color: #F4F4F8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bar-container h2 i {
+    margin-right: 10px; /* Espaço entre o ícone e o texto */
+    color: #333; /* Cor do ícone */
+    font-size: 32px; /* Tamanho do ícone */
+}
+
+.titulo{
+    display: flex;
+}
+
+.titulo h2{
+    margin-left: 10px;
+    align-content: center;
+}
+
+
+.bar {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.bar-size {
+    display: flex;
+    align-items: center;
+    background-color: #d9d9db;
+    border-color: #0000;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    flex:1;
+    margin-right: 10px;
+}
+
+.bar-dados {
+    display: flex;
+    justify-content: left;
+    align-items: center; 
+    width: 50px; 
+    font-size: 18px; 
+    color: #333;
+    font-weight: bold; 
+}
+
+.bar-value {
+    height: 25px;
+    line-height: 30px;
+    text-align: right;
+    color: white;
+    border-radius: 5px;
+    white-space: nowrap;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.buttons {
+    background-color: #023047; /* Cor de fundo do botão */
+    color: white; /* Cor do texto e ícone */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espaço entre o ícone e o texto */
+    transition: background-color 0.3s;
+}
+
+.buttons:hover {
+    background-color: #2AB7CA; /* Cor de fundo ao passar o mouse */
+}
+
+.details-imagem {
+    width: 14px;
+    height: auto;
+    filter: brightness(0) invert(1);
+}
+
+.details-button i {
+    font-size: 14px; /* Tamanho do ícone */
+}
+
+.buttons[name="responder"]{
+    width: 100%;
+    background-color: #023047; /* Cor de fundo do botão */
+    color: white; /* Cor do texto e ícone */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Espaço entre o ícone e o texto */
+    transition: background-color 0.3s;
+}
+.buttons[name="responder"]:hover {
+    background-color: #2AB7CA; /* Cor de fundo ao passar o mouse */
+}
+
+.buttons[name="resposta"]{
+    width: 100%;
+    background-color: #28a745; /* Cor de fundo do botão */
+    color: white; /* Cor do texto e ícone */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Espaço entre o ícone e o texto */
+    transition: background-color 0.3s;
+}
+.buttons[name="resposta"]:hover  {
+    background-color: #186C77; /* Cor de fundo ao passar o mouse */
+}
+
+.sugestoes-botoes {
+    display: flex;
+    justify-content:start;
+    margin-bottom: 10px;
+}
+
+.filtro {
+    background-color: white; /* Cor de fundo dos botões inativos */
+    color: #023047; /* Cor do texto dos botões inativos */
+    border: 1px solid #023047; /* Borda para indicar que é um botão */
+    border-radius: 30px; /* Aumenta o arredondamento das bordas */
+    margin-right: 10px; /* Espaço entre os botões */
+}
+
+.filtro.ativo {
+    background-color: #023047; /* Cor de fundo do botão ativo */
+    color: white; /* Cor do texto do botão ativo */
+}
+
+.filtro:hover {
+    background-color: #2AB7CA; /* Cor de fundo ao passar o mouse sobre botões inativos */
+    color: white; /* Cor do texto ao passar o mouse sobre botões inativos */
+}
+
+.tabela {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-height: 400px; /* Altura fixa da tabela */
+    overflow-y: auto; /* Permite a rolagem vertical */
+    margin-bottom: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px;
+    margin-bottom: 30px;
+    padding: 10px;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #023047;
+}
+
+table th, table td {
+    padding: 12px 5px;
+    text-align: center;
+    border-bottom: 1px solid #ceced1;
+    border-right: 1px solid #ceced1;
+}
+
+table th {
+    background-color: #F9FAFB;
+    font-weight: 600;
+    color: #6B7280;
+    font-size: 14px;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 1; /* Garante que o cabeçalho ficará sobre as linhas da tabela */
+}
+
+table td {
+    font-family: "Titillium Web", sans-serif;
+    font-size: 14px;
+    color: #4A4A4A;
+    text-align:center;
+}
+
+table td input[type="checkbox"] {
+    margin: 0 auto;
+    display: block;
+}
+
+/* Estilo das Linhas */
+table tr:nth-child(even) {
+    background-color: #FAFAFA;
+}
+
+table tr:hover {
+    background-color: #F1F1F1;
+    cursor: pointer;
+}
+
+/* Estilo do Status */
+.status {
+    display: inline-block;
+    padding: 5px 5px;
+    border-radius: 20px;
+    font-size: 12px;
+    text-align: center;
+    color: #FFF;
+    font-weight: 600;
+}
+
+.status.respondida {
+    background-color: #10B981;
+}
+
+.status.pendente {
+    background-color: #EF4444;
+}
+
+/* Estilo dos Cabeçalhos */
+.tb-cabecalho th {
+    text-align: center;
+    color: #fff;
+    background-color: #023047;
+}
+
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1001; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.4); 
+    padding-top: 20px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 2% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #FE4A49;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.pergunta {
+    background-color: #F4F4F8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;  /* Adiciona flexbox ao contêiner */
+    justify-content: space-between;  /* Espaço entre os elementos */
+    align-items: center;  /* Alinha os itens ao centro verticalmente */
+}
+
+.pergunta-info {
+    width: 50%;
+    align-items: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;  /* Mantém os elementos dentro dessa div em coluna */
+}
+
+.pergunta-info h4{
+    font-size: 24px;
+}
+
+.pergunta-bar {
+    display:flex;
+    width: 70%;
+    margin-bottom: 10px;
+}
+.pergunta-bar-size {
+    display: flex;
+    align-items: center;
+    background-color: #d9d9db;
+    border-color: #0000;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    flex:1;
+    margin-right: 30px;
+}
+
+.pergunta-bar-size span{
+    margin-left: 15px;
+}
+
+.pergunta-bar-value {
+    height: 30px;
+    line-height: 30px;
+    text-align: right;
+    color: white;
+    border-radius: 5px;
+    white-space: nowrap;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.pergunta-grafico {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.pergunta-grafico canvas {
+    height: 250px !important; /* Defina a altura desejada */
+    width: 100%; /* Opcional: ajuste a largura para preencher o contêiner */
+}
+
+.modal-content h2,
+.modal-content h3 {
+    text-align: center;
+}
+
+blockquote {
+    font-style: italic;
+    margin: 20px 0;
+}
+
+.modal-content p {
+    margin-bottom: 10px;
+}
+
+.sugestao-enviada {
+    font-size:18px;
+    display: flex;
+    justify-content: center;
+}
+.sugestao-info {
+    display: flex;
+    justify-content: space-around;
+    font-size: 14px;
+}
+
+.caixa-texto-resposta{
+    width: 100%;
+    font-size: 14px;
+    flex:1;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.caixa-texto-resposta textarea {
+    width: 100%;
+    font-size: 14px;
+    margin: 0;
+    height: 100px;
+    resize: vertical;
+    margin-bottom: 10px;
+    border: 2px solid #000000; 
+    border-radius: 5px; 
+    font-size: 16px; 
+    background-color: #E6E6EA; 
+    color: #333; 
+    transition: border-color 0.3s ease; 
+    box-sizing: border-box;
+}
+
+.caixa-texto-resposta textarea:focus{
+    border-color: #2AB7CA; 
+    outline: none; 
+}
+
+.resposta-botao {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 0px;
+}
+
+button {
+    background-color: #023047;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2AB7CA;
+}
+
+.alert {
+    margin-top: 10px;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.alert.alert-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.respostas-enviadas {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.resposta-card {
+    background-color: #F4F4F8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.resposta-info {
+    display: flex;
+    justify-content: space-around;
+    gap:10px;
+}

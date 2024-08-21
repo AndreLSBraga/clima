@@ -1,0 +1,67 @@
+.container {
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #F4F4F8;
+    z-index: 1;
+    height: auto;
+    max-width: 900px;  
+    min-width: 300px;  
+    min-height: 200px;
+    margin-top: 70px; /* Ajuste conforme a altura da navbar + um pouco de espaço */
+}
+
+.container .logo {
+    /* Dimensionando a imagem */
+    width: 100%; /* A imagem terá a largura da div */
+    height: auto; /* A altura será ajustada proporcionalmente */
+    max-width: 300px; /* Limite máximo da largura */
+    max-height: 300px; /* Limite máximo da altura */
+}
+
+input[type="text"],input[type="date"] {
+    padding: 10px;
+    width: 80%;
+    max-width: 300px;
+    margin-bottom: 20px;
+    border: 2px solid #ccc; 
+    border-radius: 5px; 
+    font-size: 16px; 
+    background-color: #f2f2f2; 
+    color: #333; 
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus {
+    border-color: #FE4A49; 
+    outline: none; 
+}
+
+.buttons{
+    display: flex;
+    justify-content: center;
+}
+
+button {
+    background-color: #186C77; /* Remove fundo padrão */
+    border: none; /* Remove a borda padrão */
+    border-radius: 50%; /* Torna o botão redondo */
+    padding: 10px; /* Ajuste conforme necessário para o tamanho do botão */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer; /* Altera o cursor ao passar sobre o botão */
+}
+
+.buttons button:hover {
+    background-color: #2AB7CA; 
+}
+
+button .icon {
+    width: 32px; /* Ajuste o tamanho da imagem conforme necessário */
+    height: 32px; /* Certifique-se de que a imagem esteja dentro do botão */
+    filter: invert(1); /* Inverte as cores para que a seta seja branca */
+}
+

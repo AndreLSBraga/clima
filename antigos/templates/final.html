@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulsa 7L - Respondido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img class="logo" src="{{ url_for('static', filename='images/logo_completa.svg') }}">
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('entrada') }}" class="active">Responder</a></li>
+            <li><a href="{{ url_for('sugestao') }}">Sugestões</a></li>
+            <li><a href="{{ url_for('login') }}">Gestor</a></li>
+        </ul>
+    </nav>
+    <form action="/respondido" method="POST">
+        <div class="container">
+            <div class="text"> Obrigado(a) pela participação.</div>
+            <img src = "../static/images/done.svg">
+            <div class="buttons">
+                <button type="submit" name="enviar_sugestao">Tenho uma sugestão</i></button>
+            </div>
+            <div class="alerts">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </form>
+    <script src="{{ url_for('static', filename='background.js') }}"></script>
+</body>
+</html>

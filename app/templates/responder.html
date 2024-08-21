@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulsa 7L</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/responder.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img class="logo" src="/static/images/logos/logo_completa.svg">
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}" class="active">Responder</a></li>
+            <li><a href="{{ url_for('sugestao.sugestao_view') }}">Sugestões</a></li>
+            <li><a href="{{ url_for('login_gestor.login_gestor_view') }}">Gestor</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="question">{{ pergunta }}</div>
+        <form id="formPerguntas" action="/responder" method="POST">
+            <div class="slider-container">
+                <input type="range" name="resposta" min="0" max="10" step="0.01" value="5" class="slider" id="resposta">
+                <div class="slider-scale">
+                    {% for i in range(11) %}
+                        <span>{{ i }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="suggestion">
+                <div class ="suggestion text">
+                    <label for="sugestao">Comentário/Sugestões:</label>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="auto_identificacao" name="auto_identificacao" value="auto_identificacao">
+                    <label for="auto_identificacao"><i>Desejo me identificar</i></label>
+                </div>
+                <textarea name="sugestao" id="sugestao" placeholder="Digite sua sugestão aqui..."></textarea>
+            </div>
+            <div class="question-number">Pergunta {{ pergunta_num }} de {{ total_perguntas }}</div>
+            <div class="buttons">
+                <button type="submit" name="anterior">
+                    <img class="imagem" src="/static/images/icons/esquerda.svg"> Anterior
+                </button>
+            
+                {% if pergunta_num == total_perguntas %}
+                    <button type="button" name="pular" onclick="abrirModal()">Pular<img class="imagem" src="/static/images/icons/pular.svg"></button>
+                    <button type="button" name="enviar-inicial" onclick="abrirModal()">Próxima <img class="imagem" src="/static/images/icons/direita.svg"></button>
+                {% else %}
+                    <button type="submit" name="pular">Pular<img class="imagem" src="/static/images/icons/pular.svg"></button>
+                    <button type="submit" name="proxima">Próxima<img class="imagem" src="/static/images/icons/direita.svg"></button>
+                {% endif %}
+            </div>      
+            
+            <!-- Modal -->
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <h2>Confirmar Envio</h2>
+                    <p>Você tem certeza de que deseja enviar suas respostas?</p>
+                    <div class="buttons">
+                        <button type="button" name="pular" onclick="fecharModal()">Cancelar</button>
+                        <button type="submit" name="proxima" onclick="enviarFormulario()">Confirmar<img class="imagem" src="/static/images/icons/enviar.svg"></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="alerts">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message | safe }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+        </div>
+    </div>
+    
+    <script src="/static/js/background.js"></script>
+    <script>
+        function abrirModal() {
+            var modal = document.getElementById('myModal');
+            if (modal) {
+                modal.style.display = 'block';
+            }
+        }
+
+        function fecharModal() {
+            var modal = document.getElementById('myModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function enviarFormulario() {
+            var form = document.getElementById("formPerguntas");
+            if (form) {
+                form.submit();
+            }
+        }
+    </script>
+</body>
+</html>

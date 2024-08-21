@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulsa 7L - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img class="logo" src="{{ url_for('static', filename='images/logo_completa.svg') }}">
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('entrada') }}" >Responder</a></li>
+            <li><a href="{{ url_for('sugestao') }}">Sugestões</a></li>
+            <li><a href="{{ url_for('login') }}" class="active">Gestor</a></li>
+        </ul>
+    </nav>
+    <form action="{{ url_for('configura_senha') }}" method="POST">
+        <div class="container">
+            <div class="text">Configuração Senha</div>
+            <div class="input-group">
+                <label for="past_password">Senha Anterior:</label>
+                <input type="password" name="past_password" id="past_password"  placeholder="Digite a senha padrão" required>
+            </div>
+            <div class="input-group">
+                <label for="new_password">Nova Senha:</label>
+                <input type="password" name="new_password" id="new_password" placeholder="Digite a nova senha" required>
+            </div>
+            <div class="input-group">
+                <label for="confirmed_password">Confirme a nova Senha:</label>
+                <input type="password" name="confirmed_password" id="confirmed_password"  placeholder="Confirme sua nova senha" required>
+            </div>
+            <div class="buttons">
+                <button type="submit" name="login">Redifinir Senha</button>
+            </div>
+            <div class="alerts">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </form>
+    <script src="{{ url_for('static', filename='background.js') }}"></script>
+</body>
+</html>

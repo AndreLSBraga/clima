@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Pulsa 7L</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles_dash.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/build/chartjs-plugin-datalabels.min.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <img class="logo" src="{{ url_for('static', filename='images/logo_completa.svg') }}">
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="{{ url_for('dashboard') }}" class="active">Time</a></li>
+            {% if perfil == 'admin' or perfil == 'gerente_fabril' %}
+                <li><a href="{{ url_for('dashboard_geral') }}" >Geral</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('logout') }}">Sair</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="introbar">
+            <div class="introbar-text">
+                <h1>Olá, {{dados[0].nome}}!</h1>
+                <p>Este é o resultado em que o seu time respondeu para você.</p>	
+                <p>Sua nota está baseada em {{dados[0].qtd_respostas}} respostas, entre os dias {{dados[0].data_min}} e {{dados[0].data_max}}.</p>
+            </div>
+            <div class="introbar-filters">
+                <!-- <form id="filtroForm" method="POST" action="/aplicar-filtros">
+                    <div class="filtroForm-itens">
+                        <label for="intervalo_datas">Intervalo de Datas:</label>
+                        <input type="date" id="data_inicio" name="data_inicio" min="{{ dados[0].data_min }}" max="{{ dados[0].data_max }}">
+                        <span>até</span>
+                        <input type="date" id="data_fim" name="data_fim" min="{{ dados[0].data_min }}" max="{{ dados[0].data_max }}">
+                    </div>
+        
+                    <div class="filtroForm-itens">
+                        <label for="cargo">Cargos:</label>
+                        <select id="cargo" name="cargo" class="custom-select">
+                            <option value="" selected >Todos</option>
+                            {% set cargos_existentes = [] %}
+                            {% for cargo in filtros.cargos %}
+                                {% if cargo not in cargos_existentes %}
+                                    {% set _ = cargos_existentes.append(cargo) %}
+                                    <option value="{{ cargo }}">{{ cargo }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+        
+                    <div class="filtroForm-itens">
+                        <label for="idade">Idade:</label>
+                        <select id="idade" name="idade" class="custom-select">
+                            <option value="" selected >Todos</option>
+                            {% set idades_existentes = [] %}
+                            {% for idade in filtros.idades %}
+                                {% if idade.idade not in idades_existentes %}
+                                    {% set _ = idades_existentes.append(idade.idade) %}
+                                    <option value="{{ idade.idade }}">{{ idade.idade }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filtroForm-itens">
+                        <label for="genero">Genêro:</label>
+                        <select id="genero" name="genero" class="custom-select">
+                            <option value="" selected >Todos</option>
+                            {% set generos_existentes = [] %}
+                            {% for genero in filtros.generos %}
+                                {% if genero.genero not in generos_existentes %}
+                                    {% set _ = generos_existentes.append(genero.genero) %}
+                                    <option value="{{ genero.genero }}">{{ genero.genero }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+                <div class="introbar-botoes">
+                    <button type="submit" class="buttons" name="filtrar"><i class="fas fa-filter"></i>Aplicar Filtros</button>
+                    <button type="submit" class="buttons" name="limpar"><i class="fas fa-eraser"></i>Limpar Filtros</button>
+                </div> -->
+            </div>
+        </div>
+        <div class="container">
+            <div class="container-cards geral">
+                <div class="card" id="card-geral">
+                    <div class="bar-container">
+
+                        <div class="bar-container-card">
+                            <div class="titulo-cards">
+                                <img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/nota_geral.svg') }}">
+                                <h2>Nota Geral:</h2>
+                            </div>
+                            
+                            <div class="bar">
+                                <div class="bar-size">
+                                    <div class="bar-value" data-nota="{{dados[0].nota_media }}" style="width: {{dados[0].size_bar}}%;"></div>
+                                </div>
+                                <div class="bar-dados">
+                                    {% if nota_media != None %}
+                                        <span>{{dados[0].nota_media}}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-respostas">
+                                <div class="info-respostas-dados">
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}">
+                                    <p>Nº Respostas: {{dados[0].qtd_respostas}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}">
+                                    <p>Nº Puladas: {{dados[0].qtd_puladas}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}">
+                                    <p>Datas: {{dados[0].data_min}} e {{dados[0].data_max}}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bar-container-card">
+                            <div class="titulo-cards">
+                                <img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/nps.svg') }}">
+                                <h2>NPS:</h2>
+                            </div>
+                            <div class="bar">
+                                <div class="bar-size">
+                                    <div class="bar-value" data-nota="{{ dados[0].nota_nps }}" style="width: {{dados[0].size_nps}}%;"></div>
+                                </div>
+                                <div class="bar-dados">
+                                    {% if dados[0].nota_nps != None %}
+                                        <span>{{dados[0].nota_nps}}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-respostas">
+                                <div class="info-respostas-dados">
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}">
+                                    <p>Nº Respostas: {{dados[0].qtd_nps}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}">
+                                    <p>Nº Puladas: {{dados[0].qtd_puladas_nps}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}">
+                                    <p>Datas: {{dados[0].data_min_nps}} e {{dados[0].data_max_nps}}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bar-container-card">
+                            <div class="titulo-cards">
+                                <img class="imagem-inicio" src="{{ url_for('static', filename='images/awesome_fonts/seguranca.svg') }}">
+                                <h2>Segurança Psicológica:</h2>
+                            </div>
+                            
+                            <div class="bar">
+                                <div class="bar-size">
+                                    <div class="bar-value" data-nota="{{ dados[0].nota_psico }}" style="width: {{dados[0].size_psico}}%;"></div>
+                                </div>
+                                <div class="bar-dados">
+                                    {% if nota_psico != None %}
+                                        <span>{{dados[0].nota_psico}}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-respostas">
+                                <div class="info-respostas-dados">
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}">
+                                    <p>Nº Respostas: {{dados[0].qtd_psico}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}">
+                                    <p>Nº Puladas: {{dados[0].qtd_puladas_psico}}</p>
+                                </div>
+                                <div class="info-respostas-dados">
+                                    <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}">
+                                    <p>Datas: {{dados[0].data_min_psico}} e {{dados[0].data_max_psico}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="card" id="card-grafico">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+            <h1>Dimensões:</h1>
+            <div class="container-cards detalhado">
+                {% for card in cards %}
+                <div class="card-detalhe" id="card-{{ card.id }}">
+                    <div class="titulo-cards">
+                        {% if card.id == 1 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/clima.svg') }}" alt="Cloud">
+                        {% elif card.id == 2 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/lideranca.svg') }}" alt="User Tie">
+                        {% elif card.id == 3 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/funcoes.svg') }}" alt="Tasks">
+                        {% elif card.id == 4 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/carreira.svg') }}" alt="Chart Line">
+                        {% elif card.id == 5 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/ambiente.svg') }}" alt="Building">
+                        {% elif card.id == 6 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/salario.svg') }}" alt="Dollar Sign">
+                        {% elif card.id == 7 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/feedback.svg') }}" alt="Smile">
+                        {% elif card.id == 8 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/comunicacao.svg') }}" alt="Comments">
+                        {% elif card.id == 9 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/servicos.svg') }}" alt="Tools">
+                        {% elif card.id == 10 %}
+                            <img class="imagem-categorias" src="{{ url_for('static', filename='images/awesome_fonts/seguranca.svg') }}" alt="Brain">
+                        {% endif %}
+                        <h3>
+                            {{ card.title }}:
+                        </h3>
+                    </div>
+                    <div class="bar">
+                        <div class="bar-size">
+                            <div class="bar-value" data-nota="{{ card.value }}" style="width: {{ card.size }}%;"></div>
+                        </div>
+                        <div class="bar-dados">
+                            {% if card.value != None %}
+                                <span>{{card.value}}</span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>                        
+                    </div>
+                    <div class="info-respostas-cards">
+                        <div class="info-respostas-dados-cards">
+                            <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}"><p>Nº Respostas: {{card.qtd_respostas}}</p>
+                        </div>
+                        <div class="info-respostas-dados-cards">
+                            <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}"><p>Nº Puladas: {{card.qtd_puladas}}</p>
+                        </div>
+                        <div class="info-respostas-dados-cards">
+                            <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}"><p>Datas: {{card.data_min}} e {{card.data_max}}</p>
+                        </div>
+                    </div>
+                    <div class="details">
+                        <button class="buttons" data-id="{{ card.id }}" name="detalhes">
+                            <img class="details-imagem" src="{{ url_for('static', filename='images/awesome_fonts/detalhes.svg') }}">
+                            </i> Detalhes</button></i>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div id="detalhes" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2 id="modalTitle"></h2>
+                    <p id="modalContent"></p>
+                </div>
+            </div>
+            <h1>Sugestões:</h1>
+            <p>Quantidade total de sugestões: {{dados[0].qtd_sugestoes}}. Sugestões respondidas: {{dados[0].qtd_sugestoes_respondidas}}. Sugestões sem respostas: {{dados[0].qtd_sugestoes_pendentes}}</p>
+            <div class="sugestoes-botoes">
+                
+                    <button type="submit" class="buttons filtro ativo" name="filtro" value="todas" onclick="carregarTabela('todos')">Todas</button>
+                    <button type="submit" class="buttons filtro" name="filtro" value="respondidas" onclick="carregarTabela('respondidas')">Respondidas</button>
+                    <button type="submit" class="buttons filtro" name="filtro" value="pendentes" onclick="carregarTabela('pendentes')">Pendentes</button>
+                
+            </div>
+            <div class="tabela">
+                {% if tabela %}
+                    <table>
+                        <thead class="tb-cabecalho">
+                            <tr>
+                                <th>Data</th>
+                                <th>Gestor</th>
+                                <th>Status</th>
+                                <th>Categoria</th>
+                                <th>Pergunta</th>
+                                <th>Sugestão</th>
+                                <th>Resposta</th>
+                            </tr>
+                        </thead>
+                        <tbody class="tb-linhas">
+                            {% for row in tabela %}
+                            <tr>
+                                <td>{{ row.data }}</td>
+                                <td>{{ row.gestor }}</td>
+                                <td>
+                                    <span class="status {{ row.status | lower }}">{{ row.status }}</span>
+                                </td>
+                                <td>{{ row.categoria }}</td>
+                                <td>{{ row.pergunta }}</td>
+                                <td>{{ row.sugestao }}</td>
+                                <td>
+                                    {% if row.respondido == 0 %}
+                                    <button class="buttons" name="responder" onclick="abrirModalSugestao('{{ row.id_sugestao }}')">
+                                        Responder
+                                        <img class="details-imagem" src="{{ url_for('static', filename='images/awesome_fonts/responder.svg') }}">
+                                    </button>
+                                
+                                    {% elif row.respondido == 1 %}
+                                    <button class="buttons" name="resposta" onclick="abrirModalSugestao('{{ row.id_sugestao }}')">
+                                        Resposta
+                                        <img class="details-imagem" src="{{ url_for('static', filename='images/awesome_fonts/resposta.svg') }}">
+                                    {% endif %}
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Não há sugestões disponíveis no momento.</p>
+                {% endif %}
+            </div>
+            <div id="detalhesSugestaoModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal('detalhesSugestaoModal')">&times;</span>
+                    <h2>Detalhes Sugestão:</h2>
+                    <div class="sugestao-enviada">
+                        <blockquote id="sugestaoTexto"></blockquote>
+                    </div>
+                    <div class="sugestao-info">
+                        <p><strong>Gestor:</strong> <span id="sugestaoGestor"></span></p>
+                        <p><strong>Categoria:</strong> <span id="sugestaoCategoria"></span></p>
+                        <p><strong>Pergunta:</strong> <span id="sugestaoPergunta"></span></p>
+                    </div>
+                    <h3>Responder sugestão:</h3>
+                    <form id="formResposta">
+                        <div class="caixa-texto-resposta">
+                            <textarea id="responderTextarea" name="responderTextarea" placeholder="Digite aqui sua resposta..." required></textarea>
+                        </div>
+                        <div class="resposta-botao">
+                            <button type="button" id="enviar_resposta">Enviar resposta</button>
+                        </div>
+                    </form>
+                    <div id="mensagemResposta"></div>
+                    <h3>Respostas Enviadas:</h3>
+                    <div id="respostasEnviadas" class="respostas-enviadas"></div>
+                </div>
+            </div>            
+        </div>
+    </div>
+    <script> // Cria gráfico
+    
+        function calcularCor(nota) {
+                if (nota < 4) {
+                    return '#FE4A49';  // Vermelho para notas menores que 4
+                } else if (nota < 8) {
+                    return '#FEC10B';  // Amarelo para notas entre 4 e 7.9
+                } else {
+                    return '#2AC96A';  // Verde para notas maiores ou iguais a 8
+                }
+            }
+
+        const dadosGrafico = {{ dados_grafico | tojson | safe }};
+        const labels = dadosGrafico.map(dado => dado.eixo_x);
+        const notaData = dadosGrafico.map(dado => dado.nota);
+        const respostaData = dadosGrafico.map(dado => dado.num_respostas);
+
+        // Configuração do gráfico
+        const config = {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Nota',
+                        backgroundColor: notaData.map(nota => calcularCor(nota)),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        data: notaData,
+                    },
+                    {
+                        label: 'Nº Respostas',
+                        backgroundColor: 'rgba(64, 64, 64, 0.7)',
+                        borderColor: 'rgba(0, 0, 0, 1)',
+                        data: respostaData,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Nota média por semana do ano', // Título do gráfico
+                        color: '#333', // Cor do título do gráfico
+                        font: {
+                            size: 20,
+                            weight: 'bold'
+                        }
+                    },
+                    legend: {
+                        position: 'bottom', // Coloca a legenda abaixo do gráfico
+                    },
+                    datalabels: { // Plugin para exibir os rótulos de dados nas barras
+                        anchor: 'end',
+                        align: 'end',
+                        color: '#333',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        formatter: function(value, context) {
+                            return value.toFixed(2); // Formato dos valores, ajuste conforme necessário
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Semana do ano / Mês', // Título do eixo x
+                            color: '#333', // Cor do título do eixo x
+                            font: {
+                                size: 16,
+                                weight: 'normal'
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Nota Média', // Título do eixo y
+                            color: '#333', // Cor do título do eixo y
+                            font: {
+                                size: 16,
+                                weight: 'normal'
+                            }
+                        },
+                        suggestedMin: 0, // Define o mínimo do eixo y como 0
+                        suggestedMax: 10, // Define o máximo do eixo y como 10
+                        ticks: {
+                            stepSize: 1 // Define o intervalo entre os ticks do eixo y
+                        }
+                    }
+                },
+                
+            }
+        };
+
+        // Renderiza o gráfico
+        const lineChart = new Chart(
+            document.getElementById('lineChart'),
+            config
+        );
+    </script>
+    <script> //Colore as barras
+        document.addEventListener('DOMContentLoaded', function() {
+            // Função para calcular a cor com base na nota
+            function calcularCor(nota) {
+                if (nota < 4) {
+                    return '#FE4A49';  // Nota menor que 4 será vermelho
+                } else if (nota < 8) {
+                    return '#FEC10B';  // Nota entre 4 e 6.9 será amarelo
+                } else {
+                    return '#2AC96A';  // Nota maior ou igual a 7 será verde
+                }
+            }
+            
+            // Selecionar todas as barras de progresso
+            const bars = document.querySelectorAll('.bar-value');
+            
+            // Iterar sobre cada barra de progresso e definir a cor com base na nota
+            bars.forEach(bar => {
+                const nota = parseFloat(bar.getAttribute('data-nota'));
+                bar.style.backgroundColor = calcularCor(nota);
+            });
+        });
+    </script>
+    <script>//Cria aba detalhes e gráfico
+        document.addEventListener("DOMContentLoaded", function() {
+            function formatarData(data) {
+                const date = new Date(data);
+                const dia = date.getDate().toString().padStart(2, '0');
+                const mes = (date.getMonth() + 1).toString().padStart(2, '0');
+                const ano = date.getFullYear().toString().substr(-2);
+                return `${dia}/${mes}/${ano}`;
+            }
+            const modal = document.getElementById("detalhes");
+            const modalTitle = document.getElementById("modalTitle");
+            const modalContent = document.getElementById("modalContent");
+            const closeModal = document.getElementsByClassName("close")[0];
+    
+            document.querySelectorAll(".buttons[name='detalhes']").forEach(button => {
+                button.addEventListener("click", function() {
+                    const cardId = this.getAttribute("data-id");
+                    fetch(`/detalhes/${cardId}`)
+                        .then(response => response.json())
+                        .then(dados_detalhes   => {
+                            modalTitle.textContent = dados_detalhes.title;
+                            modalContent.innerHTML = `
+                                <p>${dados_detalhes.content}</p>
+                                ${dados_detalhes.perguntas.map((pergunta, index) =>
+                                `
+                                <div class="pergunta">
+                                    <div class="pergunta-info">
+                                        <h4>${pergunta.pergunta}</h4>
+                                        <div class="pergunta-bar">
+                                            <div class="pergunta-bar-size">
+                                                <div class="pergunta-bar-value" data-nota="${pergunta.nota}" style="width: ${pergunta.size}%;"></div>
+                                            </div>
+                                            <div class="bar-dados">
+                                                <span>${pergunta.nota !== null ? pergunta.nota : '-'}</span>
+                                            </div>                        
+                                        </div>
+                                        <div class="info-respostas">
+                                            <div class="info-respostas-dados">
+                                                <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/respostas.svg') }}"></i><p>Nº Respostas: ${pergunta.respostas}</p>
+                                            </div>
+                                            <div class="info-respostas-dados">
+                                                <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/pular.svg') }}"></i><p>Nº Puladas: ${pergunta.puladas}</p>
+                                            </div>
+                                            <div class="info-respostas-dados">
+                                                <img class="imagem" src="{{ url_for('static', filename='images/awesome_fonts/calendario.svg') }}"></i><p>Datas: ${pergunta.data_min ? formatarData(pergunta.data_min) : '-'} e ${pergunta.data_max ? formatarData(pergunta.data_max) : '-'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pergunta-grafico">
+                                        <canvas id="chart-${index}"></canvas>
+                                    </div>
+                                </div>
+                                `).join('')}
+                            `;
+    
+                            // Colorir as barras
+                            const bars = modalContent.querySelectorAll('.pergunta-bar-value');
+                            bars.forEach(bar => {
+                                const nota = parseFloat(bar.getAttribute('data-nota'));
+                                bar.style.backgroundColor = calcularCor(nota);
+                            });
+    
+                            // Gerar gráficos para cada pergunta
+                            dados_detalhes.perguntas.forEach((pergunta, index) => {
+                                const ctx = document.getElementById(`chart-${index}`).getContext('2d');
+                                const labels = pergunta.grafico.map(dado => `${dado.eixo_x}`);
+                                const notaData = pergunta.grafico.map(dado => dado.nota);
+    
+                                new Chart(ctx, {
+                                    type: 'bar',
+                                    data: {
+                                        labels: labels,
+                                        datasets: [
+                                            {
+                                                label: 'Nota',
+                                                backgroundColor: notaData.map(nota => calcularCor(nota)),
+                                                borderColor: 'rgba(75, 192, 192, 1)',
+                                                data: notaData
+                                            },
+                                            {
+                                                label: 'Nº Respostas',
+                                                backgroundColor: 'rgba(64, 64, 64, 0.7)',
+                                                borderColor: 'rgba(0, 0, 0, 1)',
+                                                data: respostaData,
+                                            }
+                                        ]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            title: {
+                                                display: true,
+                                                text: `Nota média por semana`,
+                                                color: '#333',
+                                                font: {
+                                                    size: 20,
+                                                    weight: 'bold'
+                                                }
+                                            },
+                                            legend: {
+                                                position: 'bottom'
+                                            },
+                                            datalabels: {
+                                                anchor: 'end',
+                                                align: 'end',
+                                                color: '#333',
+                                                font: {
+                                                    size: 14,
+                                                    weight: 'bold'
+                                                },
+                                                formatter: function(value, context) {
+                                                    return value.toFixed(2);
+                                                }
+                                            }
+                                        },
+                                        scales: {
+                                            x: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Semanas do Ano',
+                                                    color: '#333',
+                                                    font: {
+                                                        size: 16,
+                                                        weight: 'normal'
+                                                    }
+                                                }
+                                            },
+                                            y: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Nota Média',
+                                                    color: '#333',
+                                                    font: {
+                                                        size: 16,
+                                                        weight: 'normal'
+                                                    }
+                                                },
+                                                suggestedMin: 0,
+                                                suggestedMax: 10,
+                                                ticks: {
+                                                    stepSize: 1
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+                            console.log("Dados recebidos:", dados_detalhes);
+                            modal.style.display = "block";
+                        });
+                });
+            });
+    
+            closeModal.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+    
+            window.addEventListener("click", function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+    
+        // Função para calcular a cor com base na nota
+        function calcularCor(nota) {
+            if (nota < 4) {
+                return '#FE4A49';  // Vermelho para notas menores que 4
+            } else if (nota < 8) {
+                return '#FEC10B';  // Amarelo para notas entre 4 e 7.9
+            } else {
+                return '#2AC96A';  // Verde para notas maiores ou iguais a 8
+            }
+        }
+    </script>
+    <script>//Colore botões dos filtros
+        document.querySelectorAll('.buttons.filtro').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.buttons.filtro').forEach(btn => btn.classList.remove('ativo'));
+                this.classList.add('ativo');
+            });
+        });
+    </script>
+    <script>//Gera filtros da tabela
+        function carregarTabela(filtro) {
+        fetch(`/filtro_tabela?status=${filtro}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);  // Verificar os dados recebidos no console
+
+                let tbody = document.querySelector('.tb-linhas');
+                tbody.innerHTML = '';
+
+                if (data.tabela && data.tabela.length > 0) {
+                    data.tabela.forEach(row => {
+                        let tr = document.createElement('tr');
+
+                        // Coluna Data
+                        let tdData = document.createElement('td');
+                        tdData.textContent = row.data;
+                        tr.appendChild(tdData);
+
+                        // Coluna Gestor
+                        let tdGestor = document.createElement('td');
+                        tdGestor.textContent = row.gestor;
+                        tr.appendChild(tdGestor);
+
+                        // Coluna Status
+                        let tdStatus = document.createElement('td');
+                        let spanStatus = document.createElement('span');
+                        spanStatus.classList.add('status', row.status.toLowerCase());
+                        spanStatus.textContent = row.status;
+                        tdStatus.appendChild(spanStatus);
+                        tr.appendChild(tdStatus);
+
+                        // Coluna Categoria
+                        let tdCategoria = document.createElement('td');
+                        tdCategoria.textContent = row.categoria;
+                        tr.appendChild(tdCategoria);
+
+                        // Coluna Pergunta
+                        let tdPergunta = document.createElement('td');
+                        tdPergunta.textContent = row.pergunta;
+                        tr.appendChild(tdPergunta);
+
+                        // Coluna Sugestão
+                        let tdSugestao = document.createElement('td');
+                        tdSugestao.textContent = row.sugestao;
+                        tr.appendChild(tdSugestao);
+
+                        // Coluna Ação (Botão)
+                        let tdResposta = document.createElement('td');
+                        let button = document.createElement('button');
+                        button.classList.add('buttons');
+                        button.name = row.respondido == 0 ? 'responder' : 'resposta';
+                        button.textContent = row.respondido == 0 ? 'Responder' : 'Resposta';
+                        button.onclick = function() {
+                            if (row.respondido == 0) {
+                                abrirModalSugestao(row.id_sugestao);
+                            } else {
+                                abrirModalSugestao(row.id_sugestao);
+                            }
+                        };
+
+                        // Adicionar a imagem dentro do botão
+                        let img = document.createElement('img');
+                        img.classList.add('details-imagem');
+                        img.src = row.respondido == 0 ? '/static/images/awesome_fonts/responder.svg' : '/static/images/awesome_fonts/resposta.svg';
+                        img.alt = row.respondido == 0 ? 'Responder' : 'Resposta';
+                        button.appendChild(img);
+
+                        tdResposta.appendChild(button);
+                        tr.appendChild(tdResposta);
+
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    // Caso não haja sugestões disponíveis
+                    let tr = document.createElement('tr');
+                    let td = document.createElement('td');
+                    td.colSpan = 7;  // Pode ser o número de colunas ou apenas um número grande o suficiente
+                    td.textContent = 'Não há sugestões disponíveis no momento.';
+                    td.style.textAlign = 'center';
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+    }
+    </script>
+    <script> //Gera modal da sugestão
+        function abrirModalSugestao(sugestaoId) {
+            if (!sugestaoId) {
+                console.error('ID da sugestão não fornecido');
+                return;
+            }
+    
+            fetch(`/detalhes_sugestao/${sugestaoId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor');
+                    }
+                    return response.json();
+                })
+                .then(dados => {
+                    function formatarData(data) {
+                        const dataObj = new Date(data);
+                        const dia = dataObj.getDate().toString().padStart(2, '0');
+                        const mes = (dataObj.getMonth() + 1).toString().padStart(2, '0');
+                        const ano = dataObj.getFullYear();
+                        return `${dia}/${mes}/${ano}`;
+                    }
+                    // Verifica se os campos existem nos dados recebidos
+                    if (dados.sugestao) {
+                        document.getElementById('sugestaoTexto').textContent = dados.sugestao;
+                    } else {
+                        document.getElementById('sugestaoTexto').textContent = 'Sugestão não encontrada';
+                    }
+    
+                    if (dados.gestor) {
+                        document.getElementById('sugestaoGestor').textContent = dados.gestor;
+                    } else {
+                        document.getElementById('sugestaoGestor').textContent = 'Gestor não encontrado';
+                    }
+    
+                    if (dados.categoria) {
+                        document.getElementById('sugestaoCategoria').textContent = dados.categoria;
+                    } else {
+                        document.getElementById('sugestaoCategoria').textContent = 'Categoria não encontrada';
+                    }
+    
+                    if (dados.pergunta) {
+                        document.getElementById('sugestaoPergunta').textContent = dados.pergunta;
+                    } else {
+                        document.getElementById('sugestaoPergunta').textContent = 'Pergunta não encontrada';
+                    }
+    
+                    document.getElementById('responderTextarea').value = '';
+    
+                    const respostasEnviadas = document.getElementById('respostasEnviadas');
+                    if (dados.respostas && dados.respostas.length > 0) {
+                        respostasEnviadas.innerHTML = dados.respostas.map(resposta => `
+                            <div class="resposta-card">
+                                <div class="resposta-info">
+                                    <p><strong>${resposta.gestor}</strong></p>
+                                    <p><strong>Data:</strong> <span>${formatarData(resposta.data)}</span></p>
+                                </div>
+                                <blockquote><p>${resposta.texto_resposta}</p></blockquote>
+                            </div>
+                        `).join('');
+                    } else {
+                        respostasEnviadas.innerHTML = `
+                            <div class="resposta-card">
+                                <blockquote><p>Não houve respostas para essa sugestão ainda. Seja o primeiro a responder!</p></blockquote>
+                            </div>
+                        `;
+                    }
+    
+                    openModal('detalhesSugestaoModal');
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                });
+        }
+    
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+    
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+    
+        window.onclick = function(event) {
+            const modal = document.getElementById('detalhesSugestaoModal');
+            if (event.target == modal) {
+                closeModal('detalhesSugestaoModal');
+            }
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("enviar_resposta").addEventListener("click", function() {
+                enviarResposta();
+            });
+        });
+
+        function enviarResposta() {
+            var resposta = document.getElementById("responderTextarea").value.trim();
+
+            if (resposta === "") {
+                alert("Por favor, digite sua resposta antes de enviar.");
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("responderTextarea", resposta);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/enviar_resposta", true);
+            xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        exibirMensagem(response.message, response.status);
+                        document.getElementById("formResposta").reset(); // Limpa o formulário após o envio
+                    } else {
+                        exibirMensagem("Erro ao enviar resposta.", "error");
+                    }
+                }
+            };
+
+            xhr.send(formData);
+        }
+
+        function exibirMensagem(message, status) {
+            var mensagemElement = document.getElementById("mensagemResposta");
+            mensagemElement.innerHTML = `<div class="alert alert-${status}">${message}</div>`;
+        }
+    </script>
+</body>
+</html>

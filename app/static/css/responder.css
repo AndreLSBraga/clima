@@ -1,0 +1,215 @@
+.container {
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #F4F4F8;
+    z-index: 1;
+    width: 80%;
+    height: auto;
+    max-width: 900px;  
+    min-width: 300px;  
+    min-height: 200px;
+    margin-top: 70px; /* Ajuste conforme a altura da navbar + um pouco de espaço */
+}
+
+.question {
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+form {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.slider-container {
+    margin-top: 20px;
+    position: relative;
+}
+
+.slider {
+    margin-top: 20px;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 15px;
+    border-radius: 5px;
+    background: linear-gradient(to right, #FE4A49 0%, #FE4A49 40%, #FED766 40%, #FED766 79%, #57DB8C 79%, #2AC96A 100%);
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #403D39;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.slider-scale {
+    width: 100%;
+    display: flex;
+    justify-content:space-between;
+    position: absolute;
+    top: -25px;
+    left: 0;
+    right: 0;
+}
+
+.slider-scale span {
+    margin-top: 20px;
+    font-size: 12px;
+}
+
+.suggestion{
+    width: 100%;
+    height: 90%;
+    margin-top: 10px;
+    font-size: 18px;
+    flex:1;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.suggestion-box{
+    flex: 1;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.suggestion.text{
+    font-size: 24px;
+    margin: 0 auto;
+    justify-content: end;
+}
+
+.suggestion textarea {
+    flex: 1;
+    padding: 30px;
+    height: 100%;
+    width: 80%; 
+    border: 2px solid #000000; 
+    border-radius: 5px; 
+    font-size: 16px; 
+    background-color: #E6E6EA; 
+    color: #333; 
+    transition: border-color 0.3s ease; 
+    box-sizing: border-box;
+}
+
+.suggestion textarea:focus {
+    border-color: #FE4A49; 
+    outline: none; 
+}
+
+.checkbox-container {
+    width: 80%;
+    margin: 10px 0;
+    display: flex;
+}
+
+.checkbox-container input[type="checkbox"] {
+    margin-right: 10px; /* Ajuste a margem conforme necessário */
+}
+
+.question-number {
+    font-size: 12px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.buttons {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 10px;  
+    margin-top: 10px;
+}
+
+.buttons button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px 5px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #186C77; 
+    color: white; 
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; 
+    width: 20%;
+}
+
+.buttons button:hover {
+    background-color: #2AB7CA; 
+}
+
+button[name="anterior"]:hover {
+    background-color: #2AB7CA; 
+}
+
+button[name="pular"]:hover {
+    background-color: #FECB34; 
+}
+
+button[name="proxima"]:hover {
+    background-color: #03C956; 
+}
+
+.buttons button i {
+    margin-right: 5px;
+}
+
+.imagem {
+    width: 15px;  /* Ajuste a largura conforme necessário */
+    height: auto;  /* Mantém a proporção da imagem */
+    filter: brightness(0) invert(1);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.modal-button-container {
+    margin-top: 15px;
+}

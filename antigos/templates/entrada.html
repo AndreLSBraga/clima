@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulsa 7L</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img class="logo" src="{{ url_for('static', filename='images/logo_completa.svg') }}">
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('entrada') }}" class="active">Responder</a></li>
+            <li><a href="{{ url_for('sugestao') }}">Sugestões</a></li>
+            <li><a href="{{ url_for('login') }}">Gestor</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <img class="logo" src="{{ url_for('static', filename='images/logo_completa.svg') }}">
+        <form action="/" method="POST">
+            <h4>Selecione sua área:</h4>
+            <select name="area" id="area" class="custom-select" required>
+                <option value="" disabled selected hidden>Selecione uma opção</option>
+                {% for area in areas %}
+                    <option value="{{ area }}">{{ area }}</option>
+                {% endfor %}
+            </select>
+            <h4>Selecione seu gestor:</h4>
+            <select name="gestor" id="gestor" class="custom-select" required>
+                <option value="" disabled selected hidden>Selecione uma opção</option>
+                {% for gestor in gestores %}
+                    <option value="{{ gestor }}">{{ gestor }}</option>
+                {% endfor %}
+            </select>
+            <h4>Selecione seu cargo:</h4>
+            <select name="cargo" id="cargo" class="custom-select" required>
+                <option value="" disabled selected hidden>Selecione uma opção</option>
+                {% for cargo in cargos %}
+                    <option value="{{ cargo }}">{{ cargo }}</option>
+                {% endfor %}
+            </select>
+            <h4>Faixa Etária:</h4>
+            <select name="idade" id="idade" class="custom-select" required>
+                <option value="" disabled selected hidden>Selecione uma opção</option>
+                <option value="18-24">18-24 anos</option>
+                <option value="25-39">25-39 anos</option>
+                <option value="40-54">40-54 anos</option>
+                <option value="55+">55 anos ou mais</option>
+            </select>
+            <h4>Genêro:</h4>
+            <select name="genero" id="genero" class="custom-select" required>
+                <option value="" disabled selected hidden>Selecione uma opção</option>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+                <option value="ND">Não informar</option>
+            </select>
+            <div class="buttons">
+                <button type="submit" name="login">Responder</button>
+            </div> 
+        </form>
+        <div class="alerts">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='background.js') }}"></script>
+</body>
+<script>
+    document.getElementById('area').addEventListener('change', function() {
+    var area = this.value;
+        fetch(`/gestores/${area}`)
+            .then(response => response.json())
+            .then(data => {
+                var gestorSelect = document.getElementById('gestor');
+                gestorSelect.innerHTML = '<option value="" disabled selected hidden>Selecione uma opção</option>';
+                data.gestores.forEach(function(gestor) {
+                    var option = document.createElement('option');
+                    option.value = gestor;
+                    option.text = gestor;
+                    gestorSelect.appendChild(option);
+                });
+            });
+    });
+
+    document.getElementById('gestor').addEventListener('change', function() {
+        var gestor = this.value;
+        fetch(`/area/${gestor}`)
+            .then(response => response.json())
+            .then(data => {
+                var areaSelect = document.getElementById('area');
+                areaSelect.value = data.area;  // Define o valor selecionado no select de área
+            });
+    });
+</script>
+</html>
