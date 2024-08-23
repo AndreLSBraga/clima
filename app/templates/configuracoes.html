@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulsa 7L</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/pagina_inicial.css">
+    <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img class="logo" src="/static/images/logos/logo_completa.svg">
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
+            <li><a href="{{ url_for('sugestao.sugestao_view') }}">Sugestões</a></li>
+            <li><a href="{{ url_for('configuracoes.configuracoes_view') }}"  class="active">Configurações</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h2>Configurações</h2>
+
+        <!-- Barra de Pesquisa -->
+        <div class="search-container">
+            <input type="text" id="searchId" placeholder="Pesquisar pelo ID...">
+            <button type="button" onclick="pesquisarID()">Pesquisar</button>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="action-buttons">
+            
+        </div>
+    </div>
+    <script src="/static/js/background.js"></script>
+</body>
+</html>

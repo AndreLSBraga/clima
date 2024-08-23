@@ -6,6 +6,7 @@
     <title>Pulsa 7L</title>
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/responder.css">
+    <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
 </head>
 <body>
     <nav class="navbar">
@@ -15,12 +16,13 @@
         <ul class="navbar-menu">
             <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}" class="active">Responder</a></li>
             <li><a href="{{ url_for('sugestao.sugestao_view') }}">Sugestões</a></li>
-            <li><a href="{{ url_for('login_gestor.login_gestor_view') }}">Gestor</a></li>
+            <li><a href="{{ url_for('configuracoes.configuracoes_view') }}">Configurações</a></li>
         </ul>
     </nav>
     <div class="container">
         <div class="question">{{ pergunta }}</div>
         <form id="formPerguntas" action="/responder" method="POST">
+            <input type="hidden" name="action" id="actionInput">
             <div class="slider-container">
                 <input type="range" name="resposta" min="0" max="10" step="0.01" value="5" class="slider" id="resposta">
                 <div class="slider-scale">
@@ -35,7 +37,7 @@
                 </div>
                 <div class="checkbox-container">
                     <input type="checkbox" id="auto_identificacao" name="auto_identificacao" value="auto_identificacao">
-                    <label for="auto_identificacao"><i>Desejo me identificar</i></label>
+                    <label for="auto_identificacao"><i>Desejo me identificar no comentário/sugestão</i></label>
                 </div>
                 <textarea name="sugestao" id="sugestao" placeholder="Digite sua sugestão aqui..."></textarea>
             </div>
@@ -46,8 +48,8 @@
                 </button>
             
                 {% if pergunta_num == total_perguntas %}
-                    <button type="button" name="pular" onclick="abrirModal()">Pular<img class="imagem" src="/static/images/icons/pular.svg"></button>
-                    <button type="button" name="enviar-inicial" onclick="abrirModal()">Próxima <img class="imagem" src="/static/images/icons/direita.svg"></button>
+                    <button type="button" name="pular" onclick="abrirModal('pular')">Pular e Enviar<img class="imagem" src="/static/images/icons/pular.svg"></button>
+                    <button type="button" name="proxima" onclick="abrirModal('proxima')">Responder e Enviar <img class="imagem" src="/static/images/icons/direita.svg"></button>
                 {% else %}
                     <button type="submit" name="pular">Pular<img class="imagem" src="/static/images/icons/pular.svg"></button>
                     <button type="submit" name="proxima">Próxima<img class="imagem" src="/static/images/icons/direita.svg"></button>
@@ -61,7 +63,7 @@
                     <p>Você tem certeza de que deseja enviar suas respostas?</p>
                     <div class="buttons">
                         <button type="button" name="pular" onclick="fecharModal()">Cancelar</button>
-                        <button type="submit" name="proxima" onclick="enviarFormulario()">Confirmar<img class="imagem" src="/static/images/icons/enviar.svg"></button>
+                        <button type="submit" name="enviar" onclick="enviarFormulario()">Confirmar<img class="imagem" src="/static/images/icons/enviar.svg"></button>
                     </div>
                 </div>
             </div>
@@ -79,20 +81,21 @@
     
     <script src="/static/js/background.js"></script>
     <script>
-        function abrirModal() {
+        function abrirModal(acao) {
+            document.getElementById('actionInput').value = acao;
             var modal = document.getElementById('myModal');
             if (modal) {
                 modal.style.display = 'block';
             }
         }
-
+    
         function fecharModal() {
             var modal = document.getElementById('myModal');
             if (modal) {
                 modal.style.display = 'none';
             }
         }
-
+    
         function enviarFormulario() {
             var form = document.getElementById("formPerguntas");
             if (form) {

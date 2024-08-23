@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulsa 7L</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/pagina_final.css">
+    <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img class="logo" src="/static/images/logos/logo_completa.svg">
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
+            <li><a href="{{ url_for('sugestao.sugestao_view') }}"  class="active">Sugestões</a></li>
+            <li><a href="{{ url_for('configuracoes.configuracoes_view') }}">Configurações</a></li>
+        </ul>
+    </nav>
+    <div  class="container_respondido">
+        <h2>Você respondeu a Pulsa desta semana!</h2>
+        <img class="logo" src="/static/images/logos/final.svg">
+    </div>
+    <div class="container_sugestao">
+        <form action="/Sugerir" method="POST">
+            <h2> Deixe aqui um comentário/sugestão</h2>
+            <select name="categoria" id="categoria" class="custom-select" required>
+                <option value="" disabled selected hidden>Selecione a categoria</option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria }}">{{ categoria }}</option>
+                {% endfor %}
+            </select>
+            <div class="suggestion">
+                <textarea name="sugestao" id="sugestao" placeholder="Digite seu comentário/sugestão aqui..."></textarea>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="auto_identificacao" name="auto_identificacao" value="auto_identificacao">
+                <label for="auto_identificacao"><i>Desejo me identificar no comentário/sugestão</i></label>
+            </div>
+            <div class="buttons">
+                <button type="submit" name="responder">
+                    <img class="icon" src="/static/images/icons/direita.svg" alt="Direita">
+                </button>
+            </div> 
+        </form>
+        <div class="alerts">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message | safe }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+        </div>
+    </div>
+    <script src="/static/js/background.js"></script>
+</body>
+</html>

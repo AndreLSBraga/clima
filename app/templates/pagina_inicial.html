@@ -6,6 +6,7 @@
     <title>Pulsa 7L</title>
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/pagina_inicial.css">
+    <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
 </head>
 <body>
     <nav class="navbar">
@@ -15,7 +16,7 @@
         <ul class="navbar-menu">
             <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}" class="active">Responder</a></li>
             <li><a href="{{ url_for('sugestao.sugestao_view') }}">Sugestões</a></li>
-            <li><a href="{{ url_for('login_gestor.login_gestor_view') }}">Gestor</a></li>
+            <li><a href="{{ url_for('configuracoes.configuracoes_view') }}"  class="active">Configurações</a></li>
         </ul>
     </nav>
     <div class="container">

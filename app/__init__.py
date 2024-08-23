@@ -3,7 +3,7 @@ import logging
 from app.blueprints.pagina_inicial import pagina_inicial
 from app.blueprints.pagina_final import pagina_final
 from app.blueprints.sugestao import sugestao
-from app.blueprints.login_gestor import login_gestor
+from app.blueprints.configuracoes import configuracoes
 from app.blueprints.responder import responder
 from app.utils.db import close_db
 
@@ -17,7 +17,7 @@ def create_app():
     # Registro de Blueprints
     app.register_blueprint(pagina_inicial)
     app.register_blueprint(sugestao)
-    app.register_blueprint(login_gestor)
+    app.register_blueprint(configuracoes)
     app.register_blueprint(responder)
     app.register_blueprint(pagina_final)
     

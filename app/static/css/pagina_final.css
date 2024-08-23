@@ -1,0 +1,137 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza o conteúdo horizontalmente */
+}
+
+.container_respondido {
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #F4F4F8;
+    z-index: 1;
+    max-width: 900px;  
+    min-width: 300px;  
+    min-height: 200px;
+    margin-top: 70px;
+    width: 50%;
+}
+
+.container_respondido .logo {
+    height: auto; /* A altura será ajustada proporcionalmente */
+    max-width: 120px; /* Limite máximo da largura */
+    max-height: 120px; /* Limite máximo da altura */
+}
+
+.container_sugestao{
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #F4F4F8;
+    z-index: 1;
+    max-width: 900px;  
+    min-width: 300px;  
+    min-height: 200px;
+    margin-top: 10px;
+    width: 50%;
+}
+
+.custom-select {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #f2f2f2;
+    color: #333;
+    transition: border-color 0.3s ease;
+    margin-bottom: 20px;
+    margin: 0 auto; display: block;
+    text-align: center;
+}
+
+.custom-select:focus {
+    border-color: #FE4A49;
+    outline: none;
+}
+
+.custom-select option {
+    padding: 10px;
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+.suggestion{
+    width: 100%;
+    height: 200px;
+    margin-top: 10px;
+    font-size: 18px;
+    flex:1;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.suggestion-box{
+    flex: 1;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.suggestion.text{
+    font-size: 24px;
+    margin: 0 auto;
+    justify-content: end;
+}
+
+.suggestion textarea {
+    flex: 1;
+    padding: 10px;
+    width: 80%; 
+    border: 2px solid #000000; 
+    border-radius: 5px; 
+    font-size: 16px; 
+    background-color: #E6E6EA; 
+    color: #333; 
+    transition: border-color 0.3s ease; 
+    box-sizing: border-box;
+}
+
+.suggestion textarea:focus {
+    border-color: #FE4A49; 
+    outline: none; 
+}
+
+.buttons{
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+button {
+    background-color: #186C77; /* Remove fundo padrão */
+    border: none; /* Remove a borda padrão */
+    border-radius: 50%; /* Torna o botão redondo */
+    padding: 10px; /* Ajuste conforme necessário para o tamanho do botão */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer; /* Altera o cursor ao passar sobre o botão */
+}
+
+.buttons button:hover {
+    background-color: #2AB7CA; 
+}
+
+button .icon {
+    width: 48px; /* Ajuste o tamanho da imagem conforme necessário */
+    height: 48px; /* Certifique-se de que a imagem esteja dentro do botão */
+    filter: invert(1); /* Inverte as cores para que a seta seja branca */
+}
