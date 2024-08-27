@@ -9,3 +9,5 @@ MYSQL_DB = 'pulsa'
 
 ADMIN_LOGIN = '99805257'
 ADMIN_SENHA = 'eu'
+
+SENHA_PRIMEIRO_ACESSO = 'pulsaSupply2024'

@@ -8,20 +8,20 @@ def insert_resposta(dados_usuario, resposta, tipo):
     data_contratacao = converte_datas(dados_usuario['data_contratacao'])
     data_nascimento = converte_datas(dados_usuario['data_nascimento'])
     data_ultima_movimentacao = converte_datas(dados_usuario['data_ultima_movimentacao'])
-    data_hora = dados_usuario['data_hora']
-    fk_area = dados_usuario['fk_area']
-    fk_banda = dados_usuario['fk_banda']
-    fk_cargo = dados_usuario['fk_cargo']
-    fk_fte = dados_usuario['fk_fte']
-    fk_gestor = dados_usuario['fk_gestor']
-    fk_genero = dados_usuario['fk_genero']
-    fk_subarea = dados_usuario['fk_subarea']
-    fk_tipo_cargo = dados_usuario['fk_tipo_cargo']
-    fk_unidade = dados_usuario['fk_unidade']
+    data_hora = dados_usuario.get('data_hora', None)
+    fk_area = dados_usuario.get('fk_area', None)
+    fk_banda = dados_usuario.get('fk_banda', None)
+    fk_cargo = dados_usuario.get('fk_cargo', None)
+    fk_fte = dados_usuario.get('fk_fte', None)
+    fk_gestor = dados_usuario.get('fk_gestor', None)
+    fk_genero = dados_usuario.get('fk_genero', None)
+    fk_subarea = dados_usuario.get('fk_subarea', None)
+    fk_tipo_cargo = dados_usuario.get('fk_tipo_cargo', None)
+    fk_unidade = dados_usuario.get('fk_unidade', None)
     #Informações da resposta
-    fk_pergunta = resposta['fk_pergunta']
-    fk_categoria = resposta['fk_categoria']
-    valor_resposta = resposta['resposta']
+    fk_pergunta = resposta.get('fk_pergunta',None)
+    fk_categoria = resposta.get('fk_categoria', None)
+    valor_resposta = resposta.get('resposta', None)
     
     db = get_db()
     cursor = db.cursor()
@@ -51,12 +51,12 @@ def insert_resposta(dados_usuario, resposta, tipo):
         db.commit()
 
     elif tipo == 'sugestao':
-        auto_identificacao = resposta['auto_identificacao_sugestao']
+        auto_identificacao = resposta.get('auto_identificacao_sugestao', None)
         if auto_identificacao == 1:
-            globalId = dados_usuario['id_usuario']
+            globalId = dados_usuario.get('id_usuario', None)
         else:
             globalId = None
-        texto_sugestao = resposta['sugestao']
+        texto_sugestao = resposta.get('sugestao', None)
         id_sugestao = uuid.uuid4().hex
         cursor.execute(
             '''
@@ -87,8 +87,8 @@ def insert_resposta(dados_usuario, resposta, tipo):
 
 def insert_usuario_respondeu(dados_usuario):
     
-    globalId = dados_usuario['id_usuario']
-    data = dados_usuario['data_hora']
+    globalId = dados_usuario.get('id_usuario', None)
+    data = dados_usuario.get('data_hora', None)
     data_formatada = data.date()
     app.logger.debug(globalId, data, data_formatada)
     db = get_db()
@@ -119,3 +119,11 @@ def converte_datas(data_str):
     date_data = date_datetime.date()
 
     return date_data
+
+def update_senha_gestor(senha, fk_gestor):
+    db = get_db()
+    cursor = db.cursor()
+    #Atualiza senha nova no banco
+    cursor.execute('UPDATE gestores SET senha = %s, primeiro_acesso = 1 WHERE fk_gestor = %s',(senha, fk_gestor))
+    db.commit()
+    cursor.close()

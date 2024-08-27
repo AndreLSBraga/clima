@@ -1,0 +1,139 @@
+/* Estilos para a barra lateral */
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: "Titillium Web", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    overflow-y: auto;
+}
+
+.text_sidebar{
+    margin: 0;
+}
+
+.sidebar {
+    width: 60px; /* Largura inicial da barra lateral */
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background-color: #f0f0f0;
+    margin-top: 60px; /* Altura da navbar */
+    margin-left: 10px;
+    height: 82%; /* Altura da tela menos a altura da navbar */
+    left: 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 900;
+    border-right: 1px solid #ccc;
+    transition: width 0.3s ease; /* Transição suave para expandir */
+    overflow: hidden; /* Esconde o conteúdo que não cabe */
+    border-radius: 10px;
+}
+
+.sidebar:hover {
+    width: 150px; /* Largura expandida ao passar o mouse */
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    margin: 10px 0;
+    width: 100%;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.sidebar-menu li a {
+    text-decoration: none;
+    color: #000000;
+    font-size: 18px;    
+    display: flex;
+    align-items: center; /* Alinha verticalmente no centro */
+    padding: 10px 15px;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+/* Exibe o texto dos links quando a barra é expandida */
+.sidebar:hover .sidebar-menu li a .text_sidebar {
+    display: inline-block;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+
+/* Cor de fundo ao passar o mouse sobre o item li */
+.sidebar-menu li:hover {
+    background-color: #2AB7CA; /* Cor de fundo ao passar o mouse */
+}
+
+.sidebar-menu li:hover a {
+    color: white; /* Cor do texto ao passar o mouse */
+}
+
+.sidebar-menu li:hover .icon img {
+    display: block; /* Remove o espaço abaixo da imagem */
+    filter: invert(1); /* Inverte as cores da imagem ao passar o mouse */
+    height: auto; /* Mantém a proporção da imagem */
+}
+
+/* Cor de fundo do item ativo */
+.sidebar-menu li.active {
+    background-color: #2AB7CA; /* Cor de fundo para o item ativo */
+}
+
+.sidebar-menu li.active a {
+    color: white; /* Cor do texto para o item ativo */
+}
+.sidebar-menu li.active .icon img {
+    display: block; /* Remove o espaço abaixo da imagem */
+    filter: invert(1); /* Inverte as cores da imagem ao passar o mouse */
+    height: auto; /* Mantém a proporção da imagem */
+}
+
+.sidebar-menu li a .icon {
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+/* Esconde o texto dos links quando a barra está minimizada */
+.sidebar-menu li a .text_sidebar {
+    font-size: 14px;
+    display: none;
+    transition: opacity 0.3s;
+}
+
+
+/* Estilos para o contêiner principal */
+.fundo-container {
+    margin-top: 60px; /* Altura da navbar */
+    margin-left: 10px; /* Largura da barra lateral */
+    padding: 10px;
+    background-color: #f0f0f0;
+    width: 91%; /* Ajusta para margem e largura da barra lateral */
+    height: 82%; /* Ajusta a altura para navbar e outras margens */
+    overflow-y: auto; /* Permite rolagem se necessário */
+    align-items: flex-start; /* Alinha ao topo */
+    border-radius: 10px; 
+}
+
+.container {
+    margin:0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start; /* Alinha ao topo */
+    width: 100%; 
+    padding-top: 5px; /* Remove padding extra */
+    box-sizing: border-box; /* Inclui padding e border no tamanho total */
+}
+

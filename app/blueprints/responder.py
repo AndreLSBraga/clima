@@ -81,5 +81,4 @@ def responder_view():
     fk_pergunta_atual = perguntas_selecionadas[num_pergunta_atual]
     fk_categoria = consulta_fk_categoria(fk_pergunta_atual)
     texto_pergunta = consulta_texto_perguntas(fk_pergunta_atual)
-    app.logger.debug(session)
     return render_template('responder.html', pergunta = texto_pergunta, pergunta_num = num_pergunta_atual + 1, total_perguntas = 10)

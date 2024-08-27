@@ -3,12 +3,12 @@ import logging
 from app.blueprints.pagina_inicial import pagina_inicial
 from app.blueprints.pagina_final import pagina_final
 from app.blueprints.sugestao import sugestao
-from app.blueprints.configuracoes import configuracoes
+from app.blueprints.gestor import gestor, dashboard, configuracoes, configuracoes_usuario, configuracoes_gestor, configura_senha
 from app.blueprints.responder import responder
 from app.utils.db import close_db
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__,  static_url_path='/static')
     
     # Configuração de chave secreta
     app.secret_key = 'your_secret_key'
@@ -17,10 +17,14 @@ def create_app():
     # Registro de Blueprints
     app.register_blueprint(pagina_inicial)
     app.register_blueprint(sugestao)
-    app.register_blueprint(configuracoes)
+    app.register_blueprint(gestor)
     app.register_blueprint(responder)
     app.register_blueprint(pagina_final)
-    
+    app.register_blueprint(dashboard)
+    app.register_blueprint(configuracoes)
+    app.register_blueprint(configuracoes_usuario)
+    app.register_blueprint(configuracoes_gestor)
+    app.register_blueprint(configura_senha)
     # Finaliza a conexão com o banco de dados
     app.teardown_appcontext(close_db)
     

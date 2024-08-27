@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulsa 7L</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/main_dash_config.css">
+    <link rel="stylesheet" href="/static/css/configuracoes.css">
+    <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img class="logo" src="/static/images/logos/logo_completa.svg">
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view') }}"class="active">Gestor</a></li>
+        </ul>
+    </nav>
+    <nav class="sidebar">
+        <ul class="sidebar-menu">
+            <li ><a href="{{ url_for('dashboard.dashboard_view') }}">
+                <span class="icon"><img src="/static/images/icons/dashboard.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">Dashboard</span>
+            </a></li>
+            <li class="active"><a href="{{ url_for('configuracoes.configuracoes_view') }}">
+                <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
+                <span class="text_sidebar">Configurações</span>
+            </a></li>
+        </ul>
+    </nav>
+    
+    <div class="fundo-container">
+        <form action="/configuracoes" method="POST">
+            <div class="container">
+                <div class="bar">
+                    <div class="bar-options">
+                        <div class="bar-options-voltar">
+                            <a href="{{ url_for('configuracoes.configuracoes_view') }}">
+                                <span class="icon"><img src="/static/images/icons/esquerda.svg" alt="Dashboard Icon"></span>
+                            </a>
+                        </div>
+                        <div class="bar-options-cadastrar">
+                            <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view') }}" class="cadastrar">
+                                <img src="/static/images/icons/detalhes.svg" alt="Novo Icon">
+                                Cadastrar Novo Usuário
+                            </a>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="tabela-container">
+                    <div class="tabela">
+                    {%if usuarios %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="tabela-titulo-imagem">
+                                        Global Id
+                                        <button id="pesquisa_id" class="filtro_tabela">
+                                            <img src="/static/images/icons/pesquisa.svg" alt="Filtro">
+                                        </button>
+                                    </th>
+                                    <th>Email</th>
+                                    <th>Nome</th>
+                                    <th>Unidade</th>
+                                    <th>ID Gestor</th> 
+                                    <th>Editar</th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios %}
+                                <tr>
+                                    <td>{{usuario.globalId}}</td>
+                                    <td>{{usuario.email}}</td>
+                                    <td>{{usuario.nome}}</td>
+                                    <td>{{usuario.unidade}}</td>
+                                    <td>{{usuario.id_gestor}}</td>
+                                    <td class="align-center">
+                                        <button id="editar_usuario" class="editar_usuario" type="button" onclick='abrirModal({{ usuario | tojson }})'>
+                                            <img src="/static/images/icons/editar.svg" alt="Editar">
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="pagination-center">
+                            {% if pagina > 10 %}
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina-10) }}" id="retorno">
+                                    <img src="/static/images/icons/retorno.svg" alt="retorno Icon">
+                                </a>
+                            {% endif %}
+                            {% if pagina > 1 %}
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina-1) }}" id="anterior">
+                                    <img src="/static/images/icons/esquerda.svg" alt="Anterior Icon">
+                                </a>
+                            {% endif %}
+                            
+                            <span>Página {{ pagina }} de {{ total_paginas }}</span>
+                            {% if pagina < total_paginas %}
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina+1) }}" id="proximo">
+                                    <img src="/static/images/icons/direita.svg" alt="Próximo Icon">
+                                </a>
+                            {% endif %}
+                            {% if pagina < 61 %}
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina+10) }}" id="avanco">
+                                    <img src="/static/images/icons/avanco.svg" alt="avanco Icon">
+                                </a>
+                            {% endif %}
+                        </div>
+                        
+                    {% else %}
+                        <p> Não há usuários cadastrados para a unidade</p>
+                    {% endif %}
+                    </div>
+                </div>
+                <div id="usuarioModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="fecharModal()">&times;</span>
+                        <h2>Dados do Usuário</h2>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="modal-globalId">Global ID:</label>
+                                <input type="text" id="modal-globalId">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-email">Email:</label>
+                                <input type="email" id="modal-email">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-nome">Nome:</label>
+                                <input type="text" id="modal-nome">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-data_nascimento">Data Nascimento:</label>
+                                <input type="date" id="modal-data_nascimento">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-data_ultima_movimentacao">Data Última Movimentação:</label>
+                                <input type="date" id="modal-data_ultima_movimentacao">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-data_contratacao">Data Contratação:</label>
+                                <input type="date" id="modal-data_contratacao">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-banda">Banda:</label>
+                                <select id="modal-banda">
+                                    {% for banda in selecao[0].bandas %}
+                                        <option value="{{ banda }}">{{ banda }}</option>
+                                    {% endfor %}
+                                </select>                                    
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-tipo_cargo">Tipo Cargo:</label>
+                                <select id="modal-tipo_cargo">
+                                    {% for tipo_cargo in selecao[0].tipo_cargos %}
+                                        <option value="{{ tipo_cargo }}">{{ tipo_cargo }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-fte">FTE:</label>
+                                <select id="modal-fte">
+                                    {% for fte in selecao[0].ftes %}
+                                        <option value="{{ fte }}">{{ fte }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-cargo">Cargo:</label>
+                                <select id="modal-cargo">
+                                    {% for cargo in selecao[0].cargos %}
+                                        <option value="{{ cargo }}">{{ cargo }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-unidade">Unidade:</label>
+                                <select id="modal-unidade">
+                                    {% for unidade in selecao[0].unidades %}
+                                        <option value="{{ unidade }}">{{ unidade }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-area">Área:</label>
+                                <select id="modal-area">
+                                    {% for area in selecao[0].areas %}
+                                        <option value="{{ area }}">{{ area }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="modal-subarea">Subárea:</label>
+                                <select id="modal-subarea">
+                                    {% for subarea in selecao[0].subareas %}
+                                        <option value="{{ subarea }}">{{ subarea }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="modal-id_gestor">ID Gestor:</label>
+                                <input type="text" id="modal-id_gestor">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-genero">Gênero:</label>
+                                <select id="modal-genero">
+                                    {% for genero in selecao[0].generos %}
+                                        <option value="{{ genero }}">{{ genero }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                        </div>
+                        <div class="buttons">
+                            <button onclick="salvarAlteracoes()">Salvar Alterações</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="/static/js/background.js"></script>
+    <script>
+        function formatarData(data) {
+            const dataObj = new Date(data);
+            const ano = dataObj.getFullYear();
+            const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+            const dia = String(dataObj.getDate()).padStart(2, '0');
+            return `${ano}-${mes}-${dia}`;
+        }
+        function abrirModal(usuario) {
+
+            // Preencher o modal com os dados do usuário
+            document.getElementById('modal-globalId').value = usuario.globalId;
+            document.getElementById('modal-email').value = usuario.email;
+            document.getElementById('modal-nome').value = usuario.nome;
+            document.getElementById('modal-data_nascimento').value = formatarData(usuario.data_nascimento);
+            document.getElementById('modal-data_ultima_movimentacao').value = formatarData(usuario.data_ultima_movimentacao);
+            document.getElementById('modal-data_contratacao').value = formatarData(usuario.data_contratacao);
+            document.getElementById('modal-banda').value = usuario.banda;
+            document.getElementById('modal-tipo_cargo').value = usuario.tipo_cargo;
+            document.getElementById('modal-fte').value = usuario.fte;
+            document.getElementById('modal-cargo').value = usuario.cargo;
+            document.getElementById('modal-unidade').value = usuario.unidade;
+            document.getElementById('modal-area').value = usuario.area;
+            document.getElementById('modal-subarea').value = usuario.subarea;
+            document.getElementById('modal-id_gestor').value = usuario.id_gestor;
+            document.getElementById('modal-genero').value = usuario.genero;
+            
+            // Exibir o modal
+            document.getElementById('usuarioModal').style.display = 'block';
+        }
+
+        function fecharModal() {
+            document.getElementById('usuarioModal').style.display = 'none';
+        }
+
+        function salvarAlteracoes() {
+            // Função para salvar as alterações feitas no modal
+            const globalId = document.getElementById('modal-globalId').value;
+            const email = document.getElementById('modal-email').value;
+            const nome = document.getElementById('modal-nome').value;
+            const unidade = document.getElementById('modal-unidade').value;
+            const idGestor = document.getElementById('modal-id_gestor').value;
+            
+            fecharModal(); // Fechar o modal após salvar
+        }
+
+    </script>
+</body>
+</html>

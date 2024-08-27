@@ -102,7 +102,7 @@ body, html {
     bottom: 0;
     width: 0;
     height: 3px;
-    background-color: #FE4A49;
+    background-color: #2AB7CA;
     transition: width 0.3s;
 }
 
@@ -113,6 +113,11 @@ body, html {
 
 .navbar-menu li a:hover {
     color: #000;
+}
+.navbar-menu .icon {
+    vertical-align: middle;
+    margin-right: 8px;
+    height: 20px;  /* Ajuste o tamanho conforme necessário */
 }
 
 .text {

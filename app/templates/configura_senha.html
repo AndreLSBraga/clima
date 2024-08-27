@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulsa 7L</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/gestor.css">
+    <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img class="logo" src="/static/images/logos/logo_completa.svg">
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view') }}" class="active">Gestor</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <form action="/configura_senha" method="POST">
+            <img class="logo" src="/static/images/logos/logo_completa.svg">
+            <h2>Configuração Nova Senha</h2>
+            <div class="input-group">
+                <h3>Senha Padrão:</h3>
+                <input type="password" name="senha_padrao" id="senha_padrao" placeholder="Digite a senha padrão" required>
+            </div>
+            <div class="input-group">
+                <h3>Nova Senha:</h3>
+                <input type="password" name="senha_nova" id="senha_nova" placeholder="Digite a nova senha" required>
+            </div>
+            <div class="input-group">
+                <h3>Confirme sua nova senha:</h3>
+                <input type="password" name="senha_confirmacao" id="senha_confirmacao" placeholder="Confirme sua nova senha" required>
+            </div>
+            <div class="buttons">
+                <button type="submit" name="responder">
+                    <img class="icon" src="/static/images/icons/direita.svg" alt="Direita">
+                </button>
+            </div>
+            <div class="alerts">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message | safe }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </form>
+    </div>
+    <script src="/static/js/background.js"></script>
+</body>
+</html>
