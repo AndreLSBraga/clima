@@ -109,3 +109,31 @@ def consulta_tabela_dimensao(tabela, coluna=None, pesquisa=None):
                 return result
         else:
                 return None
+        
+def consulta_fk_dimensao(tabela, coluna_retorno, coluna_pesquisa, pesquisa):
+        query = f'SELECT {coluna_retorno} FROM {tabela}'
+        params = []
+        conditions = []
+        fetchone = False
+
+        if coluna_pesquisa is not None:
+                conditions.append(f"{coluna_pesquisa} = '{pesquisa}'")
+                params.append(coluna_pesquisa)
+                fetchone = True
+
+        if conditions:
+                query += ' WHERE ' + ' AND '.join(conditions)
+
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query)
+        if not fetchone:
+                result = cursor.fetchall()
+        else:
+                result = cursor.fetchone()
+
+        cursor.close()
+        if result:
+                return result
+        else:
+                return None

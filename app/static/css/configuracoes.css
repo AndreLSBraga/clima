@@ -68,47 +68,42 @@
     filter: invert(1)
 }
 
-/* Estilo para o botão de cadastrar usuário */
-.bar-options-cadastrar .cadastrar {
-    text-decoration: none;
-    padding: 10px 20px;
-    background-color: #186C77; /* Cor de fundo do botão */
-    color: #ffffff; /* Cor do texto do botão */
-    border-radius: 5px;
-    font-size: 16px;
-    transition: background-color 0.3s;
+.bar-options-cadastrar {
+    display: flex;           /* Alinha itens em linha */
+    justify-content: center; /* Centraliza o botão horizontalmente */
+    padding: 10px;           /* Espaçamento interno */
+    background-color: #f5f5f5; /* Cor de fundo do contêiner */
 }
 
-/* Estilo para o link do botão de cadastrar */
-.bar-options-cadastrar .cadastrar {
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #2AB7CA; /* Cor de fundo do botão */
-    color: #ffffff; /* Cor do texto */
-    border: none; /* Remove a borda padrão */
-    border-radius: 5px; /* Bordas arredondadas */
-    padding: 10px 15px; /* Espaçamento interno */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para destaque */
-    font-size: 16px; /* Tamanho da fonte */
-    font-weight: bold; /* Negrito para o texto */
-    cursor: pointer; /* Cursor em forma de mão para indicar clique */
-    transition: background-color 0.3s; /* Transição suave para hover */
+.cadastrar_usuario {
+    display: flex;               /* Alinha o conteúdo do botão em linha */
+    align-items: center;         /* Centraliza verticalmente o conteúdo do botão */
+    background-color: #2397A6;   /* Cor de fundo do botão */
+    color: white;                /* Cor do texto */
+    padding: 10px 20px;          /* Espaçamento interno */
+    font-size: 16px;             /* Tamanho da fonte */
+    border: none;                /* Remove bordas padrão */
+    border-radius: 5px;          /* Bordas arredondadas */
+    cursor: pointer;             /* Cursor de mão ao passar por cima */
+    transition: background-color 0.3s ease; /* Transição suave de cor ao passar o mouse */
 }
 
-/* Estilo para o ícone dentro do botão */
-.bar-options-cadastrar .cadastrar img {
-    width: 20px; /* Largura do ícone */
-    height: 20px; /* Altura do ícone */
-    margin-right: 10px; /* Espaçamento entre o ícone e o texto */
+.cadastrar_usuario img {
+    margin-right: 10px;
+    width: 24px;
+    height: 100%;
     filter: invert(1);
 }
 
-/* Efeito hover para o botão de cadastrar */
-.bar-options-cadastrar .cadastrar:hover {
-    background-color: #186C77; /* Cor de fundo ao passar o mouse */
+.cadastrar_usuario:hover {
+    background-color: #56C4D2;   /* Cor de fundo ao passar o mouse */
 }
+
+.cadastrar_usuario:active {
+    background-color: #1D8690;   /* Cor de fundo ao clicar */
+    transform: scale(0.98);      /* Efeito de clique */
+}
+
 /* Estilo para a tabela */
 .tabela-container {
     width: 100%;
@@ -272,11 +267,18 @@ pagination a:hover img{
     font-weight: bold;
 }
 
-.form-group input,
-.form-group select {
+.form-group input ,.form-group select {
     width: 100%;
     padding: 8px;
     box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #888;
+}
+
+.form-group:hover {
+    color: #2AB7CA;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .buttons {
@@ -294,6 +296,7 @@ pagination a:hover img{
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+    border-radius: 5px;
 }
 
 .buttons button:hover {

@@ -48,7 +48,6 @@ def gera_dados_modal_selecao():
         "subareas": consulta_lista(subareas_lista,1),
         "generos": consulta_lista(generos_lista,1)
     }]
-    app.logger.debug(dados)
     return dados
 
 def consulta_lista(lista, num_item):

@@ -3,7 +3,7 @@ import logging
 from app.blueprints.pagina_inicial import pagina_inicial
 from app.blueprints.pagina_final import pagina_final
 from app.blueprints.sugestao import sugestao
-from app.blueprints.gestor import gestor, dashboard, configuracoes, configuracoes_usuario, configuracoes_gestor, configura_senha
+from app.blueprints.gestor import gestor, dashboard, configuracoes, configuracoes_usuario, configuracoes_gestor, configura_senha, configuracoes_salvar_alteracoes
 from app.blueprints.responder import responder
 from app.utils.db import close_db
 
@@ -24,6 +24,7 @@ def create_app():
     app.register_blueprint(configuracoes)
     app.register_blueprint(configuracoes_usuario)
     app.register_blueprint(configuracoes_gestor)
+    app.register_blueprint(configuracoes_salvar_alteracoes)
     app.register_blueprint(configura_senha)
     # Finaliza a conexão com o banco de dados
     app.teardown_appcontext(close_db)
