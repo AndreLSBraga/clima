@@ -52,7 +52,6 @@ def verifica_resposta_usuario(user_id):
 
     semana_resposta_recente = consulta_usuario_resposta_data(user_id)
     semana_atual = datetime.now().isocalendar()[1]
-    app.logger.debug(f'Semana resposta:{semana_resposta_recente}, semana atual:{semana_atual}')
 
     if semana_atual == semana_resposta_recente:
         return True
@@ -68,3 +67,24 @@ def codifica_senha(senha):
 
 def verifica_senha(senha_digitada, senha_codificada):
     return bcrypt.checkpw(senha_digitada.encode('utf-8'), senha_codificada.encode('utf-8'))
+
+def valida_id_novo(user_id):
+    if len(user_id) == 8 and user_id.isdigit():
+        return True
+    else:
+        return False
+
+def valida_email_novo(email):
+    # Verifica se a string contém exatamente um '@'
+    if '@' in email and email.count('@') == 1:
+        # Divide a string em duas partes
+        globalId, dominio = email.split('@', 1)        
+        # Verifica se a parte antes do '@' não está vazia
+        if globalId and dominio:
+            # Verifica se o domínio é um dos permitidos
+            if dominio == 'ambev.com.br' or dominio == 'ab-inbev.com':
+                return True
+        return False
+    return False
+
+

@@ -16,10 +16,10 @@ def consulta_usuario_resposta_data(user_id):
         db = get_db()
         cursor = db.cursor()
         cursor.execute('SELECT WEEK(data,1) FROM usuario_respondeu WHERE globalId = %s ORDER BY data desc LIMIT 1',(user_id,))
-        result = cursor.fetchone()[0]
+        result = cursor.fetchone()
         cursor.close()
         if result:
-                return result
+                return result[0]
         else:
                 return None
         

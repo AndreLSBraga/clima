@@ -302,3 +302,8 @@ pagination a:hover img{
 .buttons button:hover {
     background-color: #45a049; /* Cor do botão ao passar o mouse */
 }
+
+#modal-save-button:active {
+    transform: scale(0.95);
+    transition: transform 0.1s;
+}

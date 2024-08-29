@@ -1,5 +1,5 @@
 from app.utils.db import get_db  # Importando a função get_db
-from flask import current_app as app
+from flask import current_app as app, jsonify
 from datetime import datetime
 import uuid
 
@@ -127,3 +127,139 @@ def update_senha_gestor(senha, fk_gestor):
     cursor.execute('UPDATE gestores SET senha = %s, primeiro_acesso = 1 WHERE fk_gestor = %s',(senha, fk_gestor))
     db.commit()
     cursor.close()
+
+def processar_diferencas(diferencas, global_id):
+    resultados = {
+        "success": [],
+        "error": []
+    }
+    status_global = "success"
+
+    # Mapeia as chaves para suas funções de atualização correspondentes
+    acoes = {
+        "globalId": lambda dados: atualizar_usuario('globalId', dados, global_id),
+        "email": lambda dados: atualizar_usuario('email', dados, global_id),
+        "nome": lambda dados: atualizar_usuario('nome', dados, global_id),
+        "data_nascimento": lambda dados: atualizar_usuario('data_nascimento', dados, global_id),
+        "data_ultima_movimentacao": lambda dados: atualizar_usuario('data_ultima_movimentacao', dados, global_id),
+        "data_contratacao": lambda dados: atualizar_usuario('data_contratacao', dados, global_id),
+        "fk_banda": lambda dados: atualizar_usuario('fk_banda', dados, global_id),
+        "fk_tipo_cargo": lambda dados: atualizar_usuario('fk_tipo_cargo', dados, global_id),
+        "fk_fte": lambda dados: atualizar_usuario('fk_fte', dados, global_id),
+        "fk_cargo": lambda dados: atualizar_usuario('fk_cargo', dados, global_id),
+        "fk_unidade": lambda dados: atualizar_usuario('fk_unidade', dados, global_id),
+        "fk_area": lambda dados: atualizar_usuario('fk_area', dados, global_id),
+        "fk_subarea": lambda dados: atualizar_usuario('fk_subarea', dados, global_id),
+        "fk_gestor": lambda dados: atualizar_usuario('fk_gestor', dados, global_id),
+        "fk_genero": lambda dados: atualizar_usuario('fk_genero', dados, global_id)
+    }
+
+    for chave, dados in diferencas.items():
+        if chave in acoes:
+            resultado = acoes[chave](dados)
+            if resultado["status"] == "success":
+                resultados["success"].append(chave)
+            else:
+                resultados["error"].append(chave)
+                status_global = "error"  # Atualiza o status global se houver erro
+
+            if chave == 'globalId':
+                # Atualiza a variável global_id após a alteração do globalId
+                global_id = dados.get('novo')
+
+    # Construir a mensagem final com base nos resultados
+    if status_global == "success":
+        mensagem_final = f"Os campos '{', '.join(resultados['success'])}' foram alterados com sucesso."
+    else:
+        campos_sucesso = ", ".join(resultados['success'])
+        campos_erro = ", ".join(resultados['error'])
+        mensagem_final = f"Os campos {campos_sucesso} foram alterados com sucesso. " \
+                         f"Ocorreu um erro nos campos: {campos_erro}."
+
+    return jsonify({
+        "message": mensagem_final,
+        "status": status_global
+    })
+
+def atualizar_usuario(coluna, dados_alteracao, global_id):
+    novo = dados_alteracao.get('novo')
+    db = get_db()
+    cursor = db.cursor()
+    query = f'''
+            UPDATE usuarios SET
+                {coluna} = %s
+            WHERE 
+                globalId = %s
+        '''
+    cursor.execute(query, (novo, global_id))
+    # Verificar o número de linhas afetadas
+    if cursor.rowcount > 0:
+        status = "success"
+        mensagem =  f"Alteração do campo '{coluna}' realizada com sucesso."
+    else:
+        status = "warning"
+        mensagem = f"Nenhuma alteração foi feita no campo '{coluna}'."
+
+    db.commit()
+    cursor.close()
+    return {
+        "status": status,
+        "message": mensagem
+    }
+
+def criar_usuario(dados_usuario):
+
+    #Variáveis dos dados usuario
+    global_id = dados_usuario.get('globalId')
+    email = dados_usuario.get('email')
+    nome = dados_usuario.get('nome')
+    data_nascimento = dados_usuario.get('data_nascimento')
+    data_ultima_movimentacao = dados_usuario.get('data_ultima_movimentacao')
+    data_contratacao = dados_usuario.get('data_contratacao')
+    fk_banda = dados_usuario.get('fk_banda')
+    fk_tipo_cargo = dados_usuario.get('fk_tipo_cargo')
+    fk_fte = dados_usuario.get('fk_fte')
+    fk_cargo = dados_usuario.get('fk_cargo')
+    fk_unidade = dados_usuario.get('fk_unidade')
+    fk_area = dados_usuario.get('fk_area')
+    fk_subarea = dados_usuario.get('fk_subarea')
+    fk_gestor = dados_usuario.get('fk_gestor')
+    fk_genero = dados_usuario.get('fk_genero')
+
+    db = get_db()
+    cursor = db.cursor()
+    query = '''
+            INSERT into usuarios 
+            (
+                globalId, email, nome, data_nascimento, data_ultima_movimentacao, data_contratacao,
+                fk_banda, fk_tipo_cargo, fk_fte, fk_cargo, fk_unidade, fk_area,
+                fk_subarea, fk_gestor, fk_genero
+            )
+            values
+            (
+                %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s, %s,
+                %s, %s, %s
+            )
+        '''
+    cursor.execute(query, (global_id, email, nome, data_nascimento, data_ultima_movimentacao, data_contratacao, 
+                           fk_banda, fk_tipo_cargo, fk_fte, fk_cargo, fk_unidade, fk_area,
+                           fk_subarea, fk_gestor, fk_genero
+                           ))
+    
+    if cursor.rowcount > 0:
+        db.commit()
+        cursor.close()
+        return {
+            "status": "success",
+            "message": "Usuário criado com sucesso."
+        }
+    else:
+        db.rollback()
+        cursor.close()
+        return {
+            "status": "error",
+            "message": "Falha ao criar o usuário."
+        }
+
+

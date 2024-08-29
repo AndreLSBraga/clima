@@ -2,7 +2,8 @@ from flask import Blueprint, render_template, session, request, flash, redirect,
 from app.utils.responder import cria_grupos_perguntas, sorteia_perguntas, navegar_perguntas
 from app.utils.db_consultas import consulta_fk_pergunta_categoria, consulta_fk_categoria, consulta_texto_perguntas
 from app.utils.db_dml import insert_resposta,insert_usuario_respondeu
-
+from datetime import datetime
+from random import shuffle
 
 responder = Blueprint('responder', __name__)
 
@@ -15,10 +16,19 @@ def responder_view():
     #Cria grupo de perguntas que serão sorteadas
     grupo_perguntas = cria_grupos_perguntas(fk_perguntas_categorias)
 
-    #Sorteia as perguntas e salva dados da sessão
+    semana_atual = datetime.now().isocalendar()[1]
+    
     if 'perguntas_selecionadas' not in session:
-        session['pergunta_atual'] = 0
-        session['perguntas_selecionadas'] = sorteia_perguntas(grupo_perguntas)
+        # Verifica se a semana é múltipla de 4 e define perguntas fixas
+        if semana_atual % 4 == 0 or semana_atual == 36 or semana_atual == 38:
+            perguntas_fixas = [50, 51, 52, 53, 54, 55, 56, 57, 58, 59]
+            shuffle(perguntas_fixas)  # Embaralha a lista de perguntas fixas
+            session['pergunta_atual'] = 0
+            session['perguntas_selecionadas'] = perguntas_fixas
+        else:
+            # Sorteia as perguntas e salva dados da sessão
+            session['pergunta_atual'] = 0
+            session['perguntas_selecionadas'] = sorteia_perguntas(grupo_perguntas)
     
     perguntas_selecionadas = session['perguntas_selecionadas']
     num_pergunta_atual = session['pergunta_atual']
@@ -60,6 +70,7 @@ def responder_view():
             })
 
             num_pergunta_atual = navegar_perguntas(num_pergunta_atual, botao_clicado, len(perguntas_selecionadas))
+            
             session['pergunta_atual'] = num_pergunta_atual
 
         elif 'anterior' in request.form:

@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, session, request, flash, redirect, url_for, current_app as app, jsonify
 from config import SENHA_PRIMEIRO_ACESSO
-from app.utils.auth import valida_id, usuario_is_gestor, verifica_senha, codifica_senha
+from datetime import datetime
+from app.utils.auth import valida_id, usuario_is_gestor, verifica_senha, codifica_senha, valida_id_novo, valida_email_novo
 from app.utils.db_consultas import consulta_dados_gestor, consulta_usuario_id, consulta_usuarios_por_unidade, consulta_fk_dimensao
-from app.utils.db_dml import update_senha_gestor
-from app.utils.configuracoes import gera_tabela, gera_dados_modal_selecao
+from app.utils.db_dml import update_senha_gestor,processar_diferencas, criar_usuario
+from app.utils.configuracoes import gera_tabela, gera_dados_modal_selecao, verificar_alteracao
 
 gestor = Blueprint('gestor', __name__)
 dashboard = Blueprint('dashboard', __name__)
@@ -28,9 +29,13 @@ def gestor_view():
         id_gestor = dados_gestor[1]
         senha_banco = dados_gestor[3]
         primeiro_acesso = dados_gestor[4]
+        perfil = dados_gestor[5]
         
         session['fk_gestor'] = fk_gestor
         session['id_gestor'] = id_gestor
+        session['perfil'] = perfil
+        session['logged_in'] = True
+
         if not primeiro_acesso:
             if senha_formulario != SENHA_PRIMEIRO_ACESSO:
                 flash("A senha digitada está incorreta.<br>Tente novamente com a senha correta", "error")
@@ -48,16 +53,31 @@ def gestor_view():
 
 @dashboard.route('/dashboard', methods = ['GET', 'POST'])
 def dashboard_view():
-
-    return render_template('dashboard.html')
+    app.logger.debug(session == {})
+    
+    if 'logged_in' not in session:
+        flash("É necessário fazer login primeiro.", "error")
+        return redirect(url_for('gestor.gestor_view'))
+    perfil = session['perfil']
+    return render_template('dashboard.html', perfil = perfil)
 
 @configuracoes.route('/configuracoes', methods = ['GET', 'POST'])
 def configuracoes_view():
+    if 'logged_in' not in session:
+        flash("É necessário fazer login primeiro.", "error")
+        return redirect(url_for('gestor.gestor_view'))
+
     globalId_gestor = session['id_gestor']
     return render_template('configuracoes.html')
 
 @configuracoes_usuario.route('/configuracoes_usuario', methods = ['GET', 'POST'])
 def configuracoes_usuario_view():
+    
+    #Se não tiver globalId, voltar para tela inicial
+    if 'logged_in' not in session:
+        flash("É necessário fazer login primeiro.", "error")
+        return redirect(url_for('gestor.gestor_view'))
+    
     globalId_gestor = session['id_gestor']
     dados_gestor= consulta_usuario_id(globalId_gestor)
     fk_unidade = dados_gestor[10]
@@ -72,7 +92,6 @@ def configuracoes_usuario_view():
     usuarios_paginados = usuarios_unidade_gestor[inicio:final]
 
     dados_usuarios = gera_tabela(usuarios_paginados)
-
     total_usuarios = len(usuarios_unidade_gestor)
     total_paginas = (total_usuarios + por_pagina - 1) // por_pagina
     
@@ -82,37 +101,87 @@ def configuracoes_usuario_view():
 
 @configuracoes_gestor.route('/configuracoes_gestor', methods = ['GET', 'POST'])
 def configuracoes_gestor_view():
-
+    if 'logged_in' not in session:
+        flash("É necessário fazer login primeiro.", "error")
+        return redirect(url_for('gestor.gestor_view'))
     return render_template('configuracoes_gestor.html')
 
 @configuracoes_salvar_alteracoes.route('/salvar_alteracoes', methods=['POST'])
 def salvar_alteracoes():  
-    dados_alteracao = request.json
-    tipo = dados_alteracao.get('tipo')
-    global_id = dados_alteracao.get('globalId')
-    email = dados_alteracao.get('email')
-    nome = dados_alteracao.get('nome')
-    data_nascimento = dados_alteracao.get('data_nascimento')
-    data_ultima_movimentacao = dados_alteracao.get('data_ultima_movimentacao')
-    data_contratacao = dados_alteracao.get('data_contratacao')
-    fk_banda = consulta_fk_dimensao('bandas', 'fk_banda', 'descricao_banda' , dados_alteracao.get('banda'))[0]
-    fk_tipo_cargo = consulta_fk_dimensao('tipo_cargos', 'fk_tipo_cargo', 'descricao_tipo_cargo', dados_alteracao.get('tipo_cargo'))[0]
-    fk_fte = consulta_fk_dimensao('ftes', 'fk_fte', 'descricao_fte', dados_alteracao.get('fte'))[0]
-    fk_cargo = consulta_fk_dimensao('cargos','fk_cargo', 'descricao_cargo', dados_alteracao.get('cargo'))[0]
-    fk_unidade = consulta_fk_dimensao('unidades','fk_unidade', 'Unidade', dados_alteracao.get('unidade'))[0]
-    fk_area = consulta_fk_dimensao('areas', 'fk_area', 'descricao_area', dados_alteracao.get('area'))[0]
-    fk_subarea = consulta_fk_dimensao('subareas', 'fk_subarea', 'descricao_subarea', dados_alteracao.get('subarea'))[0]
-    fk_gestor = consulta_fk_dimensao('gestores', 'fk_gestor', 'globalId', dados_alteracao.get('id_gestor'))[0]
-    fk_genero = consulta_fk_dimensao('generos', 'fk_genero', 'genero', dados_alteracao.get('genero'))[0]
+    dados_formulario = request.json    
+    tipo = dados_formulario.get('tipo')
+    globalId_original = dados_formulario.get('globalIdOriginal')
+    globalId_novo = dados_formulario.get('globalId')
+    #Verifica as informações digitadas
+    if not globalId_novo:
+        return jsonify({"message":"Preencha os dados obrigatórios.", "status": "error"})
+    id_gestor = dados_formulario.get('id_gestor')
+    
+    #Verifica se o usuário já existe
+    if not globalId_original == globalId_novo:
+        if valida_id(globalId_novo):
+            return jsonify({"message":"Já existe usuário com esse ID cadastrado.<br> Procure pelo ID nas configurações de usuários.", "status": "error"})
+    #Verifica se o ID é apenas números e se são 8 caracteres
+    if not valida_id_novo(globalId_novo):
+        return jsonify({"message":"Os dados informados no campo 'Global ID' não segue algum dos padrões necessários.<br>Tem mais ou menos que 8 números ou não tem apenas números", "status": "error"})
+    #Verifica se o email digitado é válido
+    if not valida_email_novo(dados_formulario.get('email')):
+        return jsonify({"message":"Os dados informados no campo 'Email' não segue algum dos padrões necessários.<br>Não está digitado corretamente como @ambev.com.br ou @ab-inbev.com", "status": "error"})
+    #Verificar se o ID do gestor é o ID de um gestor existente na base de gestores
+    if not consulta_dados_gestor(id_gestor):
+        return jsonify({"message":"Os dados informados no campo 'ID Gestor' não existe na base de gestores.<br>Entre em contato com a área de gente da unidade.", "status": "error"})
 
-    app.logger.debug(dados_alteracao)
-
-    dados_usuario = consulta_usuario_id(global_id)
-
-    return jsonify({'message': 'Dados salvos com sucesso!'}), 200
+    data_nascimento = dados_formulario.get('data_nascimento')
+    data_ultima_movimentacao = dados_formulario.get('data_ultima_movimentacao')
+    data_contratacao = dados_formulario.get('data_contratacao')
+    dados = (
+        int(dados_formulario.get('globalId')),
+        dados_formulario.get('email'),
+        dados_formulario.get('nome'),
+        datetime.strptime(data_nascimento, '%Y-%m-%d').date(),
+        datetime.strptime(data_ultima_movimentacao, '%Y-%m-%d').date(),
+        datetime.strptime(data_contratacao, '%Y-%m-%d').date(),
+        consulta_fk_dimensao('bandas', 'fk_banda', 'descricao_banda' , dados_formulario.get('banda'))[0],
+        consulta_fk_dimensao('tipo_cargos', 'fk_tipo_cargo', 'descricao_tipo_cargo', dados_formulario.get('tipo_cargo'))[0],
+        consulta_fk_dimensao('ftes', 'fk_fte', 'descricao_fte', dados_formulario.get('fte'))[0],
+        consulta_fk_dimensao('cargos','fk_cargo', 'descricao_cargo', dados_formulario.get('cargo'))[0],
+        consulta_fk_dimensao('unidades','fk_unidade', 'Unidade', dados_formulario.get('unidade'))[0],
+        consulta_fk_dimensao('areas', 'fk_area', 'descricao_area', dados_formulario.get('area'))[0],
+        consulta_fk_dimensao('subareas', 'fk_subarea', 'descricao_subarea', dados_formulario.get('subarea'))[0],
+        consulta_fk_dimensao('gestores', 'fk_gestor', 'globalId', dados_formulario.get('id_gestor'))[0],
+        consulta_fk_dimensao('generos', 'fk_genero', 'genero', dados_formulario.get('genero'))[0]
+        )
+    #Baseado no ID do formulário, consulta o usuário no banco
+    dados_usuario = consulta_usuario_id(globalId_original)
+    chaves = ("globalId", "email", "nome", "data_nascimento", "data_ultima_movimentacao", "data_contratacao", "fk_banda", "fk_tipo_cargo", "fk_fte", "fk_cargo","fk_unidade", "fk_area", "fk_subarea", "fk_gestor", "fk_genero")
+        
+    if tipo == 'edicao':
+        #Se o usuário não existir, mensagem de ID Alterado
+        if not dados_usuario:
+            return jsonify({"message":"Abrea novamente a tela de edição, o ID foi alterado.", "status": "warning"})
+        
+        dados_alteracao = dados
+        dicionario_dados_usuario = dict(zip(chaves, dados_usuario))
+        dicionario_dados_alteracao = dict(zip(chaves, dados_alteracao))
+        #Verifica se houve alterações nos dados
+        if dicionario_dados_usuario == dicionario_dados_alteracao:
+            return jsonify({"message": "Não houve alteração nos dados do usuário", "status": "warning"})
+        else:
+            alteracoes = verificar_alteracao(dicionario_dados_usuario, dicionario_dados_alteracao)
+            resultado_diferencas = processar_diferencas(alteracoes, globalId_original)
+        return resultado_diferencas
+    
+    if tipo == 'criacao':
+        dicionario_dados_criacao = dict(zip(chaves, dados))
+        resultado_criar = criar_usuario(dicionario_dados_criacao)
+        app.logger.debug(resultado_criar)
+        return resultado_criar
 
 @configura_senha.route('/configura_senha', methods = ['GET', 'POST'])
 def configura_senha_view():
+    if 'logged_in' not in session:
+        flash('É necessário fazer login primeiro',"warning")
+        redirect(url_for('gestor.gestor_view'))
     fk_gestor = session['fk_gestor']
 
     if request.method == 'POST':

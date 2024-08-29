@@ -29,6 +29,10 @@
                 <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
                 <span class="text_sidebar">Configurações</span>
             </a></li>
+            <li><a href="{{ url_for('gestor.gestor_view') }}">
+                <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
+                <span class="text_sidebar">Sair</span>
+            </a></li>
         </ul>
     </nav>
     
@@ -121,9 +125,10 @@
                     <span class="close" onclick="fecharModal()">&times;</span>
                     <h2>Dados do Usuário</h2>
                     <div class="modal-body">
+                        <input type="hidden" id="modal-original-globalId">
                         <div class="form-group">
                             <label for="modal-globalId">Global ID:</label>
-                            <input type="text" id="modal-globalId" required>
+                            <input type="number" maxlength="8" id="modal-globalId" required>
                         </div>
                         <div class="form-group">
                             <label for="modal-email">Email:</label>
@@ -218,7 +223,10 @@
                         
                     </div>
                     <div class="buttons">
-                        <button type ="submit" id="modal-save-button" onclick="salvarAlteracoes()">Salvar Alterações</button>
+                        <button type ="submit" id="modal-save-button">Salvar Alterações</button>
+                    </div>
+                    <div class="alerts">
+                        <!-- As mensagens de alerta aparecerão aqui -->
                     </div>
                 </div>
             </div>
@@ -233,101 +241,105 @@
             const dia = String(dataObj.getDate()).padStart(2, '0');
             return `${ano}-${mes}-${dia}`;
         }
-
+    
         function abrirModal(usuario) {
             const saveButton = document.getElementById('modal-save-button');
+            
             let tipo;
-
+    
             if (usuario) {
                 saveButton.textContent = 'Salvar Alterações';
-                // Preencher o modal com os dados do usuário
-                document.getElementById('modal-globalId').value = usuario.globalId;
-                document.getElementById('modal-email').value = usuario.email;
-                document.getElementById('modal-nome').value = usuario.nome;
-                document.getElementById('modal-data_nascimento').value = formatarData(usuario.data_nascimento);
-                document.getElementById('modal-data_ultima_movimentacao').value = formatarData(usuario.data_ultima_movimentacao);
-                document.getElementById('modal-data_contratacao').value = formatarData(usuario.data_contratacao);
-                document.getElementById('modal-banda').value = usuario.banda;
-                document.getElementById('modal-tipo_cargo').value = usuario.tipo_cargo;
-                document.getElementById('modal-fte').value = usuario.fte;
-                document.getElementById('modal-cargo').value = usuario.cargo;
-                document.getElementById('modal-unidade').value = usuario.unidade;
-                document.getElementById('modal-area').value = usuario.area;
-                document.getElementById('modal-subarea').value = usuario.subarea;
-                document.getElementById('modal-id_gestor').value = usuario.id_gestor;
-                document.getElementById('modal-genero').value = usuario.genero;
+                preencherCamposModal(usuario);
                 tipo = 'edicao';
+                document.getElementById('modal-original-globalId').value = usuario.globalId;
             } else {
                 saveButton.textContent = 'Criar Usuário';
-
-                // Limpar campos do modal
-                document.getElementById('modal-globalId').value = '';
-                document.getElementById('modal-email').value = '';
-                document.getElementById('modal-nome').value = '';
-                document.getElementById('modal-data_nascimento').value = '';
-                document.getElementById('modal-data_ultima_movimentacao').value = '';
-                document.getElementById('modal-data_contratacao').value = '';
-                document.getElementById('modal-banda').value = '';
-                document.getElementById('modal-tipo_cargo').value = '';
-                document.getElementById('modal-fte').value = '';
-                document.getElementById('modal-cargo').value = '';
-                document.getElementById('modal-unidade').value = '';
-                document.getElementById('modal-area').value = '';
-                document.getElementById('modal-subarea').value = '';
-                document.getElementById('modal-id_gestor').value = '';
-                document.getElementById('modal-genero').value = '';
+                limparCamposModal();
                 tipo = 'criacao';
+                document.getElementById('modal-original-globalId').value = '';
             }
+    
             // Exibir o modal
             document.getElementById('usuarioModal').style.display = 'block';
-
-            // Adiciona o evento ao botão de salvar
-            document.getElementById('modal-save-button').addEventListener('click', function() {
+    
+            // Atualizar o evento do botão salvar
+            saveButton.removeEventListener('click', salvarAlteracoesHandler);
+            saveButton.addEventListener('click', salvarAlteracoesHandler);
+    
+            function salvarAlteracoesHandler() {
                 salvarAlteracoes(tipo);
-            });
+            }
         }
-
+    
         function fecharModal() {
             document.getElementById('usuarioModal').style.display = 'none';
+            const paginaAtual = {{pagina}} || 1;
+
+            // Limpar os alertas ao fechar o modal
+            const alertsDiv = document.querySelector('.alerts');
+            alertsDiv.innerHTML = '';
+            window.location.href = `/configuracoes_usuario?pagina=${paginaAtual}`
         }
-
+    
+        function preencherCamposModal(usuario) {
+            document.getElementById('modal-globalId').value = usuario.globalId;
+            document.getElementById('modal-email').value = usuario.email;
+            document.getElementById('modal-nome').value = usuario.nome;
+            document.getElementById('modal-data_nascimento').value = usuario.data_nascimento;
+            document.getElementById('modal-data_ultima_movimentacao').value = usuario.data_ultima_movimentacao;
+            document.getElementById('modal-data_contratacao').value = usuario.data_contratacao;
+            document.getElementById('modal-banda').value = usuario.banda;
+            document.getElementById('modal-tipo_cargo').value = usuario.tipo_cargo;
+            document.getElementById('modal-fte').value = usuario.fte;
+            document.getElementById('modal-cargo').value = usuario.cargo;
+            document.getElementById('modal-unidade').value = usuario.unidade;
+            document.getElementById('modal-area').value = usuario.area;
+            document.getElementById('modal-subarea').value = usuario.subarea;
+            document.getElementById('modal-id_gestor').value = usuario.id_gestor;
+            document.getElementById('modal-genero').value = usuario.genero;
+        }
+    
+        function limparCamposModal() {
+            document.getElementById('modal-globalId').value = '';
+            document.getElementById('modal-email').value = '';
+            document.getElementById('modal-nome').value = '';
+            document.getElementById('modal-data_nascimento').value = '';
+            document.getElementById('modal-data_ultima_movimentacao').value = '';
+            document.getElementById('modal-data_contratacao').value = '';
+            document.getElementById('modal-banda').value = '';
+            document.getElementById('modal-tipo_cargo').value = '';
+            document.getElementById('modal-fte').value = '';
+            document.getElementById('modal-cargo').value = '';
+            document.getElementById('modal-unidade').value = '';
+            document.getElementById('modal-area').value = '';
+            document.getElementById('modal-subarea').value = '';
+            document.getElementById('modal-id_gestor').value = '';
+            document.getElementById('modal-genero').value = '';
+        }
+    
         function salvarAlteracoes(tipo) {
-            // Função para salvar as alterações feitas no modal
-            const globalId = document.getElementById('modal-globalId').value;
-            const email = document.getElementById('modal-email').value;
-            const nome = document.getElementById('modal-nome').value;
-            const data_nascimento = document.getElementById('modal-data_nascimento').value;
-            const data_ultima_movimentacao = document.getElementById('modal-data_ultima_movimentacao').value;
-            const data_contratacao = document.getElementById('modal-data_contratacao').value;
-            const banda = document.getElementById('modal-banda').value;
-            const tipo_cargo = document.getElementById('modal-tipo_cargo').value;
-            const fte = document.getElementById('modal-fte').value;
-            const cargo = document.getElementById('modal-cargo').value;
-            const unidade = document.getElementById('modal-unidade').value;
-            const area = document.getElementById('modal-area').value;
-            const subarea = document.getElementById('modal-subarea').value;
-            const id_gestor = document.getElementById('modal-id_gestor').value;
-            const genero = document.getElementById('modal-genero').value;
-
+            const globalIdOriginal = document.getElementById('modal-original-globalId').value;
+            const paginaAtual = {{pagina}} || 1;
             const dados = {
                 tipo,
-                globalId,
-                email,
-                nome,
-                data_nascimento,
-                data_ultima_movimentacao,
-                data_contratacao,
-                banda,
-                tipo_cargo,
-                fte,
-                cargo,
-                unidade,
-                area,
-                subarea,
-                id_gestor,
-                genero
+                globalIdOriginal,
+                globalId: document.getElementById('modal-globalId').value,
+                email: document.getElementById('modal-email').value,
+                nome: document.getElementById('modal-nome').value,
+                data_nascimento: document.getElementById('modal-data_nascimento').value,
+                data_ultima_movimentacao: document.getElementById('modal-data_ultima_movimentacao').value,
+                data_contratacao: document.getElementById('modal-data_contratacao').value,
+                banda: document.getElementById('modal-banda').value,
+                tipo_cargo: document.getElementById('modal-tipo_cargo').value,
+                fte: document.getElementById('modal-fte').value,
+                cargo: document.getElementById('modal-cargo').value,
+                unidade: document.getElementById('modal-unidade').value,
+                area: document.getElementById('modal-area').value,
+                subarea: document.getElementById('modal-subarea').value,
+                id_gestor: document.getElementById('modal-id_gestor').value,
+                genero: document.getElementById('modal-genero').value
             };
-
+    
             fetch('/salvar_alteracoes', {
                 method: 'POST',
                 headers: {
@@ -337,15 +349,23 @@
             })
             .then(response => response.json())
             .then(data => {
-                fecharModal();  // Fechar o modal após salvar
+                // Atualize a div de alertas com a mensagem recebida
+                const alertsDiv = document.querySelector('.alerts');
+                alertsDiv.innerHTML = `<div class="alert alert-${data.status}">${data.message}</div>`;
+
+                if (data.status === 'success') {
+                    // Fechar o modal após exibir a mensagem de sucesso por 1 segundo
+                    setTimeout(() => {
+                        fecharModal();
+                        // Recarregar a página após fechar o modal
+                        window.location.href = `/configuracoes_usuario?pagina=${paginaAtual}`;
+                    }, 1000); // Espera de 1 segundo
+                }
             })
             .catch(error => {
                 console.error('Erro:', error);
             });
         }
-
-        
-
     </script>
 </body>
 </html>

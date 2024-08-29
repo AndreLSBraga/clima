@@ -1,6 +1,7 @@
 from app.utils.db import get_db  # Importando a função get_db
 from app.utils.db_consultas import consulta_tabela_dimensao
 from flask import current_app as app
+from datetime import datetime
 
 def gera_tabela(usuarios):
     tabela = []
@@ -9,9 +10,9 @@ def gera_tabela(usuarios):
             "globalId": usuario[0],
             "email": usuario[1],
             "nome": usuario[2],
-            "data_nascimento": usuario[3],
-            "data_ultima_movimentacao": usuario[4],
-            "data_contratacao": usuario[5],
+            "data_nascimento": usuario[3].strftime('%Y-%m-%d'),
+            "data_ultima_movimentacao": usuario[4].strftime('%Y-%m-%d'),
+            "data_contratacao": usuario[5].strftime('%Y-%m-%d'),
             "banda": consulta_tabela_dimensao('bandas', 'fk_banda', usuario[6])[1],
             "tipo_cargo": consulta_tabela_dimensao('tipo_cargos', 'fk_tipo_cargo', usuario[7])[1],
             "fte": consulta_tabela_dimensao('ftes', 'fk_fte', usuario[8])[1],
@@ -63,3 +64,15 @@ def consulta_lista(lista, num_item):
             if len(item) > num_item:
                 resultado.append(item[num_item])
     return resultado
+
+def verificar_alteracao(dict1, dict2):
+    diferencas = {}
+    
+    for chave in dict1:
+        if dict1[chave] != dict2.get(chave):
+            diferencas[chave] = {
+                'original': dict1[chave],
+                'novo': dict2.get(chave)
+            }
+    
+    return diferencas
