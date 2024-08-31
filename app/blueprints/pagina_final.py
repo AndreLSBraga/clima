@@ -2,11 +2,9 @@ from flask import Blueprint, render_template, current_app as app, request, sessi
 from app.utils.db_consultas import consulta_categorias, consulta_fk_categoria_pela_desc_categoria
 from app.utils.db_dml import insert_resposta
 
-
 pagina_final = Blueprint('pagina_final', __name__)
 
 @pagina_final.route('/Sugerir', methods=['GET', 'POST'])
-
 def pagina_final_view():
     grupo_categorias = consulta_categorias()
     categorias = []

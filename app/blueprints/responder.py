@@ -47,18 +47,19 @@ def responder_view():
         if 'pular' in request.form or action == 'pular' or 'proxima' in request.form or action == 'proxima':
             if 'pular' in request.form or action == 'pular':
                 resposta = -1
-                sugestao = None
+                sugestao = request.form.get('sugestao')
                 botao_clicado = 'pular'
 
             elif 'proxima' in request.form or action == 'proxima':
                 botao_clicado = 'proxima'
                 resposta = request.form.get('resposta')
                 sugestao = request.form.get('sugestao')
-                check_box_auto_identificacao = request.form.get('auto_identificacao')
-                if check_box_auto_identificacao:
-                    auto_identificacao = 1
-                else:
-                    auto_identificacao = 0
+            
+            check_box_auto_identificacao = request.form.get('auto_identificacao')
+            if check_box_auto_identificacao:
+                auto_identificacao = 1
+            else:
+                auto_identificacao = 0
 
             session['respostas'].append({
                 'num_pergunta': num_pergunta_atual,

@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pulsa 7L</title>
+    <title>Pulsa Supply</title>
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/main_dash_config.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
     <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
+    
 </head>
 <body>
     <nav class="navbar">
@@ -38,13 +40,226 @@
     </nav>
     
     <div class="fundo-container">
-        <form action="/gestor" method="POST">
-            <div class="container">
-                <img class="logo" src="/static/images/logos/logo_completa.svg">
-                <h1> Página em desenvolvimento</h1>
+        <div class="container">
+            <div class="introbar">
+                <div class="introbar-text">
+                    <span><h2>Olá, nome! Esse é o resultado do seu time.</h2></span>
+                    <span class="small-text">Sua nota está baseada em qtd_respostas respostas, entre os dias data_min e data_max.</span>
+                </div>
             </div>
-        </form>    
+                <div class="dashboard-container">
+                    <div class="main-cards">
+                        <div class="card card-principal geral">
+                            <div class="card-header">
+                                <img class="icon" src="/static/images/icons/nota_geral.svg" alt="Icone Nota Geral">
+                                <h4>Nota Geral:</h4>
+                            </div>
+                            <div class="card-content">
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-fill" style="width: {{ dados[0].size_bar }}%;"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-data">
+                                    {% if dados[0].nota_media != None %}
+                                        <span>{{ dados[0].nota_media }}</span>
+                                    {% else %}
+                                        <span>-</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="info-item">
+                                    <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
+                                    <p>{{ dados[0].qtd_respostas }} respostas</p>
+                                </div>
+                                <div class="info-item">
+                                    <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
+                                    <p>{{ dados[0].data_min }} e {{ dados[0].data_max }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card card-principal nps">
+                            <div class="card-header">
+                                <img class="icon" src="/static/images/icons/nps.svg" alt="Icone NPS">
+                                <h4>NPS:</h4>
+                            </div>
+                            <div class="card-content">
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-fill" style="width: {{ dados[0].size_bar }}%;"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-data">
+                                    {% if dados[0].nota_media != None %}
+                                        <span>{{ dados[0].nota_media }}</span>
+                                    {% else %}
+                                        <span>-</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="info-item">
+                                    <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
+                                    <p>{{ dados[0].qtd_respostas }} respostas</p>
+                                </div>
+                                <div class="info-item">
+                                    <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
+                                    <p>{{ dados[0].data_min }} e {{ dados[0].data_max }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card card-principal eficacia">
+                            <div class="card-header">
+                                <img class="icon" src="/static/images/icons/lideranca.svg" alt="Icone Eficácia Gestor">
+                                <h4>Eficácia Gestor:</h4>
+                            </div>
+                            <div class="card-content">
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-fill" style="width: {{ dados[0].size_bar }}%;"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-data">
+                                    {% if dados[0].nota_media != None %}
+                                        <span>{{ dados[0].nota_media }}</span>
+                                    {% else %}
+                                        <span>-</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="info-item">
+                                    <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
+                                    <p> {{ dados[0].qtd_respostas }} respostas</p>
+                                </div>
+                                <div class="info-item">
+                                    <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
+                                    <p>{{ dados[0].data_min }} e {{ dados[0].data_max }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="main-grafico">
+                        <div class="chart-container">
+                            <canvas id="myChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <span><h2>Dimensões:</h2></span>
+                <div class="dimensions-container">
+                    <div class="container-cards detalhado dimension-card">
+                        {% for card in cards %}
+                        <div class="card card-detalhe" id="card-{{ card.id }}" onclick="modalPerguntas('{{ card.id }}')">
+                            <div class="card-header">
+                                {% if card.id == 1 %}
+                                    <img class="icon" src="/static/images/icons/clima.svg" alt="Engagment">
+                                {% elif card.id == 2 %}
+                                    <img class="icon" src="/static/images/icons/lideranca.svg" alt="Eficácia Gestor">
+                                {% elif card.id == 3 %}
+                                    <img class="icon" src="/static/images/icons/funcoes.svg" alt="Funções Desempenhadas">
+                                {% elif card.id == 4 %}
+                                    <img class="icon" src="/static/images/icons/carreira.svg" alt="Carreira">
+                                {% elif card.id == 5 %}
+                                    <img class="icon" src="/static/images/icons/ambiente.svg" alt="Ambiente">
+                                {% elif card.id == 6 %}
+                                    <img class="icon" src="/static/images/icons/salario.svg" alt="Salário e Benefícios">
+                                {% elif card.id == 7 %}
+                                    <img class="icon" src="/static/images/icons/feedback.svg" alt="Feedback e Reconhecimento">
+                                {% elif card.id == 8 %}
+                                    <img class="icon" src="/static/images/icons/comunicacao.svg" alt="Comunicação e Colaboração">
+                                {% elif card.id == 9 %}
+                                    <img class="icon" src="/static/images/icons/servicos.svg" alt="Serviços Gerais">
+                                {% elif card.id == 10 %}
+                                    <img class="icon" src="/static/images/icons/seguranca.svg" alt="Segurança Psicológica">
+                                {% elif card.id == 11 %}
+                                    <img class="icon" src="/static/images/icons/nps_pulsa.svg" alt="Pulsa Supply">
+                                {% endif %}
+                                <h4>{{ card.title }}:</h4>
+                            </div>
+                            <div class="card-content">
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-fill" style="width: {{ card.size }}%;"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-data">
+                                    {% if card.value != None %}
+                                        <span>{{ card.value }}</span>
+                                    {% else %}
+                                        <span>-</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="info-item">
+                                    <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
+                                    <p>{{ card.qtd_respostas }} respostas</p>
+                                </div>
+                                <div class="info-item">
+                                    <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
+                                    <p>{{ card.data_min }} e {{ card.data_max }}</p>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        {% else %}
+                            <span>Sem dimensões para mostrar</span>
+                        {% endfor %}
+                    </div>
+                </div>
+        </div>
     </div>
     <script src="/static/js/background.js"></script>
+    <script src="/static/js/chart.umd.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+                    datasets: [
+                        {
+                            label: 'Nota média',
+                            data: [7, 8, 6, 9],
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Aderência',
+                            data: [70, 80, 60, 90],
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Semanas do Ano'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Valor'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>

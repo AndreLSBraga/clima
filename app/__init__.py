@@ -3,7 +3,9 @@ import logging
 from app.blueprints.pagina_inicial import pagina_inicial
 from app.blueprints.pagina_final import pagina_final
 from app.blueprints.sugestao import sugestao
-from app.blueprints.gestor import gestor, dashboard, configuracoes, configuracoes_usuario, configuracoes_gestor, configura_senha, configuracoes_salvar_alteracoes
+from app.blueprints.gestor import gestor, configura_senha
+from app.blueprints.configuracoes import  configuracoes, configuracoes_usuario, configuracoes_gestor, configuracoes_salvar_alteracoes
+from app.blueprints.dashboard import dashboard
 from app.blueprints.responder import responder
 from app.utils.db import close_db
 

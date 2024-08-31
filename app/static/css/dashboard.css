@@ -1,0 +1,163 @@
+.dashboard-container {
+    display: flex; /* Cria um contêiner flexível */
+    gap: 10px; /* Espaço entre os cards e o gráfico */
+    width: 100%;
+    align-items: stretch;
+    column-gap: 26px;
+}
+.small-text {
+    font-size: 0.8rem; /* Ajuste o valor conforme necessário */
+}
+
+.main-cards {
+    width: 32%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-top: 10px;
+    min-height: 100%;
+}
+
+.card {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.card-header {
+    display: flex;
+    align-items: center;
+    width: 35%;
+}
+
+.card-header h4 {
+    margin-left: 5px;
+    font-size: 0.8rem;
+    color: #333;
+
+}
+
+.icon {
+    width: 18px;
+    height: 18px;
+}
+
+.card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 40%;
+}
+
+.progress-bar-container {
+    width: 100%; /* Alinhamento à largura do container */
+}
+
+.progress-bar-bg {
+    width: 100%; /* Largura fixa para o fundo */
+    height: 20px; /* Altura da barra */
+    background-color: #d3d3d3; /* Cor de fundo da barra */
+    border-radius: 5px; /* Bordas arredondadas */
+    position: relative;
+    overflow: hidden; /* Garante que o preenchimento não transborde */
+}
+
+.progress-fill {
+    background-color: #4caf50; /* Cor de preenchimento (barra de progresso) */
+    height: 100%; /* Preenche completamente a altura da barra de fundo */
+    width: 0; /* Começa sem largura, será ajustada pelo inline style */
+    transition: width 0.5s ease; /* Animação suave para transições de progresso */
+    position: absolute; /* Posicionamento absoluto para sobrepor o fundo */
+    top: 0;
+    left: 0;
+}
+
+.progress-data {
+    font-size: 1em;
+    color: #555;
+    text-align: center;
+    margin-left: 5px;
+}
+
+.card-info {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    flex-direction: column;
+    width: 25%;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 5px;
+}
+
+.icon-small {
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+}
+
+.info-item p {
+    margin: 0;
+    font-size: 0.7em;
+    color: #555;
+}
+
+
+.main-grafico {
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding-top: 10px;
+    min-height: 100%;
+    min-width: 500px;
+    width: 67%;
+}
+
+.chart-container {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.dimensions-container{
+   width: 100%; 
+  }
+
+.container-cards.detalhado.dimension-card {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    row-gap: 5px;
+    column-gap: 5px;
+}
+
+.card.card-detalhe {
+    flex: 0 1 calc(33.33% - 26px);
+}
+.card.card-detalhe {
+    transition: transform 0.3s ease; 
+    cursor: default;
+  }
+  
+  .card.card-detalhe:hover {
+    transform: scale(1.1); 
+    cursor: pointer; 
+  }
