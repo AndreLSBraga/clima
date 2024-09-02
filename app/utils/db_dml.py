@@ -90,7 +90,7 @@ def insert_usuario_respondeu(dados_usuario):
     globalId = dados_usuario.get('id_usuario', None)
     data = dados_usuario.get('data_hora', None)
     data_formatada = data.date()
-    app.logger.debug(globalId, data, data_formatada)
+    
     db = get_db()
     cursor = db.cursor()
 

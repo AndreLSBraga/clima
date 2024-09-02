@@ -63,6 +63,14 @@ def consulta_fk_categoria_pela_desc_categoria(desc_categoria):
         cursor.close()
         return result
 
+def consulta_desc_categoria_pelo_fk_categoria(fk_categoria):
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT desc_categoria FROM categorias where fk_categoria = %s',(fk_categoria,))
+        result = cursor.fetchone()[0]
+        cursor.close()
+        return result
+
 def consulta_dados_gestor(user_id):
         db = get_db()
         cursor = db.cursor()
@@ -110,20 +118,23 @@ def consulta_tabela_dimensao(tabela, coluna=None, pesquisa=None):
         else:
                 return None
         
-def consulta_fk_dimensao(tabela, coluna_retorno, coluna_pesquisa, pesquisa):
+def consulta_fk_dimensao(tabela, coluna_retorno, coluna_pesquisa=None, pesquisa=None):
+        app.logger.debug(type(pesquisa))
         query = f'SELECT {coluna_retorno} FROM {tabela}'
         params = []
         conditions = []
         fetchone = False
 
         if coluna_pesquisa is not None:
-                conditions.append(f"{coluna_pesquisa} = '{pesquisa}'")
-                params.append(coluna_pesquisa)
-                fetchone = True
+                if type(pesquisa) == int:
+                       conditions.append(f"{coluna_pesquisa} = {pesquisa}")   
+                else:
+                        conditions.append(f"{coluna_pesquisa} = '{pesquisa}'")
+                        params.append(coluna_pesquisa)
+                        fetchone = True
 
         if conditions:
                 query += ' WHERE ' + ' AND '.join(conditions)
-
         db = get_db()
         cursor = db.cursor()
         cursor.execute(query)
@@ -132,6 +143,28 @@ def consulta_fk_dimensao(tabela, coluna_retorno, coluna_pesquisa, pesquisa):
         else:
                 result = cursor.fetchone()
 
+        cursor.close()
+        if result:
+                return result
+        else:
+                return None
+        
+def consulta_dados_respostas(fk_gestor=None, data_min=None, data_max = None):
+        query = f'SELECT fk_pergunta, fk_categoria, resposta, data_hora FROM respostas'
+        params = []
+        conditions = []
+
+        if fk_gestor is not None:
+                conditions.append('fk_gestor = %s')
+                params.append(fk_gestor)
+
+        if conditions:
+                query += ' WHERE ' + ' AND '.join(conditions)
+
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, params)
+        result = cursor.fetchall()
         cursor.close()
         if result:
                 return result

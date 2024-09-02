@@ -41,6 +41,7 @@
                 <textarea name="sugestao" id="sugestao" placeholder="Digite sua sugestão aqui..."></textarea>
             </div>
             <div class="question-number">Pergunta {{ pergunta_num }} de {{ total_perguntas }}</div>
+            <input type="hidden" id="actionInput" name="acao">
             <div class="buttons">
                 <button type="submit" name="anterior">
                     <img class="imagem" src="/static/images/icons/esquerda.svg"> Anterior
@@ -55,7 +56,6 @@
                 {% endif %}
             </div>      
             
-            <!-- Modal -->
             <div id="myModal" class="modal">
                 <div class="modal-content">
                     <h2>Confirmar Envio</h2>

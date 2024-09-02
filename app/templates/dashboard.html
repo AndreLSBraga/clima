@@ -43,8 +43,8 @@
         <div class="container">
             <div class="introbar">
                 <div class="introbar-text">
-                    <span><h2>Olá, nome! Esse é o resultado do seu time.</h2></span>
-                    <span class="small-text">Sua nota está baseada em qtd_respostas respostas, entre os dias data_min e data_max.</span>
+                    <span><h2>Olá, {{dados[0].nome}}! Esse é o resultado do seu time.</h2></span>
+                    <span class="small-text">Sua nota está baseada em {{dados[0].qtd_respostas}} respostas, entre os dias {{dados[0].data_min}} e {{dados[0].data_max}}.</span>
                 </div>
             </div>
                 <div class="dashboard-container">
@@ -88,12 +88,12 @@
                             <div class="card-content">
                                 <div class="progress-bar-container">
                                     <div class="progress-bar-bg">
-                                        <div class="progress-fill" style="width: {{ dados[0].size_bar }}%;"></div>
+                                        <div class="progress-fill" style="width: {{ dados[0].size_bar_nps }}%;"></div>
                                     </div>
                                 </div>
                                 <div class="progress-data">
-                                    {% if dados[0].nota_media != None %}
-                                        <span>{{ dados[0].nota_media }}</span>
+                                    {% if dados[0].nota_media_nps != None %}
+                                        <span>{{ dados[0].nota_media_nps }}</span>
                                     {% else %}
                                         <span>-</span>
                                     {% endif %}
@@ -102,11 +102,11 @@
                             <div class="card-info">
                                 <div class="info-item">
                                     <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                    <p>{{ dados[0].qtd_respostas }} respostas</p>
+                                    <p>{{ dados[0].qtd_respostas_nps }} respostas</p>
                                 </div>
                                 <div class="info-item">
                                     <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
-                                    <p>{{ dados[0].data_min }} e {{ dados[0].data_max }}</p>
+                                    <p>{{ dados[0].data_min_nps }} e {{ dados[0].data_max_nps }}</p>
                                 </div>
                             </div>
                         </div>
@@ -119,25 +119,25 @@
                             <div class="card-content">
                                 <div class="progress-bar-container">
                                     <div class="progress-bar-bg">
-                                        <div class="progress-fill" style="width: {{ dados[0].size_bar }}%;"></div>
+                                        <div class="progress-fill" style="width: {{ dados[0].size_bar_eficacia }}%;"></div>
                                     </div>
                                 </div>
                                 <div class="progress-data">
-                                    {% if dados[0].nota_media != None %}
-                                        <span>{{ dados[0].nota_media }}</span>
+                                    {% if dados[0].nota_media_eficacia != None %}
+                                        <span>{{ dados[0].nota_media_eficacia }}</span>
                                     {% else %}
-                                        <span>-</span>
+                                        <span> - </span>
                                     {% endif %}
                                 </div>
                             </div>
                             <div class="card-info">
                                 <div class="info-item">
                                     <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                    <p> {{ dados[0].qtd_respostas }} respostas</p>
+                                    <p> {{ dados[0].qtd_respostas_eficacia }} respostas</p>
                                 </div>
                                 <div class="info-item">
                                     <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
-                                    <p>{{ dados[0].data_min }} e {{ dados[0].data_max }}</p>
+                                    <p>{{ dados[0].data_min_eficacia }} e {{ dados[0].data_max_eficacia }}</p>
                                 </div>
                             </div>
                         </div>
@@ -200,7 +200,11 @@
                                 </div>
                                 <div class="info-item">
                                     <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
-                                    <p>{{ card.data_min }} e {{ card.data_max }}</p>
+                                    {% if card.data_min != None %}
+                                        <p>{{ card.data_min }} e {{ card.data_max }}</p>
+                                    {% else %}
+                                        <p>-</p>
+                                    {% endif %}
                                 </div>
                             </div>
                             
@@ -211,10 +215,21 @@
                     </div>
                 </div>
         </div>
+        <div id="modalPerguntas" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="fecharModal()">&times;</span>
+                <div class="modal-header">
+                    <h4 id="modal-card-title">Detalhes da Categoria</h4>
+                </div>
+                <div id="modal-body" class="modal-body">
+                    <!-- Os cards das perguntas serão adicionados aqui via JavaScript -->
+                </div>
+            </div>
+        </div>
     </div>
     <script src="/static/js/background.js"></script>
     <script src="/static/js/chart.umd.js"></script>
-    <script>
+    <script>//Gráfico
         document.addEventListener('DOMContentLoaded', function () {
             var ctx = document.getElementById('myChart').getContext('2d');
             var myChart = new Chart(ctx, {
@@ -260,6 +275,77 @@
                 }
             });
         });
+    </script>
+    <script>
+        function modalPerguntas(cardId) {
+            fetch(`/dashboard/detalhes-categoria:${cardId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        // Limpa o conteúdo do modal antes de adicionar novos cards
+                        const modalBody = document.getElementById('modal-body');
+                        modalBody.innerHTML = '';
+    
+                        // Itera sobre cada pergunta e cria um card para ela
+                        data.forEach(pergunta => {
+                            const card = document.createElement('div');
+                            card.classList.add('card-modal');
+
+                            const dataRange = pergunta.data_min && pergunta.data_max
+                            ? `${pergunta.data_min} e ${pergunta.data_max}`
+                            : '-';
+    
+                            card.innerHTML = `
+                                <div class="card-header-modal">
+                                    <h4>${pergunta.title}</h4>
+                                </div>
+                                <div class="card-content-modal">
+                                    <div class="card-content-modal-data">
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-bg">
+                                                <div class="progress-fill" style="width: ${pergunta.size}%;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-data">
+                                            <span>${pergunta.value}</span>
+                                        </div>
+                                        <div class="card-info">
+                                            <div class="info-item">
+                                                <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
+                                                <p>${pergunta.qtd_respostas} respostas</p>
+                                            </div>
+                                            <div class="info-item">
+                                                <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
+                                                <p>${dataRange}</p>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-grafico-modal">
+                                        <div class="chart-container">
+                                            <canvas id="myChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            modalBody.appendChild(card);
+                        });
+    
+                        // Exibe o modal
+                        document.getElementById('modalPerguntas').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar os dados do card:', error);
+                    alert('Erro ao buscar os dados do card. Tente novamente.');
+                });
+        }
+    
+        function fecharModal() {
+            document.getElementById('modalPerguntas').style.display = 'none';
+        }
     </script>
 </body>
 </html>
