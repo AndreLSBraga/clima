@@ -50,13 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     arrangement.forEach((image, index) => {
         const imgDiv = createImageDiv(image);
-
-        // Adicionando logs para verificar se as imagens estão sendo carregadas
-        const img = new Image();
-        img.src = image;
-        img.onload = () => console.log(`Imagem ${index + 1} carregada: ${image}`);
-        img.onerror = () => console.error(`Erro ao carregar a imagem ${index + 1}: ${image}`);
-
         container.appendChild(imgDiv);
     });
 

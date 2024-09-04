@@ -48,7 +48,6 @@ def responder_view():
                 resposta = -1
                 sugestao = request.form.get('sugestao')
                 botao_clicado = 'pular'
-                app.logger.debug('Pulei')
             elif 'proxima' in request.form or action == 'proxima':
                 botao_clicado = 'proxima'
                 resposta = request.form.get('resposta')
@@ -81,7 +80,6 @@ def responder_view():
             session['pergunta_atual'] = num_pergunta_atual
 
         if 'enviar' in request.form:
-            app.logger.debug(session)
             for resposta in session['respostas']:
                 insert_resposta(dados_usuario,resposta, 'resposta')
                 if resposta['sugestao']:

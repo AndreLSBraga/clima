@@ -90,6 +90,17 @@ def consulta_usuarios_por_unidade(fk_unidade):
     else:
         return None
     
+def consulta_todos_gestores():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT globalId, gestor_nome, perfil FROM gestores ORDER BY globalId asc')
+    result = cursor.fetchall()
+    cursor.close()
+    if result:
+        return result
+    else:
+        return None
+    
 def consulta_tabela_dimensao(tabela, coluna=None, pesquisa=None):
         query = f'SELECT * FROM {tabela}'
         params = []
@@ -119,7 +130,6 @@ def consulta_tabela_dimensao(tabela, coluna=None, pesquisa=None):
                 return None
         
 def consulta_fk_dimensao(tabela, coluna_retorno, coluna_pesquisa=None, pesquisa=None):
-        app.logger.debug(type(pesquisa))
         query = f'SELECT {coluna_retorno} FROM {tabela}'
         params = []
         conditions = []
@@ -164,6 +174,28 @@ def consulta_dados_respostas(fk_gestor=None, data_min=None, data_max = None):
         db = get_db()
         cursor = db.cursor()
         cursor.execute(query, params)
+        result = cursor.fetchall()
+        cursor.close()
+        if result:
+                return result
+        else:
+                return None
+        
+def consulta_time_por_fk_gestor(fk_gestor):
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT globalId FROM usuarios WHERE fk_gestor = %s ORDER BY globalId asc', (fk_gestor,))
+        result = cursor.fetchall()
+        cursor.close()
+        if result:
+                return result
+        else:
+                return None
+        
+def consulta_usuario_respondeu():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM usuario_respondeu')
         result = cursor.fetchall()
         cursor.close()
         if result:

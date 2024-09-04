@@ -181,6 +181,46 @@ def processar_diferencas(diferencas, global_id):
         "status": status_global
     })
 
+def processar_diferencas_gestor(diferencas, global_id):
+    resultados = {
+        "success": [],
+        "error": []
+    }
+    status_global = "success"
+
+    # Mapeia as chaves para suas funções de atualização correspondentes
+    acoes = {
+        "globalId": lambda dados: atualizar_gestor('globalId', dados, global_id),
+        "nome": lambda dados: atualizar_gestor('gestor_nome', dados, global_id),
+        "perfil": lambda dados: atualizar_gestor('perfil', dados, global_id)
+    }
+    for chave, dados in diferencas.items():
+        if chave in acoes:
+            resultado = acoes[chave](dados)
+            if resultado["status"] == "success":
+                resultados["success"].append(chave)
+            else:
+                resultados["error"].append(chave)
+                status_global = "error"  # Atualiza o status global se houver erro
+
+            if chave == 'globalId':
+                # Atualiza a variável global_id após a alteração do globalId
+                global_id = dados.get('novo')
+
+    # Construir a mensagem final com base nos resultados
+    if status_global == "success":
+        mensagem_final = f"Os campos '{', '.join(resultados['success'])}' foram alterados com sucesso."
+    else:
+        campos_sucesso = ", ".join(resultados['success'])
+        campos_erro = ", ".join(resultados['error'])
+        mensagem_final = f"Os campos {campos_sucesso} foram alterados com sucesso. " \
+                         f"Ocorreu um erro nos campos: {campos_erro}."
+
+    return jsonify({
+        "message": mensagem_final,
+        "status": status_global
+    })
+
 def atualizar_usuario(coluna, dados_alteracao, global_id):
     novo = dados_alteracao.get('novo')
     db = get_db()
@@ -192,6 +232,34 @@ def atualizar_usuario(coluna, dados_alteracao, global_id):
                 globalId = %s
         '''
     cursor.execute(query, (novo, global_id))
+    # Verificar o número de linhas afetadas
+    if cursor.rowcount > 0:
+        status = "success"
+        mensagem =  f"Alteração do campo '{coluna}' realizada com sucesso."
+    else:
+        status = "warning"
+        mensagem = f"Nenhuma alteração foi feita no campo '{coluna}'."
+
+    db.commit()
+    cursor.close()
+    return {
+        "status": status,
+        "message": mensagem
+    }
+
+def atualizar_gestor(coluna, dados_alteracao, global_id):
+    
+    novo = dados_alteracao.get('novo')
+    db = get_db()
+    cursor = db.cursor()
+    query = f'''
+            UPDATE gestores SET
+                {coluna} = %s
+            WHERE 
+                globalId = %s
+        '''
+    cursor.execute(query, (novo, global_id))
+    app.logger.debug(query)
     # Verificar o número de linhas afetadas
     if cursor.rowcount > 0:
         status = "success"
@@ -262,4 +330,38 @@ def criar_usuario(dados_usuario):
             "message": "Falha ao criar o usuário."
         }
 
+def criar_gestor(dados_gestor):
+    #Variáveis dos dados usuario
+    global_id = dados_gestor.get('globalId')
+    nome = dados_gestor.get('nome')
+    perfil = dados_gestor.get('perfil')
+
+    db = get_db()
+    cursor = db.cursor()
+    query = '''
+            INSERT into gestores 
+            (
+                globalId, gestor_nome, perfil
+            )
+            values
+            (
+                %s, %s, %s
+            )
+        '''
+    cursor.execute(query, (global_id, nome, perfil))
+    
+    if cursor.rowcount > 0:
+        db.commit()
+        cursor.close()
+        return {
+            "status": "success",
+            "message": "Usuário criado com sucesso."
+        }
+    else:
+        db.rollback()
+        cursor.close()
+        return {
+            "status": "error",
+            "message": "Falha ao criar o usuário."
+        }
 

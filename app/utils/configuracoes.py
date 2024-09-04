@@ -28,6 +28,19 @@ def gera_tabela(usuarios):
 
     return tabela
 
+def gera_tabela_gestores(gestores):
+    tabela = []
+    for gestor in gestores:
+        dados_gestor = {
+            "globalId": gestor[0],
+            "nome": gestor[1],
+            "perfil": gestor[2]
+        }
+        
+        tabela.append(dados_gestor)
+
+    return tabela
+
 def gera_dados_modal_selecao():
 
     bandas_lista = consulta_tabela_dimensao('bandas'),

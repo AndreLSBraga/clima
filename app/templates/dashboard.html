@@ -113,8 +113,8 @@
 
                         <div class="card card-principal eficacia">
                             <div class="card-header">
-                                <img class="icon" src="/static/images/icons/lideranca.svg" alt="Icone Eficácia Gestor">
-                                <h4>Eficácia Gestor:</h4>
+                                <img class="icon" src="/static/images/icons/nps_pulsa.svg" alt="Icone Eficácia Gestor">
+                                <h4>Pulsa Supply:</h4>
                             </div>
                             <div class="card-content">
                                 <div class="progress-bar-container">
@@ -153,7 +153,7 @@
                     <div class="container-cards detalhado dimension-card">
                         {% for card in cards %}
                         <div class="card card-detalhe" id="card-{{ card.id }}" onclick="modalPerguntas('{{ card.id }}')">
-                            <div class="card-header">
+                            <div class="card-header-detalhe">
                                 {% if card.id == 1 %}
                                     <img class="icon" src="/static/images/icons/clima.svg" alt="Engagment">
                                 {% elif card.id == 2 %}
@@ -177,15 +177,15 @@
                                 {% elif card.id == 11 %}
                                     <img class="icon" src="/static/images/icons/nps_pulsa.svg" alt="Pulsa Supply">
                                 {% endif %}
-                                <h4>{{ card.title }}:</h4>
+                                <h4>{{ card.title }}</h4>
                             </div>
-                            <div class="card-content">
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar-bg">
+                            <div class="card-content-detalhe">
+                                <div class="progress-bar-container-detalhe">
+                                    <div class="progress-bar-bg-detalhe">
                                         <div class="progress-fill" style="width: {{ card.size }}%;"></div>
                                     </div>
                                 </div>
-                                <div class="progress-data">
+                                <div class="progress-data-detalhe">
                                     {% if card.value != None %}
                                         <span>{{ card.value }}</span>
                                     {% else %}
@@ -193,12 +193,13 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            <div class="card-info">
-                                <div class="info-item">
+                            
+                            <div class="card-info-detalhe">
+                                <div class="info-item-detalhe">
                                     <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
                                     <p>{{ card.qtd_respostas }} respostas</p>
                                 </div>
-                                <div class="info-item">
+                                <div class="info-item-detalhe">
                                     <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
                                     {% if card.data_min != None %}
                                         <p>{{ card.data_min }} e {{ card.data_max }}</p>
@@ -229,27 +230,187 @@
     </div>
     <script src="/static/js/background.js"></script>
     <script src="/static/js/chart.umd.js"></script>
-    <script>//Gráfico
-        document.addEventListener('DOMContentLoaded', function () {
-            var ctx = document.getElementById('myChart').getContext('2d');
+    <script src="/static/js/chartjs-plugin-datalabels.js"></script>
+    <script>
+
+        Chart.register(ChartDataLabels);
+        function renderChart(chartId, labels, notas, aderencia) {
+            var ctx = document.getElementById(chartId).getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'bar', // O tipo principal será 'bar'
+                data: {
+                    labels: labels,  // Semanas do ano
+                    datasets: [
+                        {
+                            type: 'line',  // Define a 'nota' como gráfico de linha
+                            label: 'Nota média',
+                            data: notas,  // Notas para cada semana
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y',  // Associado ao primeiro eixo y
+                            fill: false,  // Não preencher a área abaixo da linha
+                            datalabels: {
+                                align: 'top',
+                                anchor: 'end',
+                                color: '#000',  // Cor da label para a nota
+                                formatter: function(value) {
+                                    return value.toFixed(1);  // Exibe o valor com uma casa decimal
+                                }
+                            }
+                        },
+                        {
+                            type: 'bar',  // Define a 'aderência' como gráfico de barras
+                            label: 'Aderência',
+                            data: aderencia,  // Aderência para cada semana
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y1',  // Associado ao segundo eixo y
+                            datalabels: {
+                                align: 'top',
+                                anchor: 'end',
+                                color: '#000',  // Cor da label para a aderência
+                                formatter: function(value) {
+                                    return value.toFixed(1) + '%';  // Exibe o valor com uma casa decimal e o símbolo de porcentagem
+                                }
+                            }
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        datalabels: {
+                            display: true  // Garante que o data label seja exibido
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Semanas do Ano'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 10,  // Define o limite para a nota média
+                            title: {
+                                display: true,
+                                text: 'Nota Média'
+                            }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            max: 100,  // Define o limite para a aderência
+                            position: 'right',  // Exibe o segundo eixo y à direita
+                            grid: {
+                                drawOnChartArea: false  // Remove linhas de grade para evitar confusão visual
+                            },
+                            title: {
+                                display: true,
+                                text: 'Aderência (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    <script>
+        var grafico = {{grafico | tojson}}
+        renderChart('myChart', grafico[0].semanas, grafico[0].notas, grafico[0].aderencia);
+    </script>
+    <script>//Gera modal de detalhes
+        function modalPerguntas(cardId) {
+            fetch(`/dashboard/detalhes-categoria:${cardId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        // Limpa o conteúdo do modal antes de adicionar novos cards
+                        const modalBody = document.getElementById('modal-body');
+                        modalBody.innerHTML = '';
+
+                        // Itera sobre cada pergunta e cria um card para ela
+                        data.forEach(pergunta => {
+                            const chartId = `myChart-${pergunta.id}`; // Usando pergunta.id para um ID único
+                            const card = document.createElement('div');
+                            card.classList.add('card-modal');
+
+                            card.innerHTML = `
+                                <div class="card-header-modal">
+                                    <h4>${pergunta.title}</h4>
+                                </div>
+                                <div class="card-content-modal">
+                                    <div class="card-content-modal-data">
+                                        <div class="progress-bar">
+                                            <div class="progress-bar-container-modal">
+                                                <div class="progress-bar-bg">
+                                                    <div class="progress-fill" style="width: ${pergunta.size}%;"></div>
+                                                </div>
+                                            </div>
+                                            <div class="progress-data">
+                                                <span>${pergunta.value}</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-info-modal">
+                                            <div class="info-item">
+                                                <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
+                                                <p>${pergunta.qtd_respostas} respostas</p>
+                                            </div>
+                                            <div class="info-item">
+                                                <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
+                                                <p>${pergunta.data_min || '-'} e ${pergunta.data_max || '-'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-grafico-modal">
+                                        <div class="chart-container">
+                                            <canvas id="${chartId}"></canvas>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            `;
+                            modalBody.appendChild(card);
+
+                            // Renderiza o gráfico para cada pergunta
+                            renderChartSingleAxis(chartId, pergunta.semanas, pergunta.notas);
+                        });
+
+                        // Exibe o modal
+                        document.getElementById('modalPerguntas').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar os dados do card:', error);
+                    alert('Erro ao buscar os dados do card. Tente novamente.');
+                });
+        }
+
+        function fecharModal() {
+            document.getElementById('modalPerguntas').style.display = 'none';
+        }
+    </script>
+    <script>
+        function renderChartSingleAxis(chartId, labels, notas) {
+            var ctx = document.getElementById(chartId).getContext('2d');
             var myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+                    labels: labels,  // Semanas do ano
                     datasets: [
                         {
                             label: 'Nota média',
-                            data: [7, 8, 6, 9],
+                            data: notas,  // Notas para cada semana
                             backgroundColor: 'rgba(54, 162, 235, 0.5)',
                             borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Aderência',
-                            data: [70, 80, 60, 90],
-                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1
+                            borderWidth: 1,
+                            yAxisID: 'y',  // Apenas o primeiro eixo y
                         }
                     ]
                 },
@@ -266,86 +427,17 @@
                         },
                         y: {
                             beginAtZero: true,
+                            max: 10,  // Define o limite para a nota média
                             title: {
                                 display: true,
-                                text: 'Valor'
+                                text: 'Nota Média'
                             }
                         }
                     }
                 }
             });
-        });
+        }
     </script>
-    <script>
-        function modalPerguntas(cardId) {
-            fetch(`/dashboard/detalhes-categoria:${cardId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                    } else {
-                        // Limpa o conteúdo do modal antes de adicionar novos cards
-                        const modalBody = document.getElementById('modal-body');
-                        modalBody.innerHTML = '';
-    
-                        // Itera sobre cada pergunta e cria um card para ela
-                        data.forEach(pergunta => {
-                            const card = document.createElement('div');
-                            card.classList.add('card-modal');
 
-                            const dataRange = pergunta.data_min && pergunta.data_max
-                            ? `${pergunta.data_min} e ${pergunta.data_max}`
-                            : '-';
-    
-                            card.innerHTML = `
-                                <div class="card-header-modal">
-                                    <h4>${pergunta.title}</h4>
-                                </div>
-                                <div class="card-content-modal">
-                                    <div class="card-content-modal-data">
-                                        <div class="progress-bar-container">
-                                            <div class="progress-bar-bg">
-                                                <div class="progress-fill" style="width: ${pergunta.size}%;"></div>
-                                            </div>
-                                        </div>
-                                        <div class="progress-data">
-                                            <span>${pergunta.value}</span>
-                                        </div>
-                                        <div class="card-info">
-                                            <div class="info-item">
-                                                <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                                <p>${pergunta.qtd_respostas} respostas</p>
-                                            </div>
-                                            <div class="info-item">
-                                                <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
-                                                <p>${dataRange}</p>
-                                                
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-grafico-modal">
-                                        <div class="chart-container">
-                                            <canvas id="myChart"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                            modalBody.appendChild(card);
-                        });
-    
-                        // Exibe o modal
-                        document.getElementById('modalPerguntas').style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao buscar os dados do card:', error);
-                    alert('Erro ao buscar os dados do card. Tente novamente.');
-                });
-        }
-    
-        function fecharModal() {
-            document.getElementById('modalPerguntas').style.display = 'none';
-        }
-    </script>
 </body>
 </html>

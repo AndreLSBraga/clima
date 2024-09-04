@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulsa Supply</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/main_dash_config.css">
+    <link rel="stylesheet" href="/static/css/configuracoes.css">
+    <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img class="logo" src="/static/images/logos/logo_completa.svg">
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view') }}"class="active">Gestor</a></li>
+        </ul>
+    </nav>
+    <nav class="sidebar">
+        <ul class="sidebar-menu">
+            <li ><a href="{{ url_for('dashboard.dashboard_view') }}">
+                <span class="icon"><img src="/static/images/icons/dashboard.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">Dashboard</span>
+            </a></li>
+            <li class="active"><a href="{{ url_for('configuracoes.configuracoes_view') }}">
+                <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
+                <span class="text_sidebar">Configurações</span>
+            </a></li>
+            <li><a href="{{ url_for('gestor.gestor_view') }}">
+                <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
+                <span class="text_sidebar">Sair</span>
+            </a></li>
+        </ul>
+    </nav>
+    
+    <div class="fundo-container">
+        <div class="container">
+            <div class="bar">
+                <div class="bar-options">
+                    <div class="bar-options-voltar">
+                        <a href="{{ url_for('configuracoes.configuracoes_view') }}">
+                            <span class="icon"><img src="/static/images/icons/esquerda.svg" alt="Dashboard Icon"></span>
+                        </a>
+                    </div>
+                    <span><h1>Cadastro/Edição de Gestores</h1></span>
+                    <div class="bar-options-cadastrar">
+                        <button id="cadastrar_usuario" class="cadastrar_usuario" type="button" onclick="abrirModal()">
+                            <img src="/static/images/icons/detalhes.svg" alt="Cadastrar">
+                            Cadastrar Novo Gestor
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabela-container">
+                <div class="tabela">
+                {%if gestores %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="tabela-titulo-imagem">
+                                    Global Id
+                                    <button id="pesquisa_id" class="filtro_tabela">
+                                        <img src="/static/images/icons/pesquisa.svg" alt="Filtro">
+                                    </button>
+                                </th>
+                                <th>Nome</th>
+                                <th>Redefinir Senha</th>
+                                <th>Editar</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for gestor in gestores %}
+                            <tr>
+                                <td>{{gestor.globalId}}</td>
+                                <td>{{gestor.nome}}</td>
+                                <td class="align-center">
+                                    <button id="redefinir senha" class="editar_usuario" type="button" onclick='abrirModal({{ gestor | tojson }})'>
+                                        <img src="/static/images/icons/redefinir_senha.svg" alt="Editar">
+                                    </button>
+                                </td>
+                                <td class="align-center">
+                                    <button id="editar_usuario" class="editar_usuario" type="button" onclick='abrirModal({{ gestor | tojson }})'>
+                                        <img src="/static/images/icons/editar.svg" alt="Editar">
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="pagination-center">
+                        {% if pagina > 10 %}
+                            <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina-10) }}" id="retorno">
+                                <img src="/static/images/icons/retorno.svg" alt="retorno Icon">
+                            </a>
+                        {% endif %}
+                        {% if pagina > 1 %}
+                            <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina-1) }}" id="anterior">
+                                <img src="/static/images/icons/esquerda.svg" alt="Anterior Icon">
+                            </a>
+                        {% endif %}
+                        
+                        <span>Página {{ pagina }} de {{ total_paginas }}</span>
+                        {% if pagina < total_paginas %}
+                            <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina+1) }}" id="proximo">
+                                <img src="/static/images/icons/direita.svg" alt="Próximo Icon">
+                            </a>
+                        {% endif %}
+                        {% if pagina <  (total_paginas-10) %}
+                            <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina+10) }}" id="avanco">
+                                <img src="/static/images/icons/avanco.svg" alt="avanco Icon">
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                {% else %}
+                    <p> Não há usuários cadastrados para a unidade</p>
+                {% endif %}
+                </div>
+            </div>
+            <div id="usuarioModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="fecharModal()">&times;</span>
+                    <h2>Dados do Gestor:</h2>
+                    <div class="modal-body">
+                        <input type="hidden" id="modal-original-globalId">
+                        <div class="form-group">
+                            <label for="modal-globalId">Global ID:</label>
+                            <input type="number" maxlength="8" id="modal-globalId" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-nome">Nome:</label>
+                            <input type="text" id="modal-nome" required> 
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-perfil">Perfil:</label>
+                            <select id="modal-perfil" required> 
+                                {% for perfil in selecao.perfis %}
+                                    <option value="{{ perfil }}">{{ perfil }}</option>
+                                {% endfor %}
+                            </select>                                    
+                        </div>                        
+                    </div>
+                    <div class="buttons">
+                        <button type ="submit" id="modal-save-button">Salvar Alterações</button>
+                    </div>
+                    <div class="alerts">
+                        <!-- As mensagens de alerta aparecerão aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/background.js"></script>
+    <script>    
+        function abrirModal(gestor) {
+            
+            const saveButton = document.getElementById('modal-save-button');
+            
+            let tipo;
+    
+            if (gestor) {
+                
+                saveButton.textContent = 'Salvar Alterações';
+                preencherCamposModal(gestor);
+                tipo = 'edicao';
+                document.getElementById('modal-original-globalId').value = gestor.globalId;
+            } else {
+                saveButton.textContent = 'Criar Usuário';
+                limparCamposModal();
+                tipo = 'criacao';
+                document.getElementById('modal-original-globalId').value = '';
+            }
+    
+            // Exibir o modal
+            document.getElementById('usuarioModal').style.display = 'block';
+    
+            // Atualizar o evento do botão salvar
+            saveButton.removeEventListener('click', salvarAlteracoesHandler);
+            saveButton.addEventListener('click', salvarAlteracoesHandler);
+    
+            function salvarAlteracoesHandler() {
+                salvarAlteracoes(tipo);
+            }
+        }
+    
+        function fecharModal() {
+            document.getElementById('usuarioModal').style.display = 'none';
+            const paginaAtual = {{pagina}} || 1;
+
+            // Limpar os alertas ao fechar o modal
+            const alertsDiv = document.querySelector('.alerts');
+            alertsDiv.innerHTML = '';
+            window.location.href = `/configuracoes_gestor?pagina=${paginaAtual}`
+        }
+    
+        function preencherCamposModal(gestor) {
+            document.getElementById('modal-globalId').value = gestor.globalId;
+            document.getElementById('modal-nome').value = gestor.nome;
+            document.getElementById('modal-perfil').value = gestor.perfil;
+        }
+    
+        function limparCamposModal() {
+            document.getElementById('modal-globalId').value = '';
+            document.getElementById('modal-nome').value = '';
+            document.getElementById('modal-perfil').value = '';
+        }
+    
+        function salvarAlteracoes(tipo) {
+            const globalIdOriginal = document.getElementById('modal-original-globalId').value;
+            const paginaAtual = {{pagina}} || 1;
+            const dados = {
+                tipo,
+                globalIdOriginal,
+                globalId: document.getElementById('modal-globalId').value,
+                nome: document.getElementById('modal-nome').value,
+                perfil: document.getElementById('modal-perfil').value
+            };
+    
+            fetch('/salvar_alteracoes_gestor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dados)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Atualize a div de alertas com a mensagem recebida
+                const alertsDiv = document.querySelector('.alerts');
+                alertsDiv.innerHTML = `<div class="alert alert-${data.status}">${data.message}</div>`;
+
+                if (data.status === 'success') {
+                    // Fechar o modal após exibir a mensagem de sucesso por 1 segundo
+                    setTimeout(() => {
+                        fecharModal();
+                        // Recarregar a página após fechar o modal
+                        window.location.href = `/configuracoes_gestor?pagina=${paginaAtual}`;
+                    }, 1000); // Espera de 1 segundo
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+            });
+        }
+    </script>
+</body>
+</html>
