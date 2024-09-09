@@ -7,17 +7,17 @@ def processa_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_fi
         return None, None, 0, None, None, [], [], []
     
     if fk_pergunta_filtro is not None:
-        respostas_validas = [float(resposta) for _, fk_pergunta, resposta, _ in dados_respostas if fk_pergunta == fk_pergunta_filtro and resposta >= 0]
-        datas_validas = [data_hora.date() for _, fk_pergunta, resposta, data_hora in dados_respostas if fk_pergunta == fk_pergunta_filtro and resposta >= 0]
+        respostas_validas = [float(resposta) for fk_pergunta, _ , resposta, _ in dados_respostas if fk_pergunta == fk_pergunta_filtro and resposta >= 0]
+        datas_validas = [data_hora.date() for fk_pergunta, _ , resposta, data_hora in dados_respostas if fk_pergunta == fk_pergunta_filtro and resposta >= 0]
 
     elif fk_categoria_filtro is not None:
-        respostas_validas = [float(resposta) for fk_categoria, _, resposta, _ in dados_respostas if fk_categoria == fk_categoria_filtro and resposta >= 0]
-        datas_validas = [data_hora.date() for fk_categoria, _, resposta, data_hora in dados_respostas if fk_categoria == fk_categoria_filtro and resposta >= 0]
-
+        respostas_validas = [float(resposta) for _, fk_categoria, resposta, _ in dados_respostas if fk_categoria == fk_categoria_filtro and resposta >= 0]
+        datas_validas = [data_hora.date() for _, fk_categoria, resposta, data_hora in dados_respostas if fk_categoria == fk_categoria_filtro and resposta >= 0]
     else:
         respostas_validas = [float(resposta) for _, _, resposta, _ in dados_respostas if resposta >= 0]
         datas_validas = [data_hora.date() for _, _, _, data_hora in dados_respostas]
 
+    
     semanas_mes = [(date.isocalendar()[1], date.month) for date in datas_validas]
     semanas_mes_tratada = list(set(semanas_mes))
     semanas_mes_tratada.sort()
@@ -44,13 +44,16 @@ def processa_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_fi
     if fk_gestor is not None:
         # Obter IDs de usuários a partir de fk_gestor
         globalId_time = consulta_time_por_fk_gestor(fk_gestor)
+        if len(globalId_time) < 3:
+            return None, None, 0, None, None, [], [], []
         globalId_time = {id_tuple[0] for id_tuple in globalId_time}
         dados_usuarios_responderam = consulta_usuario_respondeu()
         if not dados_usuarios_responderam:
             return None, None, 0, None, None, [], [], []
-        # usuarios_responderam = [user_id for user_id, _ in dados_usuarios_responderam]
-        # datas_respostas = [data_resposta for _, data_resposta in dados_usuarios_responderam]
-
+        
+        usuarios_responderam = [user_id for user_id, _ in dados_usuarios_responderam]
+        datas_respostas = [data_resposta for _, data_resposta in dados_usuarios_responderam]
+        
         # Contar respostas dos usuários por semana
         for user_id, data_resposta in dados_usuarios_responderam:
             semana = data_resposta.isocalendar()[1]
@@ -62,6 +65,7 @@ def processa_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_fi
                     usuarios_por_semana[chave].add(user_id)
 
         # Calculando média por semana, aderência e formatando semanas_mes_grafico
+    
     media_por_semana = {}
     for semana in semanas_mes_tratada:
         num_semana, mes = semana
@@ -110,7 +114,6 @@ def gera_cards(dados_respostas):
         # Processa as respostas para a categoria atual
         media_respostas, size, quantidade_respostas, data_min, data_max, semanas_mes_grafico, media_por_semana, aderencia_semanal = processa_respostas(dados_respostas, categoria)
         descricao_categoria = consulta_desc_categoria_pelo_fk_categoria(categoria)
-
         # Se as respostas forem válidas, cria um card
         card = {
             'id': categoria,
@@ -122,7 +125,6 @@ def gera_cards(dados_respostas):
             'data_max': data_max if data_max else None
         }
         cards.append(card)
-
     return cards
 
 def gera_cards_detalhe(dados_respostas, fk_categoria_detalhe):

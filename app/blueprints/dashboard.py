@@ -16,7 +16,8 @@ def dashboard_view():
     nome_completo_gestor = consulta_dados_gestor(id_gestor)[2].split(" ")
     ultimo_nome_completo = len(nome_completo_gestor)-1
     nome_dashboard = nome_completo_gestor[0] + ' ' + nome_completo_gestor[ultimo_nome_completo]
-    
+    tamanho_time = len(consulta_time_por_fk_gestor(fk_gestor))
+
     respostas = consulta_dados_respostas(fk_gestor)
     nota_geral = processa_respostas(respostas, None, None, fk_gestor)
     nota_nps = processa_respostas(respostas, None, 53) #fk_pergunta
