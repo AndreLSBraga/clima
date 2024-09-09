@@ -4,7 +4,8 @@ from app.blueprints.pagina_inicial import pagina_inicial
 from app.blueprints.pagina_final import pagina_final
 from app.blueprints.sugestao import sugestao
 from app.blueprints.gestor import gestor, configura_senha
-from app.blueprints.configuracoes import  configuracoes, configuracoes_usuario, configuracoes_gestor, configuracoes_salvar_alteracoes
+from app.blueprints.configuracoes import  configuracoes, configuracoes_usuario, configuracoes_gestor, configuracoes_salvar_alteracoes, configuracoes_reset_senha
+from app.blueprints.configuracoes import configuracoes_pesquisa_gestor
 from app.blueprints.dashboard import dashboard, dashboard_categoria
 from app.blueprints.responder import responder
 from app.utils.db import close_db
@@ -29,6 +30,8 @@ def create_app():
     app.register_blueprint(configuracoes_gestor)
     app.register_blueprint(configuracoes_salvar_alteracoes)
     app.register_blueprint(configura_senha)
+    app.register_blueprint(configuracoes_reset_senha)
+    app.register_blueprint(configuracoes_pesquisa_gestor)
     # Finaliza a conexão com o banco de dados
     app.teardown_appcontext(close_db)
     

@@ -46,9 +46,10 @@ def processa_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_fi
         globalId_time = consulta_time_por_fk_gestor(fk_gestor)
         globalId_time = {id_tuple[0] for id_tuple in globalId_time}
         dados_usuarios_responderam = consulta_usuario_respondeu()
-    
-        usuarios_responderam = [user_id for user_id, _ in dados_usuarios_responderam]
-        datas_respostas = [data_resposta for _, data_resposta in dados_usuarios_responderam]
+        if not dados_usuarios_responderam:
+            return None, None, 0, None, None, [], [], []
+        # usuarios_responderam = [user_id for user_id, _ in dados_usuarios_responderam]
+        # datas_respostas = [data_resposta for _, data_resposta in dados_usuarios_responderam]
 
         # Contar respostas dos usuários por semana
         for user_id, data_resposta in dados_usuarios_responderam:
@@ -140,7 +141,7 @@ def gera_cards_detalhe(dados_respostas, fk_categoria_detalhe):
         card = {
             'id': pergunta,
             'title': descricao_pergunta,  # O título da categoria
-            'value': media_respostas if media_respostas is not None else 0,  # Defina o valor como 0 se não houver média
+            'value': media_respostas if media_respostas is not None else None,  # Defina o valor como 0 se não houver média
             'size': size if media_respostas is not None else None,  # Defina o tamanho como 0 se não houver média
             'qtd_respostas': quantidade_respostas,
             'data_min': data_min if data_min else None,

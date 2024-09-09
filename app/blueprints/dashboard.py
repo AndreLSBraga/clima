@@ -58,7 +58,6 @@ def detalhes_categoria_view(card_id):
     fk_gestor = session['fk_gestor']
     respostas = consulta_dados_respostas(fk_gestor)
     cards_perguntas = gera_cards_detalhe(respostas, card_id)
-    app.logger.debug(respostas)
     if cards_perguntas:
         return jsonify(cards_perguntas)
     else:

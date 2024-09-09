@@ -54,10 +54,8 @@
                     </div>
                 </div>
             </div>
-
             <div class="tabela-container">
-                <div class="tabela">
-                {%if gestores %}
+                <div class="tabela" id="tabela">
                     <table>
                         <thead>
                             <tr>
@@ -66,19 +64,36 @@
                                     <button id="pesquisa_id" class="filtro_tabela">
                                         <img src="/static/images/icons/pesquisa.svg" alt="Filtro">
                                     </button>
+                                    <!-- Modal de Filtro -->
+                                    <div id="modal_pesquisa" class="modal-tabela" style="display: none;">
+                                        <div class="modal_pesquisa_head">
+                                            Global Id:
+                                            <span class="close" onclick="fecharModal()">&times;</span>
+                                        </div>
+                                        <div class="modal_pesquisa_input">
+                                            <input type="number" id="id_input" placeholder="Digite o ID" required>
+                                        </div>
+                                        <div class="botao_pesquisa">
+                                            <button id="limpar_pesquisa"><a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view') }}">Limpar</a></button>
+                                            <button id="pesquisar_btn">Pesquisar</button>
+                                        </div>
+                                        
+                                        
+                                    </div>
                                 </th>
                                 <th>Nome</th>
                                 <th>Redefinir Senha</th>
                                 <th>Editar</th> 
                             </tr>
                         </thead>
+                {%if gestores %}
                         <tbody>
                             {% for gestor in gestores %}
                             <tr>
                                 <td>{{gestor.globalId}}</td>
                                 <td>{{gestor.nome}}</td>
                                 <td class="align-center">
-                                    <button id="redefinir senha" class="editar_usuario" type="button" onclick='abrirModal({{ gestor | tojson }})'>
+                                    <button id="redefinir senha" class="editar_usuario" type="button" onclick='resetSenha({{gestor.globalId}})'>
                                         <img src="/static/images/icons/redefinir_senha.svg" alt="Editar">
                                     </button>
                                 </td>
@@ -91,31 +106,49 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    <div class="pagination-center">
+                    <div class="pagination-center" id="pagination">
                         {% if pagina > 10 %}
-                            <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina-10) }}" id="retorno">
+                            {% if modo == 'pesquisa' %}
+                                <a href="{{ url_for('configuracoes_gestor.pesquisar_gestor', pagina=pagina-10, globalId=request.args.get('globalId')) }}" id="retorno">
+                            {% else %}
+                                <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina-10) }}" id="retorno">
+                            {% endif %}
                                 <img src="/static/images/icons/retorno.svg" alt="retorno Icon">
                             </a>
                         {% endif %}
+                        
                         {% if pagina > 1 %}
-                            <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina-1) }}" id="anterior">
+                            {% if modo == 'pesquisa' %}
+                                <a href="{{ url_for('configuracoes_gestor.pesquisar_gestor', pagina=pagina-1, globalId=request.args.get('globalId')) }}" id="anterior">
+                            {% else %}
+                                <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina-1) }}" id="anterior">
+                            {% endif %}
                                 <img src="/static/images/icons/esquerda.svg" alt="Anterior Icon">
                             </a>
                         {% endif %}
                         
                         <span>Página {{ pagina }} de {{ total_paginas }}</span>
+                        
                         {% if pagina < total_paginas %}
-                            <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina+1) }}" id="proximo">
+                            {% if modo == 'pesquisa' %}
+                                <a href="{{ url_for('configuracoes_gestor.pesquisar_gestor', pagina=pagina+1, globalId=request.args.get('globalId')) }}" id="proximo">
+                            {% else %}
+                                <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina+1) }}" id="proximo">
+                            {% endif %}
                                 <img src="/static/images/icons/direita.svg" alt="Próximo Icon">
                             </a>
                         {% endif %}
-                        {% if pagina <  (total_paginas-10) %}
-                            <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina+10) }}" id="avanco">
+                        
+                        {% if pagina < (total_paginas - 10) %}
+                            {% if modo == 'pesquisa' %}
+                                <a href="{{ url_for('configuracoes_gestor.pesquisar_gestor', pagina=pagina+10, globalId=request.args.get('globalId')) }}" id="avanco">
+                            {% else %}
+                                <a href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', pagina=pagina+10) }}" id="avanco">
+                            {% endif %}
                                 <img src="/static/images/icons/avanco.svg" alt="avanco Icon">
                             </a>
                         {% endif %}
-                    </div>
-                    
+                    </div>             
                 {% else %}
                     <p> Não há usuários cadastrados para a unidade</p>
                 {% endif %}
@@ -142,7 +175,7 @@
                                     <option value="{{ perfil }}">{{ perfil }}</option>
                                 {% endfor %}
                             </select>                                    
-                        </div>                        
+                        </div>
                     </div>
                     <div class="buttons">
                         <button type ="submit" id="modal-save-button">Salvar Alterações</button>
@@ -152,10 +185,24 @@
                     </div>
                 </div>
             </div>
+            <div id="modalRedefinir" class="modal">
+                <div class="modal-content">
+                    <h2>Redinifir senha</h2>
+                    <p>A senha do gestor será resetada para a senha padrão. Você tem certeza?</p>
+                    <div class="buttons-modal">
+                        <button type="button" name="cancela" onclick="fecharReset()">Cancelar</button>
+                        <button type="submit" class="confirma" onclick="confirmaReset()">Confirmar</button>
+                    </div>
+                    <div class="alerts-redefinir">
+                        <!-- As mensagens de alerta aparecerão aqui -->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <script src="/static/js/background.js"></script>
-    <script>    
+    <script src="/static/js/modal_pesquisa_gestor.js"></script>
+    <script> //Modal de edição do gestor
         function abrirModal(gestor) {
             
             const saveButton = document.getElementById('modal-save-button');
@@ -192,7 +239,7 @@
             const paginaAtual = {{pagina}} || 1;
 
             // Limpar os alertas ao fechar o modal
-            const alertsDiv = document.querySelector('.alerts');
+            var alertsDiv = document.querySelector('.alerts');
             alertsDiv.innerHTML = '';
             window.location.href = `/configuracoes_gestor?pagina=${paginaAtual}`
         }
@@ -230,7 +277,7 @@
             .then(response => response.json())
             .then(data => {
                 // Atualize a div de alertas com a mensagem recebida
-                const alertsDiv = document.querySelector('.alerts');
+                var alertsDiv = document.querySelector('.alerts');
                 alertsDiv.innerHTML = `<div class="alert alert-${data.status}">${data.message}</div>`;
 
                 if (data.status === 'success') {
@@ -246,6 +293,64 @@
                 console.error('Erro:', error);
             });
         }
+    </script>
+    <script> //Modal reset senha
+    let currentGlobalId = null;
+
+    function resetSenha(globalId) {
+        currentGlobalId = globalId;  // Armazena o globalId em uma variável global
+        var modal = document.getElementById('modalRedefinir');
+        if (modal) {
+            modal.style.display = 'block';
+        }
+    }
+
+    function fecharReset() {
+            document.getElementById('modalRedefinir').style.display = 'none';
+            const paginaAtual = {{pagina}} || 1;
+
+            // Limpar os alertas ao fechar o modal
+            const alertsDivRedefinir = document.querySelector('.alerts-redefinir');
+            alertsDivRedefinir.innerHTML = '';
+            window.location.href = `/configuracoes_gestor?pagina=${paginaAtual}`
+        }
+
+    function confirmaReset() {
+        const paginaAtual = {{pagina}} || 1;
+        if (!currentGlobalId) {
+            console.error('GlobalId não definido!');
+            return;
+        }
+
+        fetch('/reset_senha_gestor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ globalId: currentGlobalId })  // Use o globalId armazenado
+        })
+        .then(response => response.json())
+        .then(data => {
+            const alertsDivRedefinir = document.querySelector('.alerts-redefinir');
+        
+            if (alertsDivRedefinir) {
+                alertsDivRedefinir.innerHTML = `<div class="alert alert-${data.status}">${data.message}</div>`;
+            } else {
+                console.error('Div de alertas não encontrada!');
+            }
+
+            if (data.status === 'success') {
+                setTimeout(() => {
+                    fecharReset();
+                    window.location.href = `/configuracoes_gestor?pagina=${paginaAtual}`;
+                }, 1000);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
+    }
+
     </script>
 </body>
 </html>

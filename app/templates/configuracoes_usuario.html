@@ -56,8 +56,7 @@
             </div>
 
             <div class="tabela-container">
-                <div class="tabela">
-                {%if usuarios %}
+                <div class="tabela">                
                     <table>
                         <thead>
                             <tr>
@@ -66,6 +65,21 @@
                                     <button id="pesquisa_id" class="filtro_tabela">
                                         <img src="/static/images/icons/pesquisa.svg" alt="Filtro">
                                     </button>
+                                    <!-- Modal de Filtro -->
+                                    <div id="modal_pesquisa" class="modal-tabela" style="display: none;">
+                                        <div class="modal_pesquisa_head">
+                                            Global Id:
+                                            <span class="close" onclick="fecharModal()">&times;</span>
+                                        </div>
+                                        <div class="modal_pesquisa_input">
+                                            <input type="number" id="id_input" placeholder="Digite o ID" required>
+                                        </div>
+                                        <div class="botao_pesquisa">
+                                            <button id="limpar_pesquisa"><a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view') }}">Limpar</a></button>
+                                            <button id="pesquisar_btn">Pesquisar</button>
+                                        </div>
+                                        
+                                    </div>
                                 </th>
                                 <th>Email</th>
                                 <th>Nome</th>
@@ -74,6 +88,7 @@
                                 <th>Editar</th> 
                             </tr>
                         </thead>
+                {%if usuarios %}
                         <tbody>
                             {% for usuario in usuarios %}
                             <tr>
@@ -91,26 +106,45 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    <div class="pagination-center">
+                    <div class="pagination-center" id="pagination">
                         {% if pagina > 10 %}
-                            <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina-10) }}" id="retorno">
+                            {% if modo == 'pesquisa' %}
+                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', pagina=pagina-10, globalId=request.args.get('globalId')) }}" id="retorno">
+                            {% else %}
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina-10) }}" id="retorno">
+                            {% endif %}
                                 <img src="/static/images/icons/retorno.svg" alt="retorno Icon">
                             </a>
                         {% endif %}
+                        
                         {% if pagina > 1 %}
-                            <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina-1) }}" id="anterior">
+                            {% if modo == 'pesquisa' %}
+                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', pagina=pagina-1, globalId=request.args.get('globalId')) }}" id="anterior">
+                            {% else %}
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina-1) }}" id="anterior">
+                            {% endif %}
                                 <img src="/static/images/icons/esquerda.svg" alt="Anterior Icon">
                             </a>
                         {% endif %}
                         
                         <span>Página {{ pagina }} de {{ total_paginas }}</span>
+                        
                         {% if pagina < total_paginas %}
-                            <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina+1) }}" id="proximo">
+                            {% if modo == 'pesquisa' %}
+                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', pagina=pagina+1, globalId=request.args.get('globalId')) }}" id="proximo">
+                            {% else %}
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina+1) }}" id="proximo">
+                            {% endif %}
                                 <img src="/static/images/icons/direita.svg" alt="Próximo Icon">
                             </a>
                         {% endif %}
-                        {% if pagina < (total_paginas-10) %}
-                            <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina+10) }}" id="avanco">
+                        
+                        {% if pagina < (total_paginas - 10) %}
+                            {% if modo == 'pesquisa' %}
+                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', pagina=pagina+10, globalId=request.args.get('globalId')) }}" id="avanco">
+                            {% else %}
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina+10) }}" id="avanco">
+                            {% endif %}
                                 <img src="/static/images/icons/avanco.svg" alt="avanco Icon">
                             </a>
                         {% endif %}
@@ -234,6 +268,7 @@
         </div>
     </div>
     <script src="/static/js/background.js"></script>
+    <script src="/static/js/modal_pesquisa_usuario.js"></script>
     <script>
         function formatarData(data) {
             const dataObj = new Date(data);

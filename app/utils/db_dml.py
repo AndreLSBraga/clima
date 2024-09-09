@@ -2,6 +2,7 @@ from app.utils.db import get_db  # Importando a função get_db
 from flask import current_app as app, jsonify
 from datetime import datetime
 import uuid
+from config import SENHA_PRIMEIRO_ACESSO
 
 def insert_resposta(dados_usuario, resposta, tipo):
     #Informações do usuário
@@ -125,6 +126,13 @@ def update_senha_gestor(senha, fk_gestor):
     cursor = db.cursor()
     #Atualiza senha nova no banco
     cursor.execute('UPDATE gestores SET senha = %s, primeiro_acesso = 1 WHERE fk_gestor = %s',(senha, fk_gestor))
+    db.commit()
+    cursor.close()
+
+def reset_senha_gestor(globalId):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('UPDATE gestores set senha =%s, primeiro_acesso = %s WHERE globalId = %s',(SENHA_PRIMEIRO_ACESSO, None, globalId))
     db.commit()
     cursor.close()
 

@@ -1,15 +1,17 @@
 from flask import Blueprint, render_template, session, request, flash, redirect, url_for, current_app as app, jsonify
-from config import SENHA_PRIMEIRO_ACESSO
 from datetime import datetime
-from app.utils.auth import valida_id, usuario_is_gestor, verifica_senha, codifica_senha, valida_id_novo, valida_email_novo
+from app.utils.auth import valida_id, valida_id_novo, valida_email_novo
 from app.utils.db_consultas import consulta_dados_gestor, consulta_usuario_id, consulta_usuarios_por_unidade, consulta_fk_dimensao, consulta_todos_gestores
-from app.utils.db_dml import update_senha_gestor,processar_diferencas, criar_usuario, processar_diferencas_gestor, criar_gestor
+from app.utils.db_consultas import consulta_pesquisa_gestor, consulta_pesquisa_usuario
+from app.utils.db_dml import processar_diferencas, criar_usuario, processar_diferencas_gestor, criar_gestor, reset_senha_gestor
 from app.utils.configuracoes import gera_tabela, gera_dados_modal_selecao, verificar_alteracao, gera_tabela_gestores
 
 configuracoes = Blueprint('configuracoes', __name__)
 configuracoes_usuario = Blueprint('configuracoes_usuario', __name__)
 configuracoes_gestor = Blueprint('configuracoes_gestor', __name__)
 configuracoes_salvar_alteracoes = Blueprint('configuracoes_salvar_alteracoes', __name__)
+configuracoes_reset_senha = Blueprint('configuracoes_reset_senha', __name__)
+configuracoes_pesquisa_gestor = Blueprint('configuracoes_pesquisa_gestor', __name__)
 
 @configuracoes.route('/configuracoes', methods = ['GET', 'POST'])
 def configuracoes_view():
@@ -45,16 +47,43 @@ def configuracoes_usuario_view():
     dados_modal = gera_dados_modal_selecao()
     return render_template('configuracoes_usuario.html', usuarios = dados_usuarios, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal)
 
+@configuracoes_usuario.route('/pesquisar_usuario', methods=['GET'])
+def pesquisar_usuario():
+    global_id_pesquisa = request.args.get('globalId')
+    globalId_gestor = session['id_gestor']
+    dados_gestor= consulta_usuario_id(globalId_gestor)
+    fk_unidade = dados_gestor[10]
+    dados_modal = gera_dados_modal_selecao()
+
+    usuarios = consulta_pesquisa_usuario(global_id_pesquisa, fk_unidade)
+    if not usuarios:
+        return render_template('configuracoes_usuario.html', usuarios = None, pagina = 1, total_paginas = 1, selecao = dados_modal)
+    
+    # Paginando os resultados
+    pagina = request.args.get('pagina', 1, type=int)
+    por_pagina = 10
+    inicio = (pagina - 1) * por_pagina
+    final = inicio + por_pagina
+    usuarios_paginados = usuarios[inicio:final]
+    dados_usuarios = gera_tabela(usuarios_paginados)
+    total_usuarios = len(usuarios)
+    total_paginas = (total_usuarios + por_pagina - 1) // por_pagina
+    
+    
+
+    # Retorna apenas o HTML da tabela
+    return render_template('configuracoes_usuario.html', usuarios = dados_usuarios, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal, modo = 'pesquisa')
+
 @configuracoes_gestor.route('/configuracoes_gestor', methods = ['GET', 'POST'])
 def configuracoes_gestor_view():
     if 'logged_in' not in session:
         flash("É necessário fazer login primeiro.", "error")
         return redirect(url_for('gestor.gestor_view'))
     
+    gestores = consulta_todos_gestores()
     # Página atual e número de itens por página
     pagina = request.args.get('pagina', 1, type=int)
     por_pagina = 10
-    gestores = consulta_todos_gestores()
     # Paginando os resultados
     inicio = (pagina - 1) * por_pagina
     final = inicio + por_pagina
@@ -63,12 +92,11 @@ def configuracoes_gestor_view():
     dados_gestores = gera_tabela_gestores(gestores_paginados)
     total_gestores = len(gestores)
     total_paginas = (total_gestores + por_pagina - 1) // por_pagina
-    
     dados_modal = {
         'perfis':['gestor', 'administrador']
     }
-    app.logger.debug(dados_gestores)
-    return render_template('configuracoes_gestor.html', gestores = dados_gestores, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal)
+
+    return render_template('configuracoes_gestor.html', gestores = dados_gestores, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal, modo='visualizacao')
 
 @configuracoes_salvar_alteracoes.route('/salvar_alteracoes', methods=['POST'])
 def salvar_alteracoes():  
@@ -138,8 +166,19 @@ def salvar_alteracoes():
     if tipo == 'criacao':
         dicionario_dados_criacao = dict(zip(chaves, dados))
         resultado_criar = criar_usuario(dicionario_dados_criacao)
-        app.logger.debug(resultado_criar)
         return resultado_criar
+    
+@configuracoes_reset_senha.route('/reset_senha_gestor', methods=['POST'])
+def reset_senha():
+    dados_reset = request.json  # Recebe os dados JSON do front-end
+    globalId = dados_reset.get('globalId')  # Obtém o 'globalId' do JSON
+    
+    if not globalId:
+        return jsonify({"message": "globalId não fornecido", "status": "error"})
+    reset_senha_gestor(globalId)  # A função para resetar a senha do gestor
+    
+    # Retorna uma resposta JSON com status de sucesso
+    return jsonify({"message": "A senha do gestor foi alterada", "status": "success"})
     
 @configuracoes_salvar_alteracoes.route('/salvar_alteracoes_gestor', methods=['POST'])
 def salvar_alteracoes_gestor():  
@@ -182,7 +221,6 @@ def salvar_alteracoes_gestor():
             return jsonify({"message": "Não houve alteração nos dados do usuário", "status": "warning"})
         else:
             alteracoes = verificar_alteracao(dicionario_dados_gestor, dicionario_dados_alteracao)
-            app.logger.debug(alteracoes)
             resultado_diferencas = processar_diferencas_gestor(alteracoes, globalId_original)
         return resultado_diferencas
     
@@ -191,3 +229,29 @@ def salvar_alteracoes_gestor():
         dicionario_dados_criacao = dict(zip(chaves, dados))
         resultado_criar = criar_gestor(dicionario_dados_criacao)
         return resultado_criar
+    
+@configuracoes_gestor.route('/pesquisar_gestor', methods=['GET'])
+def pesquisar_gestor():
+    global_id_pesquisa = request.args.get('globalId')
+    pagina = request.args.get('pagina', 1, type=int)
+    por_pagina = 10
+
+    gestores = consulta_pesquisa_gestor(global_id_pesquisa)
+    if not gestores:
+        return render_template('configuracoes_gestor.html', gestores = None, pagina = 1,total_paginas = 1, selecao = None,  modo='pesquisa')
+    # Paginando os resultados
+    inicio = (pagina - 1) * por_pagina
+    final = inicio + por_pagina
+    gestores_paginados = gestores[inicio:final]
+
+    # Gera a tabela HTML
+    dados_gestores = gera_tabela_gestores(gestores_paginados)
+    total_gestores = len(gestores)
+    total_paginas = (total_gestores + por_pagina - 1) // por_pagina
+    dados_modal = {
+        'perfis':['gestor', 'administrador']
+    }
+
+    # Retorna apenas o HTML da tabela
+    return render_template('configuracoes_gestor.html', gestores = dados_gestores, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal, modo='pesquisa')
+

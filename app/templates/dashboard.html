@@ -57,7 +57,7 @@
                             <div class="card-content">
                                 <div class="progress-bar-container">
                                     <div class="progress-bar-bg">
-                                        <div class="progress-fill" style="width: {{ dados[0].size_bar }}%;"></div>
+                                        <div class="progress-fill" data-nota="{{ dados[0].nota_media }}" data-size="{{ dados[0].size_bar }}"></div>
                                     </div>
                                 </div>
                                 <div class="progress-data">
@@ -88,7 +88,7 @@
                             <div class="card-content">
                                 <div class="progress-bar-container">
                                     <div class="progress-bar-bg">
-                                        <div class="progress-fill" style="width: {{ dados[0].size_bar_nps }}%;"></div>
+                                        <div class="progress-fill" data-nota="{{ dados[0].nota_media_nps }}" data-size="{{ dados[0].size_bar_nps }}"></div>
                                     </div>
                                 </div>
                                 <div class="progress-data">
@@ -119,7 +119,7 @@
                             <div class="card-content">
                                 <div class="progress-bar-container">
                                     <div class="progress-bar-bg">
-                                        <div class="progress-fill" style="width: {{ dados[0].size_bar_eficacia }}%;"></div>
+                                        <div class="progress-fill" data-nota="{{ dados[0].nota_media_eficacia }}" data-size="{{ dados[0].size_bar_eficacia }}"></div>
                                     </div>
                                 </div>
                                 <div class="progress-data">
@@ -182,7 +182,7 @@
                             <div class="card-content-detalhe">
                                 <div class="progress-bar-container-detalhe">
                                     <div class="progress-bar-bg-detalhe">
-                                        <div class="progress-fill" style="width: {{ card.size }}%;"></div>
+                                        <div class="progress-fill" data-nota="{{ card.value }}" data-size="{{ card.size }}"></div>
                                     </div>
                                 </div>
                                 <div class="progress-data-detalhe">
@@ -227,13 +227,64 @@
                 </div>
             </div>
         </div>
+        
     </div>
     <script src="/static/js/background.js"></script>
     <script src="/static/js/chart.umd.js"></script>
     <script src="/static/js/chartjs-plugin-datalabels.js"></script>
-    <script>
+    <script>//Carrega barras
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Seleciona tanto .progress-fill quanto .progress-fill-modal
+            const progressBars = document.querySelectorAll('.progress-fill, .progress-fill-modal');
+            console.log(progressBars)
+            progressBars.forEach(function(bar) {
 
+                const nota = parseFloat(bar.getAttribute('data-nota'));
+                const tamanho = bar.getAttribute('data-size'); // Valor do tamanho da barra
+
+                // Aplica a cor baseada na nota
+                bar.style.backgroundColor = calcularCorNota(nota);
+
+                // Adiciona um pequeno atraso para garantir que a animação comece corretamente
+                setTimeout(function() {
+                    bar.style.width = tamanho + '%'; // Atribui a largura final para "encher" a barra
+                }, 10); // Atraso mínimo para permitir que o navegador processe a transição
+            });
+        });
+
+        function calcularCorNota(nota) {
+            if (nota < 4) {
+                return '#FE4A49';  // Vermelho para notas menores que 4
+            } else if (nota < 9) {
+                return '#F7B801';  // Amarelo para notas entre 4 e 8.9
+            } else {
+                return '#2AC96A';  // Verde para notas maiores ou iguais a 9
+            }
+        }
+
+    </script>
+    <script>//Gera gráfico geral
         Chart.register(ChartDataLabels);
+        function calcularCorNota(nota) {
+                if (nota < 4) {
+                    return '#FE4A49';  // Vermelho para notas menores que 4
+                } else if (nota < 9) {
+                    return '#FEC10B';  // Amarelo para notas entre 4 e 7.9
+                } else {
+                    return '#2AC96A';  // Verde para notas maiores ou iguais a 8
+                }
+            }
+
+        function calcularCorAderencia(aderencia) {
+                if (aderencia < 40) {
+                    return '#FE4A49';  // Vermelho para notas menores que 4
+                } else if (aderencia < 90) {
+                    return '#FEC10B';  // Amarelo para notas entre 4 e 7.9
+                } else {
+                    return '#2AC96A';  // Verde para notas maiores ou iguais a 8
+                }
+            }
         function renderChart(chartId, labels, notas, aderencia) {
             var ctx = document.getElementById(chartId).getContext('2d');
             var myChart = new Chart(ctx, {
@@ -245,8 +296,8 @@
                             type: 'line',  // Define a 'nota' como gráfico de linha
                             label: 'Nota média',
                             data: notas,  // Notas para cada semana
-                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: notas.map(nota => calcularCorNota(nota)),
+                            borderColor: notas.map(nota => calcularCorNota(nota)),
                             borderWidth: 2,
                             yAxisID: 'y',  // Associado ao primeiro eixo y
                             fill: false,  // Não preencher a área abaixo da linha
@@ -263,8 +314,8 @@
                             type: 'bar',  // Define a 'aderência' como gráfico de barras
                             label: 'Aderência',
                             data: aderencia,  // Aderência para cada semana
-                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: aderencia.map(ad => calcularCorAderencia(ad)),
+                            borderColor: aderencia.map(ad => calcularCorAderencia(ad)),
                             borderWidth: 1,
                             yAxisID: 'y1',  // Associado ao segundo eixo y
                             datalabels: {
@@ -319,8 +370,8 @@
             });
         }
     </script>
-    <script>
-        var grafico = {{grafico | tojson}}
+    <script> //Gera gráfico de detalhes
+        var grafico = {{ grafico | tojson }}
         renderChart('myChart', grafico[0].semanas, grafico[0].notas, grafico[0].aderencia);
     </script>
     <script>//Gera modal de detalhes
@@ -342,21 +393,27 @@
                             card.classList.add('card-modal');
 
                             card.innerHTML = `
-                                <div class="card-header-modal">
-                                    <h4>${pergunta.title}</h4>
-                                </div>
                                 <div class="card-content-modal">
-                                    <div class="card-content-modal-data">
-                                        <div class="progress-bar">
+                                    <!-- Lado esquerdo (dados) -->
+                                    <div class="card-left-modal">
+                                        <!-- Título -->
+                                        <div class="card-header-modal">
+                                            <h4>${pergunta.title}</h4>
+                                        </div>
+
+                                        <!-- Barra de progresso -->
+                                        <div class="progress-bar-modal">
                                             <div class="progress-bar-container-modal">
-                                                <div class="progress-bar-bg">
-                                                    <div class="progress-fill" style="width: ${pergunta.size}%;"></div>
+                                                <div class="progress-bar-bg-modal">
+                                                    <div class="progress-fill-modal" data-nota=${pergunta.value} data-size=${pergunta.size}></div>
                                                 </div>
                                             </div>
-                                            <div class="progress-data">
-                                                <span>${pergunta.value}</span>
+                                            <div class="progress-data-modal">
+                                                <span>${pergunta.value || '-'}</span>
                                             </div>
                                         </div>
+
+                                        <!-- Informações adicionais -->
                                         <div class="card-info-modal">
                                             <div class="info-item">
                                                 <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
@@ -368,13 +425,15 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card-grafico-modal">
-                                        <div class="chart-container">
+
+                                    <!-- Lado direito (gráfico) -->
+                                    <div class="card-right-modal">
+                                        <div class="chart-container-modal">
                                             <canvas id="${chartId}"></canvas>
                                         </div>
                                     </div>
-                                    
                                 </div>
+
                             `;
                             modalBody.appendChild(card);
 
@@ -384,6 +443,8 @@
 
                         // Exibe o modal
                         document.getElementById('modalPerguntas').style.display = 'block';
+                        setTimeout(animateProgressBars, 100);
+
                     }
                 })
                 .catch(error => {
@@ -392,11 +453,27 @@
                 });
         }
 
+        function animateProgressBars() {
+            // Seleciona todas as barras de progresso no modal
+            const progressBarsModal = document.querySelectorAll('.progress-fill-modal');
+
+            progressBarsModal.forEach(function(bar) {
+                const nota = parseFloat(bar.getAttribute('data-nota'));
+                const tamanho = bar.getAttribute('data-size');
+
+                // Aplica a cor baseada na nota
+                bar.style.backgroundColor = calcularCorNota(nota);
+
+                // Inicia a animação
+                bar.style.width = tamanho + '%'; // Define a largura final
+            });
+}
+
         function fecharModal() {
             document.getElementById('modalPerguntas').style.display = 'none';
         }
     </script>
-    <script>
+    <script> //Função que gera o gráfico de detalhes
         function renderChartSingleAxis(chartId, labels, notas) {
             var ctx = document.getElementById(chartId).getContext('2d');
             var myChart = new Chart(ctx, {
@@ -407,8 +484,8 @@
                         {
                             label: 'Nota média',
                             data: notas,  // Notas para cada semana
-                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: notas.map(nota => calcularCorNota(nota)),
+                            borderColor: notas.map(nota => calcularCorNota(nota)),
                             borderWidth: 1,
                             yAxisID: 'y',  // Apenas o primeiro eixo y
                         }
@@ -427,6 +504,7 @@
                         },
                         y: {
                             beginAtZero: true,
+                            min: 0,
                             max: 10,  // Define o limite para a nota média
                             title: {
                                 display: true,

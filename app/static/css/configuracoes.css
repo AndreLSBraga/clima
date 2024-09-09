@@ -307,3 +307,143 @@ pagination a:hover img{
     transform: scale(0.95);
     transition: transform 0.1s;
 }
+
+.buttons-modal {
+    text-align: right;
+}
+
+.buttons-modal button.confirma {
+    background-color: #45a049; /* Cor do botão */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.buttons-modal button.confirma:hover {
+    background-color: #4CAF50; /* Cor do botão ao passar o mouse */
+}
+
+.buttons-modal button {
+    background-color: #666; /* Cor do botão */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.buttons-modal button:hover {
+    background-color: #2AB7CA; /* Cor do botão ao passar o mouse */
+}
+
+.modal-tabela {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    z-index: 100;
+}
+
+.modal_pesquisa_head{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal_pesquisa_input input{
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #888;
+}
+
+.botao_pesquisa{
+    display: flex;
+    justify-content: space-between;
+}
+
+.botao_pesquisa button{
+    background-color: #666; /* Cor do botão */
+    color: white;
+    border: none;
+    padding: 5px 10px;  
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 40%;
+    font-size: 12px;
+    text-align: center;
+}
+
+.botao_pesquisa button:hover{
+    background-color: #45a049; /* Cor do botão */
+}
+
+.botao_pesquisa a {
+    text-decoration: none; /* Remove o sublinhado */
+    color: inherit; /* Faz com que o link herde a cor do botão */
+    display: block; /* Para o link ocupar todo o espaço do botão */
+    width: 100%;
+    height: 100%;
+}
+
+.botao_pesquisa a:hover {
+    color: inherit; /* Garante que a cor não mude ao hover */
+}
+
+.alerts-redefinir {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+    
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    text-align: center;
+    transition: opacity 0.5s ease;
+    
+}
+
+/* Alertas de erro */
+.alert-error {
+    background-color: #FE4A49;
+    color: white;
+}
+
+/* Alertas de sucesso */
+.alert-success {
+    background-color: #03C956;
+    color: white;
+}
+
+/* Alertas gerais */
+.alert-warning {
+    background-color: #FECB34;
+    color: #000;
+}

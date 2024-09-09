@@ -202,3 +202,28 @@ def consulta_usuario_respondeu():
                 return result
         else:
                 return None
+        
+def consulta_pesquisa_gestor(id):
+       parametro_pesquisa = [f'%{id}%']
+       db = get_db()
+       cursor = db.cursor()
+       cursor.execute(f"SELECT globalId, gestor_nome, perfil FROM gestores WHERE globalId LIKE %s",(parametro_pesquisa))
+       result = cursor.fetchall()
+       cursor.close()
+       if result:
+              return result
+       else:
+              return None
+       
+def consulta_pesquisa_usuario(id, unidade=None):
+       parametro_pesquisa = f'%{id}%'
+       db = get_db()
+       cursor = db.cursor()
+       cursor.execute('''SELECT * FROM usuarios WHERE fk_unidade = %s AND globalId LIKE %s ORDER BY globalId asc''',(unidade, parametro_pesquisa))
+
+       result = cursor.fetchall()
+       cursor.close()
+       if result:
+              return result
+       else:
+              return None
