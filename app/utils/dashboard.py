@@ -9,13 +9,16 @@ def processa_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_fi
     if fk_pergunta_filtro is not None:
         respostas_validas = [float(resposta) for fk_pergunta, _ , resposta, _ in dados_respostas if fk_pergunta == fk_pergunta_filtro and resposta >= 0]
         datas_validas = [data_hora.date() for fk_pergunta, _ , resposta, data_hora in dados_respostas if fk_pergunta == fk_pergunta_filtro and resposta >= 0]
+        quantidade_respostas = len(respostas_validas)
 
     elif fk_categoria_filtro is not None:
         respostas_validas = [float(resposta) for _, fk_categoria, resposta, _ in dados_respostas if fk_categoria == fk_categoria_filtro and resposta >= 0]
         datas_validas = [data_hora.date() for _, fk_categoria, resposta, data_hora in dados_respostas if fk_categoria == fk_categoria_filtro and resposta >= 0]
+        quantidade_respostas = len(respostas_validas)
     else:
         respostas_validas = [float(resposta) for _, _, resposta, _ in dados_respostas if resposta >= 0]
         datas_validas = [data_hora.date() for _, _, _, data_hora in dados_respostas]
+        quantidade_respostas = len(respostas_validas)
 
     
     semanas_mes = [(date.isocalendar()[1], date.month) for date in datas_validas]
@@ -53,7 +56,7 @@ def processa_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_fi
         
         usuarios_responderam = [user_id for user_id, _ in dados_usuarios_responderam]
         datas_respostas = [data_resposta for _, data_resposta in dados_usuarios_responderam]
-        
+
         # Contar respostas dos usuários por semana
         for user_id, data_resposta in dados_usuarios_responderam:
             semana = data_resposta.isocalendar()[1]
@@ -93,7 +96,6 @@ def processa_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_fi
     if respostas_validas:
         media_respostas = round(sum(respostas_validas) / len(respostas_validas), 1)
         size = media_respostas * 10
-        quantidade_respostas = len(respostas_validas)
         data_min = min(datas_validas).strftime('%d-%m')
         data_max = max(datas_validas).strftime('%d-%m')
 
