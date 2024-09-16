@@ -293,7 +293,7 @@
                     labels: labels,  // Semanas do ano
                     datasets: [
                         {
-                            type: 'line',  // Define a 'nota' como gráfico de linha
+                            type: 'bar',  // Define a 'nota' como gráfico de linha
                             label: 'Nota média',
                             data: notas,  // Notas para cada semana
                             backgroundColor: notas.map(nota => calcularCorNota(nota)),
@@ -311,7 +311,7 @@
                             }
                         },
                         {
-                            type: 'bar',  // Define a 'aderência' como gráfico de barras
+                            type: 'line',  // Define a 'aderência' como gráfico de barras
                             label: 'Aderência',
                             data: aderencia,  // Aderência para cada semana
                             backgroundColor: aderencia.map(ad => calcularCorAderencia(ad)),

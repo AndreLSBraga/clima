@@ -203,27 +203,42 @@ def gera_cards_detalhe(dados_respostas, fk_gestor,  fk_categoria_detalhe):
             # Processa as respostas para a categoria atual
             media_respostas, size, quantidade_respostas, data_min, data_max = gera_media_quantidade_datas_respostas(dados_respostas, None, pergunta)
             dados_grafico = gera_grafico(fk_gestor, None, pergunta)
-            if dados_grafico:
-                semanas = dados_grafico[0]
-                notas_semana = dados_grafico[1]
+            app.logger.debug(pergunta, quantidade_respostas, media_respostas)
+            if quantidade_respostas < 3:
+                card = {
+                    'id': pergunta,
+                    'title': descricao_pergunta,  # O título da categoria
+                    'value': None,  # Defina o valor como 0 se não houver média
+                    'size': 0,  # Defina o tamanho como 0 se não houver média
+                    'qtd_respostas': quantidade_respostas,
+                    'data_min': None,
+                    'data_max': None,
+                    'semanas':  [],
+                    'notas': []
+                }
+                cards.append(card)
             else:
-                semanas = []
-                notas_semana = []
+                if dados_grafico:
+                    semanas = dados_grafico[0]
+                    notas_semana = dados_grafico[1]
+                else:
+                    semanas = []
+                    notas_semana = []
 
-            app.logger.debug(f'Pergunta: {pergunta}, dados: {gera_media_quantidade_datas_respostas(dados_respostas, None, pergunta)}, dados grafico: {dados_grafico}')
+                app.logger.debug(f'Pergunta: {pergunta}, dados: {gera_media_quantidade_datas_respostas(dados_respostas, None, pergunta)}, dados grafico: {dados_grafico}')
 
-            # Se as respostas forem válidas, cria um card
-            card = {
-                'id': pergunta,
-                'title': descricao_pergunta,  # O título da categoria
-                'value': media_respostas if media_respostas is not None else None,  # Defina o valor como 0 se não houver média
-                'size': size if media_respostas is not None else None,  # Defina o tamanho como 0 se não houver média
-                'qtd_respostas': quantidade_respostas,
-                'data_min': data_min if data_min else None,
-                'data_max': data_max if data_max else None,
-                'semanas':  semanas,
-                'notas': notas_semana
-            }
-            cards.append(card)
+                # Se as respostas forem válidas, cria um card
+                card = {
+                    'id': pergunta,
+                    'title': descricao_pergunta,  # O título da categoria
+                    'value': media_respostas if media_respostas is not None else None,  # Defina o valor como 0 se não houver média
+                    'size': size if media_respostas is not None else None,  # Defina o tamanho como 0 se não houver média
+                    'qtd_respostas': quantidade_respostas,
+                    'data_min': data_min if data_min else None,
+                    'data_max': data_max if data_max else None,
+                    'semanas':  semanas,
+                    'notas': notas_semana
+                }
+                cards.append(card)
 
     return cards
