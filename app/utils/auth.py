@@ -30,6 +30,16 @@ def valida_data_nascimento(usuario, data_nascimento_formulario):
         flash("Dados preenchidos não conferem.<br>Verifique os dados preenchidos.","warning")
         return False
 
+def consulta_gestor_cadastrado(user_id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM gestores where globalId = %s',(user_id,))
+    result = cursor.fetchone()
+    cursor.close()
+    if result:
+        return True
+    else:
+        return False
 def usuario_is_gestor(user_id):
         db = get_db()
         cursor = db.cursor()

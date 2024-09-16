@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, session, request, flash, redirect, url_for, current_app as app, jsonify
 from datetime import datetime
-from app.utils.auth import valida_id, valida_id_novo, valida_email_novo
+from app.utils.auth import valida_id, valida_id_novo, valida_email_novo, consulta_gestor_cadastrado
 from app.utils.db_consultas import consulta_dados_gestor, consulta_usuario_id, consulta_usuarios_por_unidade, consulta_fk_dimensao, consulta_todos_gestores
 from app.utils.db_consultas import consulta_pesquisa_gestor, consulta_pesquisa_usuario
 from app.utils.db_dml import processar_diferencas, criar_usuario, processar_diferencas_gestor, criar_gestor, reset_senha_gestor
@@ -189,14 +189,14 @@ def salvar_alteracoes_gestor():
     #Verifica as informações digitadas
     if not globalId_novo:
         return jsonify({"message":"Preencha os dados obrigatórios.", "status": "error"})
-    
-    #Verifica se o usuário já existe
-    if not globalId_original == globalId_novo:
-        if valida_id(globalId_novo):
-            return jsonify({"message":"Já existe usuário com esse ID cadastrado.<br> Procure pelo ID nas configurações de usuários.", "status": "error"})
     #Verifica se o ID é apenas números e se são 8 caracteres
     if not valida_id_novo(globalId_novo):
         return jsonify({"message":"Os dados informados no campo 'Global ID' não segue algum dos padrões necessários.<br>Tem mais ou menos que 8 números ou não tem apenas números", "status": "error"})
+    
+    #Verifica se o usuário já existe
+    if not globalId_original == globalId_novo:
+        if not valida_id(globalId_novo):
+            return jsonify({"message":"Não existe usuário cadastrado para o id informado.<br> Crie o usuário antes de cadastrar o gestor.", "status": "error"})
     
     dados = (
         int(dados_formulario.get('globalId')),
@@ -224,8 +224,11 @@ def salvar_alteracoes_gestor():
             resultado_diferencas = processar_diferencas_gestor(alteracoes, globalId_original)
         return resultado_diferencas
     
-    
     if tipo == 'criacao':
+        gestor_existe = consulta_gestor_cadastrado(globalId_novo)
+        if gestor_existe:
+            return jsonify({"message": "Já existe um gestor cadastrado com o ID informado", "status": "error"})
+        
         dicionario_dados_criacao = dict(zip(chaves, dados))
         resultado_criar = criar_gestor(dicionario_dados_criacao)
         return resultado_criar

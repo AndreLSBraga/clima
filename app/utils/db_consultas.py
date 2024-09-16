@@ -180,7 +180,45 @@ def consulta_dados_respostas(fk_gestor=None, data_min=None, data_max = None):
                 return result
         else:
                 return None
-        
+
+def consulta_semana_mes_media_respostas(fk_gestor=None, fk_categoria=None, fk_pergunta=None):
+        query = f'''SELECT weekofyear(data_hora) as semana_ano, 
+                month(data_hora) as mes, 
+                avg(resposta) as media, 
+                ROUND(((SELECT
+                                COUNT(globalId) FROM pulsa.usuarios
+                        WHERE fk_gestor = 864
+                        ) / 
+                (SELECT 
+                                CEILING(COUNT(*)/10) from pulsa.respostas WHERE fk_gestor = 864
+                        )) * 100, 0) as aderencia 
+                FROM respostas'''
+        params = []
+        conditions = []
+
+        if fk_gestor is not None:
+                conditions.append('fk_gestor = %s ')
+                params.append(fk_gestor)
+        if fk_categoria is not None:
+                conditions.append('fk_categoria = %s ')
+                params.append(fk_categoria)
+        if fk_pergunta is not None:
+                conditions.append('fk_pergunta = %s ')
+                params.append(fk_pergunta)
+
+        if conditions:
+                query += ' WHERE ' + ' AND '.join(conditions) + ' AND resposta >= 0'
+                query += ' GROUP BY semana_ano, mes ORDER BY semana_ano asc'
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, params)
+        result = cursor.fetchall()
+        cursor.close()
+        if result:
+                return result
+        else:
+                return None
+
 def consulta_time_por_fk_gestor(fk_gestor):
         db = get_db()
         cursor = db.cursor()
