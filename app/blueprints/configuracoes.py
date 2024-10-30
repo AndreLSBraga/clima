@@ -69,8 +69,6 @@ def pesquisar_usuario():
     total_usuarios = len(usuarios)
     total_paginas = (total_usuarios + por_pagina - 1) // por_pagina
     
-    
-
     # Retorna apenas o HTML da tabela
     return render_template('configuracoes_usuario.html', usuarios = dados_usuarios, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal, modo = 'pesquisa')
 
@@ -100,7 +98,7 @@ def configuracoes_gestor_view():
 
 @configuracoes_salvar_alteracoes.route('/salvar_alteracoes', methods=['POST'])
 def salvar_alteracoes():  
-    dados_formulario = request.json    
+    dados_formulario = request.json
     tipo = dados_formulario.get('tipo')
     globalId_original = dados_formulario.get('globalIdOriginal')
     globalId_novo = dados_formulario.get('globalId')

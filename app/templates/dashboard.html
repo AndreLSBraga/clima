@@ -23,8 +23,20 @@
     <nav class="sidebar">
         <ul class="sidebar-menu">
             <li class="active"><a href="{{ url_for('dashboard.dashboard_view') }}">
-                <span class="icon"><img src="/static/images/icons/dashboard.svg" alt="Dashboard Icon"></span>
-                <span class="text_sidebar">Dashboard</span>
+                <span class="icon"><img src="/static/images/icons/time.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">Time</span>
+            </a></li>
+            <li><a href="{{ url_for('dashboard.dashboard_view') }}">
+                <span class="icon"><img src="/static/images/icons/area.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">Área</span>
+            </a></li>
+            <li><a href="{{ url_for('dashboard.dashboard_view') }}">
+                <span class="icon"><img src="/static/images/icons/gestores.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">Gestores</span>
+            </a></li>
+            <li><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view') }}">
+                <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
+                <span class="text_sidebar">Sugestões</span>
             </a></li>
             {% if perfil == 'administrador' %}
                 <li><a href="{{ url_for('configuracoes.configuracoes_view') }}">
@@ -303,15 +315,15 @@
                             fill: false,  // Não preencher a área abaixo da linha
                             datalabels: {
                                 align: 'top',
-                                anchor: 'end',
-                                color: '#000',  // Cor da label para a nota
+                                anchor: 'start',
+                                color: '#000',
                                 formatter: function(value) {
                                     return value.toFixed(1);  // Exibe o valor com uma casa decimal
                                 }
                             }
                         },
                         {
-                            type: 'line',  // Define a 'aderência' como gráfico de barras
+                            type: 'bar',  // Define a 'aderência' como gráfico de barras
                             label: 'Aderência',
                             data: aderencia,  // Aderência para cada semana
                             backgroundColor: aderencia.map(ad => calcularCorAderencia(ad)),
@@ -320,7 +332,7 @@
                             yAxisID: 'y1',  // Associado ao segundo eixo y
                             datalabels: {
                                 align: 'top',
-                                anchor: 'end',
+                                anchor: 'start',
                                 color: '#000',  // Cor da label para a aderência
                                 formatter: function(value) {
                                     return value.toFixed(1) + '%';  // Exibe o valor com uma casa decimal e o símbolo de porcentagem

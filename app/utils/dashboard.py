@@ -1,8 +1,7 @@
 from flask import current_app as app, flash
 import datetime
 from app.utils.db_consultas import consulta_fk_dimensao, consulta_desc_categoria_pelo_fk_categoria, consulta_texto_perguntas,consulta_time_por_fk_gestor
-from app.utils.db_consultas import consulta_usuario_respondeu, consulta_semana_mes_media_respostas
-
+from app.utils.db_consultas import consulta_usuario_respondeu, consulta_semana_mes_media_respostas, consulta_resumo_respostas_categoria_gestor
 
 def processa_respostas_validas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_filtro=None, fk_gestor=None):
     if fk_pergunta_filtro is not None:
@@ -165,16 +164,28 @@ def gera_cards(dados_respostas):
         else:
             # Processa as respostas para a categoria atual
             media_respostas, size, quantidade_respostas, data_min, data_max = gera_media_quantidade_datas_respostas(dados_respostas, categoria)
-            card = {
+            if quantidade_respostas < 3:
+                card = {
                 'id': categoria,
-                'title': descricao_categoria,  
-                'value': media_respostas if media_respostas is not None else None, 
-                'size': size if media_respostas is not None else None,
-                'qtd_respostas': quantidade_respostas,
-                'data_min': data_min if data_min else None,
-                'data_max': data_max if data_max else None
-            }
-            cards.append(card)
+                'title': descricao_categoria,  # O título da categoria
+                'value': None ,  # Defina o valor como 0 se não houver média
+                'size': 0,  # Defina o tamanho como 0 se não houver média
+                'qtd_respostas': 0,
+                'data_min': None,
+                'data_max': None
+                }
+                cards.append(card)
+            else:
+                card = {
+                    'id': categoria,
+                    'title': descricao_categoria,  
+                    'value': media_respostas if media_respostas is not None else None, 
+                    'size': size if media_respostas is not None else None,
+                    'qtd_respostas': quantidade_respostas,
+                    'data_min': data_min if data_min else None,
+                    'data_max': data_max if data_max else None
+                }
+                cards.append(card)
     return cards
 
 def gera_cards_detalhe(dados_respostas, fk_gestor,  fk_categoria_detalhe):
@@ -225,8 +236,6 @@ def gera_cards_detalhe(dados_respostas, fk_gestor,  fk_categoria_detalhe):
                     semanas = []
                     notas_semana = []
 
-                app.logger.debug(f'Pergunta: {pergunta}, dados: {gera_media_quantidade_datas_respostas(dados_respostas, None, pergunta)}, dados grafico: {dados_grafico}')
-
                 # Se as respostas forem válidas, cria um card
                 card = {
                     'id': pergunta,
@@ -242,3 +251,45 @@ def gera_cards_detalhe(dados_respostas, fk_gestor,  fk_categoria_detalhe):
                 cards.append(card)
 
     return cards
+
+def processa_sugestoes(base_sugestoes):
+    sugestoes = []
+    for sugestao in base_sugestoes:
+        id_sugestao = sugestao[0]
+        data_sugestao = sugestao[1].strftime('%d/%m/%y')
+        fk_categoria = sugestao[2]
+        fk_pergunta = sugestao[3]
+        texto_sugestao = sugestao[4]
+        texto_categoria = None
+        texto_pergunta = None
+        if fk_categoria:
+            texto_categoria = consulta_desc_categoria_pelo_fk_categoria(fk_categoria)
+        
+        if fk_pergunta:
+            texto_pergunta = consulta_texto_perguntas(fk_pergunta)
+        
+        sugestao_tuple = {
+            'id_sugestao': id_sugestao,
+            'data_sugestao': data_sugestao,
+            'texto_categoria': texto_categoria,
+            'texto_pergunta': texto_pergunta,
+            'texto_sugestao': texto_sugestao
+        }
+        sugestoes.append(sugestao_tuple)
+
+    return sugestoes
+
+def gera_card_gestor_liderado(dados_gestor, indice):
+    fk_gestor = dados_gestor['fk_gestor']
+    nome_gestor = dados_gestor['nome_liderado']
+    respostas_categoria = consulta_resumo_respostas_categoria_gestor(fk_gestor)
+    card = {
+        'id': indice,
+        'nome_gestor': nome_gestor,
+        'qtd_respostas': 100,  # O título da categoria
+        'qtd_sugestoes': 100,
+        'perc_promotores': 50,
+        'categorias': respostas_categoria
+    }
+
+    return card

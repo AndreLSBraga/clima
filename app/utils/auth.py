@@ -1,7 +1,7 @@
 from flask import current_app as app, flash
 from app.utils.db import get_db  # Importando a função get_db
-from app.utils.db_consultas import consulta_usuario_id, consulta_usuario_resposta_data # Importando a função get_db
-from datetime import datetime
+from app.utils.db_consultas import consulta_usuario_id, consulta_usuario_resposta_semana, consulta_usuario_resposta_data # Importando a função get_db
+from datetime import datetime, timedelta
 import hashlib
 import bcrypt
 
@@ -60,13 +60,39 @@ def codifica_id(user_id):
 
 def verifica_resposta_usuario(user_id):
 
-    semana_resposta_recente = consulta_usuario_resposta_data(user_id)
-    semana_atual = datetime.now().isocalendar()[1]
+    data_atual = datetime.now().date() #Dia atual
+    data_inicio_pesquisa = datetime(2024,9,30).date() #Data de inicio da primeira pesquisa do modelo
+    
+    #Verifica se a semana da resposta do usuário, é a semana atual
+    if data_atual < data_inicio_pesquisa:
+        semana_resposta_recente = consulta_usuario_resposta_semana(user_id)
+        semana_atual = datetime.now().isocalendar()[1]
 
-    if semana_atual == semana_resposta_recente:
-        return True
-    else:
+        if semana_atual == semana_resposta_recente:
+            return True
+        else:
+            return False
+
+    diferenca_dias = (data_atual - data_inicio_pesquisa).days #Número de dias entre a data atual e o início da pesquisa
+    ciclo_atual = diferenca_dias // 14 #Ciclo atual de respostas
+
+    data_ultima_resposta_usuario = consulta_usuario_resposta_data(user_id) #Dia que o usuário respondeu
+    if not data_ultima_resposta_usuario:
         return False
+    if data_ultima_resposta_usuario < data_inicio_pesquisa:
+        # A resposta é antes da pesquisa, então pode responder
+        return False
+    
+    diferenca_dias_resposta_usuario = (data_ultima_resposta_usuario - data_inicio_pesquisa).days    
+    ciclo_resposta = diferenca_dias_resposta_usuario // 14  # Ciclo da última resposta
+    app.logger.debug(f'Data atual {data_atual}, diferenca_dias: {diferenca_dias}, ciclo_atual: {ciclo_atual}')
+
+    app.logger.debug(f'Data resposta: {data_ultima_resposta_usuario}, diferenca_dias_usuario: {diferenca_dias_resposta_usuario}, ciclo_resposta: {ciclo_resposta}')
+    # Se o ciclo da última resposta for igual ao ciclo atual, o usuário já respondeu nesta quinzena
+    if ciclo_atual == ciclo_resposta:
+        return True  # Já respondeu nesta quinzena
+    else:
+        return False  # Ainda não respondeu nesta quinzena, pode responder
 
 def codifica_senha(senha):
     # Gera um salt
@@ -91,6 +117,7 @@ def valida_email_novo(email):
         globalId, dominio = email.split('@', 1)        
         # Verifica se a parte antes do '@' não está vazia
         if globalId and dominio:
+            dominio = dominio.lower()
             # Verifica se o domínio é um dos permitidos
             if dominio == 'ambev.com.br' or dominio == 'ab-inbev.com':
                 return True

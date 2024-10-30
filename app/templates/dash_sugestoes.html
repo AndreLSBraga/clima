@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulsa Supply</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/main_dash_config.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
+    
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img class="logo" src="/static/images/logos/logo_completa.svg">
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view') }}"class="active">Gestor</a></li>
+        </ul>
+    </nav>
+    <nav class="sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="{{ url_for('dashboard.dashboard_view') }}">
+                <span class="icon"><img src="/static/images/icons/time.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">Time</span>
+            </a></li>
+            <li><a href="{{ url_for('dashboard.dashboard_view') }}">
+                <span class="icon"><img src="/static/images/icons/area.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">Área</span>
+            </a></li>
+            <li><a href="{{ url_for('dashboard_gestores.dashboard_gestores_view') }}">
+                <span class="icon"><img src="/static/images/icons/gestores.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">Gestores</span>
+            </a></li>
+            <li class="active"><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view') }}">
+                <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">Sugestões</span>
+            </a></li>
+            {% if perfil == 'administrador' %}
+                <li><a href="{{ url_for('configuracoes.configuracoes_view') }}">
+                    <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
+                    <span class="text_sidebar">Configurações</span>
+                </a></li>
+            {% endif %}
+                <li><a href="{{ url_for('gestor.gestor_view') }}">
+                    <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
+                    <span class="text_sidebar">Sair</span>
+                </a></li>
+        </ul>
+    </nav>
+    
+    <div class="fundo-container">
+        <div class="container">
+            <div class="introbar">
+                <div class="introbar-text">
+                    <span><h2>Olá, {{dados_gestor.nome}}! Aqui estão suas sugestões:</h2></span>
+                </div>
+            <div class="table-container">
+                <div>
+                    {% if sugestoes %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Categoria</th>
+                                    <th>Pergunta</th>
+                                    <th>Sugestão</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in sugestoes %}
+                                <tr>
+                                    <td>{{ row.data_sugestao }}</td>
+                                    <td>{{ row.texto_categoria }}</td>
+                                    {% if row.texto_pergunta != None %}
+                                        <td>{{ row.texto_pergunta }}</td>
+                                    {% else %}
+                                        <td>Sugestão enviada diretamente</td>
+                                    {% endif %}
+                                    <td>{{ row.texto_sugestao }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>Não há sugestões disponíveis no momento ou o seu time tem menos que 3 colaboradores.</p>
+                    {% endif %}
+                </div>                
+        </div>        
+    </div>
+    
+    <script src="/static/js/background.js"></script>
+    <link href="/static/css/datatables.css" rel="stylesheet">
+    <script type="text/javascript" src="/static/js/jquery.js"></script>
+    <script type="text/javascript" src="/static/js/datatables.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('table').DataTable({
+
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "scrollX": false,
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ sugestões por página",
+                    "zeroRecords": "Nenhuma sugestão encontrada para o filtro definido",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ sugestões totais",
+                    "infoEmpty": "Mostrando 0 a 0 de 0 sugestões",
+                    "infoFiltered": "(filtrado de _MAX_ sugestões totais)",
+                    "search": "Pesquisar: ",
+                },
+                "dom": '<"top"fl>rt<"bottom"ip><"clear">',
+                "columns": [
+                    { "width": "6%" },  // Definindo a largura da primeira coluna
+                    { "width": "15%" },  // Segunda coluna
+                    { "width": "20%" },  // Terceira coluna
+                    { "width": "35%" }   // Quarta coluna
+                ]
+            });
+        });
+    </script>
+        
+</body>
+</html>

@@ -6,7 +6,7 @@ from app.blueprints.sugestao import sugestao
 from app.blueprints.gestor import gestor, configura_senha
 from app.blueprints.configuracoes import  configuracoes, configuracoes_usuario, configuracoes_gestor, configuracoes_salvar_alteracoes, configuracoes_reset_senha
 from app.blueprints.configuracoes import configuracoes_pesquisa_gestor
-from app.blueprints.dashboard import dashboard, dashboard_categoria
+from app.blueprints.dashboard import dashboard, dashboard_categoria, dashboard_sugestoes, dashboard_gestores
 from app.blueprints.responder import responder
 from app.utils.db import close_db
 
@@ -25,6 +25,8 @@ def create_app():
     app.register_blueprint(pagina_final)
     app.register_blueprint(dashboard)
     app.register_blueprint(dashboard_categoria)
+    app.register_blueprint(dashboard_sugestoes)
+    app.register_blueprint(dashboard_gestores)
     app.register_blueprint(configuracoes)
     app.register_blueprint(configuracoes_usuario)
     app.register_blueprint(configuracoes_gestor)

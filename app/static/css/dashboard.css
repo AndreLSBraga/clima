@@ -141,7 +141,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-
 .dimensions-container{
    width: 100%; 
 }
@@ -365,3 +364,48 @@
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+table{
+    width: 100%;
+    margin: 10px 0px;
+    table-layout: fixed;
+    word-wrap: break-word;
+    white-space: normal;
+    margin: 0px 10px; 
+}
+
+thead{
+    background-color: #e5e5e5;
+    border: 1px solid rgba(0, 0, 0, 0.3)
+}
+
+thead th {
+    text-align: center;
+    padding: 10px;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    border-collapse: collapse;
+    word-wrap: initial;
+}
+
+table.dataTable tbody tr:hover {
+    background-color: #2ab7ca4b; /* Cor de fundo quando a linha está em hover */
+    cursor: pointer; /* Muda o cursor para indicar que a linha é interativa */
+}
+
+tbody td {
+    padding: 5px 10px;
+    font-size: 14px;
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.top, .bottom{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin:10px
+}
+

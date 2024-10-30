@@ -18,7 +18,7 @@ body, html {
 }
 
 .sidebar {
-    width: 60px; /* Largura inicial da barra lateral */
+    width: 50px; /* Largura inicial da barra lateral */
     padding-bottom: 20px;
     background-color: #f0f0f0;
     margin-top: 60px; /* Altura da navbar */
@@ -55,13 +55,18 @@ body, html {
 .sidebar-menu li a {
     text-decoration: none;
     color: #000000;
-    font-size: 18px;    
     display: flex;
     align-items: center; /* Alinha verticalmente no centro */
     padding: 10px 15px;
     width: 100%;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s;   
 }
+
+.sidebar-menu li .icon img {
+    height: 100%;
+    width: 100%;
+}
+
 /* Exibe o texto dos links quando a barra é expandida */
 .sidebar:hover .sidebar-menu li a .text_sidebar {
     display: inline-block;
@@ -82,7 +87,6 @@ body, html {
 .sidebar-menu li:hover .icon img {
     display: block; /* Remove o espaço abaixo da imagem */
     filter: invert(1); /* Inverte as cores da imagem ao passar o mouse */
-    height: auto; /* Mantém a proporção da imagem */
 }
 
 /* Cor de fundo do item ativo */
@@ -96,12 +100,11 @@ body, html {
 .sidebar-menu li.active .icon img {
     display: block; /* Remove o espaço abaixo da imagem */
     filter: invert(1); /* Inverte as cores da imagem ao passar o mouse */
-    height: auto; /* Mantém a proporção da imagem */
 }
 
 .sidebar-menu li a .icon {
+    align-items: center;
     margin-right: 5px;
-    font-size: 14px;
 }
 
 /* Esconde o texto dos links quando a barra está minimizada */
@@ -111,6 +114,33 @@ body, html {
     transition: opacity 0.3s;
 }
 
+.submenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: none; /* Oculta o submenu inicialmente */
+}
+
+.submenu li {
+    padding-left: 20px; /* Indentação para o submenu */
+}
+
+.submenu li a {
+    font-size: 16px; /* Tamanho de fonte menor para o submenu */
+    color: #333;
+    padding: 8px 15px;
+    display: block;
+}
+
+/* Exibir o submenu ao passar o mouse no item principal */
+.sidebar-menu li:hover .submenu {
+    display: block;
+}
+
+/* Estilos opcionais para o item de submenu */
+.submenu li:hover {
+    background-color: #e0e0e0; /* Cor de fundo ao passar o mouse */
+}
 
 /* Estilos para o contêiner principal */
 .fundo-container {

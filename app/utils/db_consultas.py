@@ -15,6 +15,16 @@ def consulta_usuario_id(user_id):
 def consulta_usuario_resposta_data(user_id):
         db = get_db()
         cursor = db.cursor()
+        cursor.execute('SELECT data FROM usuario_respondeu WHERE globalId = %s ORDER BY data desc LIMIT 1',(user_id,))
+        result = cursor.fetchone()
+        cursor.close()
+        if result:
+                return result[0]
+        else:
+                return None
+def consulta_usuario_resposta_semana(user_id):
+        db = get_db()
+        cursor = db.cursor()
         cursor.execute('SELECT WEEK(data,1) FROM usuario_respondeu WHERE globalId = %s ORDER BY data desc LIMIT 1',(user_id,))
         result = cursor.fetchone()
         cursor.close()
@@ -22,11 +32,19 @@ def consulta_usuario_resposta_data(user_id):
                 return result[0]
         else:
                 return None
-        
+
 def consulta_fk_pergunta_categoria():
         db = get_db()
         cursor = db.cursor()
         cursor.execute('SELECT fk_pergunta, fk_categoria FROM perguntas')
+        result = cursor.fetchall()
+        cursor.close()
+        return result
+
+def consulta_fk_categoria_geral():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT fk_categoria FROM categorias')
         result = cursor.fetchall()
         cursor.close()
         return result
@@ -39,10 +57,13 @@ def consulta_fk_categoria(fk_pergunta):
         cursor.close()
         return result
 
-def consulta_texto_perguntas(fk_pergunta):
+def consulta_texto_perguntas(fk_pergunta, fk_pais=3):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT texto_pergunta FROM perguntas WHERE fk_pergunta = %s',(fk_pergunta,))
+        if fk_pais != 3:
+                cursor.execute('SELECT texto_pergunta_es FROM perguntas WHERE fk_pergunta = %s',(fk_pergunta,))
+        else:
+                cursor.execute('SELECT texto_pergunta FROM perguntas WHERE fk_pergunta = %s',(fk_pergunta,))
         result = cursor.fetchone()[0]
         cursor.close()
         return result
@@ -182,42 +203,44 @@ def consulta_dados_respostas(fk_gestor=None, data_min=None, data_max = None):
                 return None
 
 def consulta_semana_mes_media_respostas(fk_gestor=None, fk_categoria=None, fk_pergunta=None):
-        query = f'''SELECT weekofyear(data_hora) as semana_ano, 
+        query = '''
+        SELECT 
+                weekofyear(data_hora) as semana_ano, 
                 month(data_hora) as mes, 
                 avg(resposta) as media, 
-                ROUND(((SELECT
-                                COUNT(globalId) FROM pulsa.usuarios
-                        WHERE fk_gestor = 864
-                        ) / 
-                (SELECT 
-                                CEILING(COUNT(*)/10) from pulsa.respostas WHERE fk_gestor = 864
-                        )) * 100, 0) as aderencia 
-                FROM respostas'''
-        params = []
+                ROUND(ceiling(count(*)/10) / 
+                (SELECT COUNT(globalId) 
+                FROM pulsa.usuarios 
+                WHERE fk_gestor = %s) * 100, 0) as aderencia
+        FROM pulsa.respostas
+        WHERE resposta >= 0
+        AND fk_gestor = %s
+        '''
+
+        params = [fk_gestor, fk_gestor]  # fk_gestor para subconsulta e para WHERE principal
         conditions = []
 
-        if fk_gestor is not None:
-                conditions.append('fk_gestor = %s ')
-                params.append(fk_gestor)
         if fk_categoria is not None:
-                conditions.append('fk_categoria = %s ')
+                conditions.append('fk_categoria = %s')
                 params.append(fk_categoria)
+
         if fk_pergunta is not None:
-                conditions.append('fk_pergunta = %s ')
+                conditions.append('fk_pergunta = %s')
                 params.append(fk_pergunta)
 
+        # Se houver condições extras (fk_categoria, fk_pergunta), adicioná-las após "resposta >= 0"
         if conditions:
-                query += ' WHERE ' + ' AND '.join(conditions) + ' AND resposta >= 0'
-                query += ' GROUP BY semana_ano, mes ORDER BY semana_ano asc'
+                query += ' AND ' + ' AND '.join(conditions)
+
+        query += ' GROUP BY semana_ano, mes ORDER BY semana_ano ASC'
         db = get_db()
         cursor = db.cursor()
         cursor.execute(query, params)
         result = cursor.fetchall()
         cursor.close()
-        if result:
-                return result
-        else:
-                return None
+
+        return result if result else None
+
 
 def consulta_time_por_fk_gestor(fk_gestor):
         db = get_db()
@@ -261,6 +284,42 @@ def consulta_pesquisa_usuario(id, unidade=None):
 
        result = cursor.fetchall()
        cursor.close()
+       if result:
+              return result
+       else:
+              return None
+       
+def consulta_sugestoes_por_gestor(fk_gestor):
+       db = get_db()
+       cursor = db.cursor()
+       cursor.execute(f"SELECT id_sugestao, data_hora, fk_categoria, fk_pergunta, texto_sugestao FROM sugestoes WHERE fk_gestor = %s ORDER BY data_hora ASC LIMIT 10",(fk_gestor,))
+       result = cursor.fetchall()
+       cursor.close()
+       if result:
+              return result
+       else:
+              return None
+       
+def consulta_resumo_respostas_categoria_gestor(fk_gestor):
+       db = get_db()
+       cursor = db.cursor()
+       cursor.execute('''
+                SELECT 
+                        IFNULL(c.fk_categoria, 0) AS fk_categoria,
+                        IF(IFNULL(c.fk_categoria, 'Resultado Geral'), MIN(c.desc_categoria),'Resultado Geral') AS desc_categoria,
+                        COUNT(*) as qtd, 
+                        IF(COUNT(*) > 3, ROUND(AVG(r.resposta), 2), NULL) AS media,
+                        DATE_FORMAT(MIN(r.data_hora), '%d-%m') as minimo,
+                        DATE_FORMAT(MAX(r.data_hora), '%d-%m') as maximo
+                FROM pulsa.categorias c
+                LEFT JOIN pulsa.respostas r ON c.fk_categoria = r.fk_categoria
+                        AND r.fk_gestor = %s
+                        AND r.resposta > 0
+                WHERE c.fk_categoria < 11
+                GROUP BY c.fk_categoria WITH ROLLUP
+                ORDER BY c.fk_categoria ASC''',
+                (fk_gestor,))
+       result = cursor.fetchall()
        if result:
               return result
        else:

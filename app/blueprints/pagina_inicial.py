@@ -20,7 +20,6 @@ def pagina_inicial_view():
         if valida_id(user_id):  
             #Usa o id respondido no formulário para ser codificado mas consulta o banco antes
             usuario = consulta_usuario_id(user_id)
-            
             #Verifica se a data de nascimento respondida está correta
             if valida_data_nascimento(usuario, data_nascimento):
                 id_resposta = codifica_id(user_id)
@@ -36,6 +35,7 @@ def pagina_inicial_view():
                 fk_subarea = usuario[12]
                 fk_gestor = usuario[13]
                 fk_genero = usuario[14]
+                fk_pais = usuario[15]
                 data_hora = datetime.datetime.now()
 
                 #Envia os dados que serão salvos no banco do usuário
@@ -54,6 +54,7 @@ def pagina_inicial_view():
                     'fk_subarea': fk_subarea,
                     'fk_gestor':fk_gestor,
                     'fk_genero':fk_genero,
+                    'fk_pais': fk_pais,
                     'id_usuario':user_id
                 }
                 #Verica se o usuário já respondeu na semana

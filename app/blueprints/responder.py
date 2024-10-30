@@ -11,6 +11,7 @@ responder = Blueprint('responder', __name__)
 def responder_view():
     #Coloca em uma variável os dados do session
     dados_usuario = session['dados']
+    fk_pais = dados_usuario.get('fk_pais', 3)
     #Consulta db para trazer as perguntas e categoria
     fk_perguntas_categorias = consulta_fk_pergunta_categoria()
     #Cria grupo de perguntas que serão sorteadas
@@ -20,7 +21,7 @@ def responder_view():
     
     if 'perguntas_selecionadas' not in session:
         # Verifica se a semana é múltipla de 4 e define perguntas fixas
-        if semana_atual % 4 == 0 or semana_atual == 36 or semana_atual == 38:
+        if semana_atual % 4 == 0 or semana_atual == 36 or semana_atual == 38 or (semana_atual >=40 and semana_atual <=43):
             perguntas_fixas = [50, 51, 52, 53, 54, 55, 56, 57, 58, 59]
             shuffle(perguntas_fixas)  # Embaralha a lista de perguntas fixas
             session['pergunta_atual'] = 0
@@ -90,5 +91,5 @@ def responder_view():
     #Carrega o fk da pergunta e o texto da pergunta
     fk_pergunta_atual = perguntas_selecionadas[num_pergunta_atual]
     fk_categoria = consulta_fk_categoria(fk_pergunta_atual)
-    texto_pergunta = consulta_texto_perguntas(fk_pergunta_atual)
+    texto_pergunta = consulta_texto_perguntas(fk_pergunta_atual, fk_pais)
     return render_template('responder.html', pergunta = texto_pergunta, pergunta_num = num_pergunta_atual + 1, total_perguntas = 10)
