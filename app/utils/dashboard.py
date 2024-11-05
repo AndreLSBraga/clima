@@ -2,6 +2,7 @@ from flask import current_app as app, flash
 import datetime
 from app.utils.db_consultas import consulta_fk_dimensao, consulta_desc_categoria_pelo_fk_categoria, consulta_texto_perguntas,consulta_time_por_fk_gestor
 from app.utils.db_consultas import consulta_usuario_respondeu, consulta_semana_mes_media_respostas, consulta_resumo_respostas_categoria_gestor
+from app.utils.db_notas_consultas import consulta_promotores_categorias, consulta_promotores_grafico_geral
 
 def processa_respostas_validas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_filtro=None, fk_gestor=None):
     if fk_pergunta_filtro is not None:
@@ -13,10 +14,8 @@ def processa_respostas_validas(dados_respostas, fk_categoria_filtro=None, fk_per
 
     return filtro_respostas
 
-def gera_media_quantidade_datas_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_filtro=None, fk_gestor=None):
-
+def gera_informacoes_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_filtro=None, fk_gestor=None):
     dados_processados = processa_respostas_validas(dados_respostas, fk_categoria_filtro, fk_pergunta_filtro, fk_gestor)
-
     respostas_validas = [round(float(resposta),1) for fk_pergunta, fk_categoria, resposta, data_hora in dados_respostas if dados_processados(fk_pergunta, fk_categoria, resposta, data_hora)]
     datas_validas = [data_hora.date() for fk_pergunta, fk_categoria, resposta, data_hora in dados_respostas if dados_processados(fk_pergunta, fk_categoria, resposta, data_hora)]
 
@@ -31,18 +30,15 @@ def gera_media_quantidade_datas_respostas(dados_respostas, fk_categoria_filtro=N
         return None, None, 0, None, None
 
 def gera_grafico(fk_gestor=None, fk_categoria_filtro=None, fk_pergunta_filtro=None ):
-    dados_grafico = consulta_semana_mes_media_respostas(fk_gestor, fk_categoria_filtro, fk_pergunta_filtro)
+    dados_grafico = consulta_promotores_grafico_geral(fk_gestor)
+    lista_pesquisa = [pesquisa for pesquisa, _, _, _ in dados_grafico]
+    lista_promotores = [
+        round(float(promotores), 1) if respondentes_unicos >= 3 else 0
+        for _, respondentes_unicos, promotores, _ in dados_grafico
+    ]
+    lista_aderencia = [round(float(aderencia),0) for _, _, _, aderencia in dados_grafico]
 
-    if dados_grafico:
-        lista_semanas_mes = [f'S: {semana} / Mês: {mes}' for semana, mes, _, _ in dados_grafico]
-        lista_media_resposta = [round(float(resposta),1) for _, _, resposta, _ in dados_grafico]
-        lista_aderencia = [round(float(aderencia),0) for _,_,_, aderencia in dados_grafico]
-
-        return lista_semanas_mes, lista_media_resposta, lista_aderencia
-    else:
-        lista_semanas_mes = []
-        lista_media_resposta = []
-        lista_aderencia = []
+    return lista_pesquisa, lista_promotores, lista_aderencia
 
 def processa_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_filtro=None, fk_gestor=None):
 
@@ -138,54 +134,61 @@ def processa_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_fi
         return media_respostas, size, quantidade_respostas_validas, data_min, data_max, semanas_mes_grafico, nota_media_semanas_grafico, aderencia_semanal
     else:
         return None, None, 0, None, None, [], [], []
-   
-def gera_cards(dados_respostas):
-    # Consulta as categorias
-    categorias_consulta = consulta_fk_dimensao('categorias', 'fk_categoria')
-    fk_categorias = [categoria[0] for categoria in categorias_consulta]
-    fk_categorias = fk_categorias[:10]
+
+def gera_main_cards(nota):
+    if nota[2] < 3:
+        return {
+                'valor': None,
+                'qtd_respostas': nota[3],
+                'data_min': nota[4],
+                'data_max': nota[5],
+        }
+    else:
+        return {
+                'valor': nota[0],
+                'qtd_respostas': nota[3],
+                'data_min': nota[4],
+                'data_max': nota[5],
+        }
+
+
+def gera_cards(fk_gestor):
+    # Consulta promotores por categoria
+    dados_categorias = consulta_promotores_categorias(fk_gestor)
     cards = []
-
     # Itera sobre cada categoria
-    for categoria in fk_categorias:
-
-        descricao_categoria = consulta_desc_categoria_pelo_fk_categoria(categoria)
-        if not dados_respostas:
+    for categoria in dados_categorias:
+        
+        fk_categoria = categoria[0]
+        descricao_categoria = categoria[1]
+        perc_promotores = categoria[2]
+        qtd_promotores = categoria[3]
+        qtd_respostas_unicas = categoria[4]
+        qtd_respostas_totais = categoria[5]
+        data_min = categoria[6]
+        data_max = categoria[7]
+        if qtd_respostas_unicas < 3:
             card = {
-            'id': categoria,
+            'id': fk_categoria,
             'title': descricao_categoria,  # O título da categoria
             'value': None ,  # Defina o valor como 0 se não houver média
             'size': 0,  # Defina o tamanho como 0 se não houver média
-            'qtd_respostas': 0,
-            'data_min': None,
-            'data_max': None
+            'qtd_respostas': qtd_respostas_totais,
+            'data_min': data_min,
+            'data_max': data_max
             }
             cards.append(card)
         else:
-            # Processa as respostas para a categoria atual
-            media_respostas, size, quantidade_respostas, data_min, data_max = gera_media_quantidade_datas_respostas(dados_respostas, categoria)
-            if quantidade_respostas < 3:
-                card = {
-                'id': categoria,
-                'title': descricao_categoria,  # O título da categoria
-                'value': None ,  # Defina o valor como 0 se não houver média
-                'size': 0,  # Defina o tamanho como 0 se não houver média
-                'qtd_respostas': 0,
-                'data_min': None,
-                'data_max': None
-                }
-                cards.append(card)
-            else:
-                card = {
-                    'id': categoria,
-                    'title': descricao_categoria,  
-                    'value': media_respostas if media_respostas is not None else None, 
-                    'size': size if media_respostas is not None else None,
-                    'qtd_respostas': quantidade_respostas,
-                    'data_min': data_min if data_min else None,
-                    'data_max': data_max if data_max else None
-                }
-                cards.append(card)
+            card = {
+            'id': fk_categoria,
+            'title': descricao_categoria,  # O título da categoria
+            'value': perc_promotores ,  # Defina o valor como 0 se não houver média
+            'size': perc_promotores,  # Defina o tamanho como 0 se não houver média
+            'qtd_respostas': qtd_respostas_totais,
+            'data_min': data_min,
+            'data_max': data_max
+            }
+            cards.append(card)
     return cards
 
 def gera_cards_detalhe(dados_respostas, fk_gestor,  fk_categoria_detalhe):
@@ -212,9 +215,8 @@ def gera_cards_detalhe(dados_respostas, fk_gestor,  fk_categoria_detalhe):
             cards.append(card)
         else:
             # Processa as respostas para a categoria atual
-            media_respostas, size, quantidade_respostas, data_min, data_max = gera_media_quantidade_datas_respostas(dados_respostas, None, pergunta)
+            media_respostas, size, quantidade_respostas, data_min, data_max = gera_informacoes_respostas(dados_respostas, None, pergunta)
             dados_grafico = gera_grafico(fk_gestor, None, pergunta)
-            app.logger.debug(pergunta, quantidade_respostas, media_respostas)
             if quantidade_respostas < 3:
                 card = {
                     'id': pergunta,

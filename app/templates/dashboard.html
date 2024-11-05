@@ -26,14 +26,6 @@
                 <span class="icon"><img src="/static/images/icons/time.svg" alt="Dashboard Icon"></span>
                 <span class="text_sidebar">Time</span>
             </a></li>
-            <li><a href="{{ url_for('dashboard.dashboard_view') }}">
-                <span class="icon"><img src="/static/images/icons/area.svg" alt="Dashboard Icon"></span>
-                <span class="text_sidebar">Área</span>
-            </a></li>
-            <li><a href="{{ url_for('dashboard.dashboard_view') }}">
-                <span class="icon"><img src="/static/images/icons/gestores.svg" alt="Dashboard Icon"></span>
-                <span class="text_sidebar">Gestores</span>
-            </a></li>
             <li><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view') }}">
                 <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
                 <span class="text_sidebar">Sugestões</span>
@@ -55,8 +47,8 @@
         <div class="container">
             <div class="introbar">
                 <div class="introbar-text">
-                    <span><h2>Olá, {{dados[0].nome}}! Esse é o resultado do seu time.</h2></span>
-                    <span class="small-text">Sua nota está baseada em {{dados[0].qtd_respostas}} respostas, entre os dias {{dados[0].data_min}} e {{dados[0].data_max}}.</span>
+                    <span><h2>Olá, {{dados.nome}}! Esse é o resultado do seu time.</h2></span>
+                    <span class="small-text">Sua nota está baseada em {{dados.card1.qtd_respostas}} respostas, entre os dias {{dados.card1.data_min}} e {{dados.card1.data_max}}.</span>
                 </div>
             </div>
                 <div class="dashboard-container">
@@ -69,12 +61,12 @@
                             <div class="card-content">
                                 <div class="progress-bar-container">
                                     <div class="progress-bar-bg">
-                                        <div class="progress-fill" data-nota="{{ dados[0].nota_media }}" data-size="{{ dados[0].size_bar }}"></div>
+                                        <div class="progress-fill" data-nota="{{ dados.card1.valor }}" data-size="{{ dados.card1.valor }}"></div>
                                     </div>
                                 </div>
                                 <div class="progress-data">
-                                    {% if dados[0].nota_media != None %}
-                                        <span>{{ dados[0].nota_media }}</span>
+                                    {% if dados.card1.valor != None %}
+                                        <span>{{ dados.card1.valor }}</span>
                                     {% else %}
                                         <span>-</span>
                                     {% endif %}
@@ -83,11 +75,11 @@
                             <div class="card-info">
                                 <div class="info-item">
                                     <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                    <p>{{ dados[0].qtd_respostas }} respostas</p>
+                                    <p>{{ dados.card1.qtd_respostas }} perguntas respondidas</p>
                                 </div>
                                 <div class="info-item">
                                     <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
-                                    <p>{{ dados[0].data_min }} e {{ dados[0].data_max }}</p>
+                                    <p>{{ dados.card1.data_min }} e {{ dados.card1.data_max }}</p>
                                 </div>
                             </div>
                         </div>
@@ -100,12 +92,12 @@
                             <div class="card-content">
                                 <div class="progress-bar-container">
                                     <div class="progress-bar-bg">
-                                        <div class="progress-fill" data-nota="{{ dados[0].nota_media_nps }}" data-size="{{ dados[0].size_bar_nps }}"></div>
+                                        <div class="progress-fill" data-nota="{{ dados.card2.valor }}" data-size="{{ dados.card2.valor }}"></div>
                                     </div>
                                 </div>
                                 <div class="progress-data">
-                                    {% if dados[0].nota_media_nps != None %}
-                                        <span>{{ dados[0].nota_media_nps }}</span>
+                                    {% if dados.card2.valor != None %}
+                                        <span>{{ dados.card2.valor }}</span>
                                     {% else %}
                                         <span>-</span>
                                     {% endif %}
@@ -114,11 +106,11 @@
                             <div class="card-info">
                                 <div class="info-item">
                                     <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                    <p>{{ dados[0].qtd_respostas_nps }} respostas</p>
+                                    <p>{{ dados.card2.qtd_respostas }} perguntas respondidas</p>
                                 </div>
                                 <div class="info-item">
                                     <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
-                                    <p>{{ dados[0].data_min_nps }} e {{ dados[0].data_max_nps }}</p>
+                                    <p>{{ dados.card2.data_min }} e {{ dados.card2.data_max}}</p>
                                 </div>
                             </div>
                         </div>
@@ -131,12 +123,12 @@
                             <div class="card-content">
                                 <div class="progress-bar-container">
                                     <div class="progress-bar-bg">
-                                        <div class="progress-fill" data-nota="{{ dados[0].nota_media_eficacia }}" data-size="{{ dados[0].size_bar_eficacia }}"></div>
+                                        <div class="progress-fill" data-nota="{{ dados.card3.valor }}" data-size="{{ dados.card3.valor }}"></div>
                                     </div>
                                 </div>
                                 <div class="progress-data">
-                                    {% if dados[0].nota_media_eficacia != None %}
-                                        <span>{{ dados[0].nota_media_eficacia }}</span>
+                                    {% if dados.card3.valor != None %}
+                                        <span>{{ dados.card3.valor }}</span>
                                     {% else %}
                                         <span> - </span>
                                     {% endif %}
@@ -145,11 +137,11 @@
                             <div class="card-info">
                                 <div class="info-item">
                                     <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                    <p> {{ dados[0].qtd_respostas_eficacia }} respostas</p>
+                                    <p> {{ dados.card3.qtd_respostas}} perguntas respondidas</p>
                                 </div>
                                 <div class="info-item">
                                     <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
-                                    <p>{{ dados[0].data_min_eficacia }} e {{ dados[0].data_max_eficacia }}</p>
+                                    <p>{{ dados.card3.data_min }} e {{ dados.card3.data_max }}</p>
                                 </div>
                             </div>
                         </div>
@@ -209,7 +201,7 @@
                             <div class="card-info-detalhe">
                                 <div class="info-item-detalhe">
                                     <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                    <p>{{ card.qtd_respostas }} respostas</p>
+                                    <p>{{ card.qtd_respostas }} perguntas respondidas</p>
                                 </div>
                                 <div class="info-item-detalhe">
                                     <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
@@ -429,7 +421,7 @@
                                         <div class="card-info-modal">
                                             <div class="info-item">
                                                 <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                                <p>${pergunta.qtd_respostas} respostas</p>
+                                                <p>${pergunta.qtd_respostas} perguntas respondidas</p>
                                             </div>
                                             <div class="info-item">
                                                 <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">

@@ -181,7 +181,7 @@ def consulta_fk_dimensao(tabela, coluna_retorno, coluna_pesquisa=None, pesquisa=
                 return None
         
 def consulta_dados_respostas(fk_gestor=None, data_min=None, data_max = None):
-        query = f'SELECT fk_pergunta, fk_categoria, resposta, data_hora FROM respostas'
+        query = f'SELECT COUNT(*) FROM respostas'
         params = []
         conditions = []
 
