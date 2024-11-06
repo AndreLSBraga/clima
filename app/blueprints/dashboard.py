@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, session, request, flash, redirect, url_for, current_app as app, jsonify
 from app.utils.db_consultas import consulta_dados_respostas, consulta_dados_gestor, consulta_time_por_fk_gestor
-from app.utils.db_consultas import consulta_sugestoes_por_gestor, consulta_fk_categoria_geral
+from app.utils.db_consultas import consulta_sugestoes_por_gestor, consulta_fk_categoria_geral, consulta_desc_categoria_pelo_fk_categoria
 from app.utils.db_notas_consultas import consulta_promotores
 from app.utils.dashboard import gera_cards, gera_cards_detalhe, gera_informacoes_respostas, processa_sugestoes
-from app.utils.dashboard import gera_grafico, gera_card_gestor_liderado, gera_main_cards
+from app.utils.dashboard import gera_grafico, gera_card_gestor_liderado, gera_main_cards, gera_cards_categoria
 
 dashboard = Blueprint('dashboard', __name__)
 dashboard_categoria = Blueprint('dashboard_categoria', __name__)
@@ -24,16 +24,10 @@ def dashboard_view():
     nome_dashboard = nome_completo_gestor[0] + ' ' + nome_completo_gestor[ultimo_nome]
     ids_time = consulta_time_por_fk_gestor(fk_gestor)
 
-    if ids_time:
-        tamanho_time = len(ids_time)
-    else:
-        tamanho_time = 0
-
     nota_geral = consulta_promotores(fk_gestor)[0]
     nota_nps = consulta_promotores(fk_gestor, 29)[0]
     nota_pulsa = consulta_promotores(fk_gestor, 59)[0]
     grafico_geral = gera_grafico(fk_gestor)
-    app.logger.debug(grafico_geral)
     dados_main_cards = {
         'nome': nome_dashboard,
         'card1': gera_main_cards(nota_geral),
@@ -55,30 +49,14 @@ def dashboard_view():
 def detalhes_categoria_view(card_id):
 
     fk_gestor = session['fk_gestor']
-    respostas = consulta_dados_respostas(fk_gestor)
-
-    ids_time = consulta_time_por_fk_gestor(fk_gestor)
-
-    if ids_time:
-        tamanho_time = len(ids_time)
-    else:
-        tamanho_time = 0
-    respostas = consulta_dados_respostas(fk_gestor)
-    if respostas:
-        qtd_respostas = len(respostas)
-    else:
-        qtd_respostas = 0
-    #Criar lógica para não exibir resultados se o tamanho do time for menor que 3 ou não tiver respostas
-    if not respostas or tamanho_time < 3:
-        cards_perguntas = gera_cards_detalhe(None, fk_gestor, card_id)
-    
-    elif qtd_respostas < 30:
-            cards_perguntas = gera_cards_detalhe(None, fk_gestor, card_id)
-    else:
-        cards_perguntas = gera_cards_detalhe(respostas, fk_gestor, card_id)
+    categoria_info = gera_cards_categoria(fk_gestor, card_id)
+    cards_perguntas = gera_cards_detalhe(fk_gestor, card_id)
 
     if cards_perguntas:
-        return jsonify(cards_perguntas)
+        return jsonify({
+            'categoria': categoria_info,
+            'perguntas': cards_perguntas
+        })
     else:
         return jsonify({"error": "Categoria não encontrada"}), 404
  
@@ -125,7 +103,6 @@ def dashboard_gestores_view():
     ultimo_nome = len(nome_completo_gestor)-1
     nome_dashboard = nome_completo_gestor[0] + ' ' + nome_completo_gestor[ultimo_nome]
     ids_time = consulta_time_por_fk_gestor(fk_gestor)
-    app.logger.debug(ids_time)
     dados_gestor = {
         'nome': nome_dashboard,
     }
@@ -150,9 +127,7 @@ def dashboard_gestores_view():
     #Se não tiver gestores na lista, já redireciona para a aba sem enviar os dados de notas
     if not lista_gestores:
         return render_template('dash_gestores.html', perfil = perfil, dados_gestor = dados_gestor)
-    app.logger.debug(lista_gestores)
     #Pra cada gestor na lista dos gestores
     for indice, gestor in enumerate(lista_gestores):
         cards_gestores.append(gera_card_gestor_liderado(gestor, indice))
-    app.logger.debug(cards_gestores)
     return render_template('dash_gestores.html', perfil = perfil, dados_gestor = dados_gestor, cards_gestores = cards_gestores)

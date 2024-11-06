@@ -47,12 +47,12 @@
         <div class="container">
             <div class="introbar">
                 <div class="introbar-text">
-                    <span><h2>Olá, {{dados.nome}}! Esse é o resultado do seu time.</h2></span>
-                    <span class="small-text">Sua nota está baseada em {{dados.card1.qtd_respostas}} respostas, entre os dias {{dados.card1.data_min}} e {{dados.card1.data_max}}.</span>
+                    <span><h2>Olá, {{dados.nome}}! Esse é o resultado do seu time direto.</h2></span>
+                    <span class="small-text">Sua nota está baseada em {{dados.card1.qtd_respostas}} perguntas respondidas, entre os dias {{dados.card1.data_min}} e {{dados.card1.data_max}}.</span>
                 </div>
             </div>
                 <div class="dashboard-container">
-                    <div class="main-cards">
+                    <!-- <div class="main-cards">
                         <div class="card card-principal geral">
                             <div class="card-header">
                                 <img class="icon" src="/static/images/icons/nota_geral.svg" alt="Icone Nota Geral">
@@ -145,7 +145,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="main-grafico">
                         <div class="chart-container">
                             <canvas id="myChart"></canvas>
@@ -196,6 +196,7 @@
                                         <span>-</span>
                                     {% endif %}
                                 </div>
+                                <div class="progress-data-detalhe">%</div>
                             </div>
                             
                             <div class="card-info-detalhe">
@@ -223,9 +224,7 @@
         <div id="modalPerguntas" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="fecharModal()">&times;</span>
-                <div class="modal-header">
-                    <h4 id="modal-card-title">Detalhes da Categoria</h4>
-                </div>
+                <div class="modal-header"></div>
                 <div id="modal-body" class="modal-body">
                     <!-- Os cards das perguntas serão adicionados aqui via JavaScript -->
                 </div>
@@ -298,37 +297,31 @@
                     datasets: [
                         {
                             type: 'bar',  // Define a 'nota' como gráfico de linha
-                            label: 'Nota média',
+                            label: 'Percentual Promotores',
                             data: notas,  // Notas para cada semana
-                            backgroundColor: notas.map(nota => calcularCorNota(nota)),
-                            borderColor: notas.map(nota => calcularCorNota(nota)),
+                            backgroundColor: '#52d17a',
+                            borderColor: '#52d17a',
                             borderWidth: 2,
                             yAxisID: 'y',  // Associado ao primeiro eixo y
                             fill: false,  // Não preencher a área abaixo da linha
                             datalabels: {
                                 align: 'top',
                                 anchor: 'start',
-                                color: '#000',
-                                formatter: function(value) {
-                                    return value.toFixed(1);  // Exibe o valor com uma casa decimal
-                                }
+                                color: '#000'
                             }
                         },
                         {
                             type: 'bar',  // Define a 'aderência' como gráfico de barras
-                            label: 'Aderência',
+                            label: 'Percentual Aderência',
                             data: aderencia,  // Aderência para cada semana
-                            backgroundColor: aderencia.map(ad => calcularCorAderencia(ad)),
-                            borderColor: aderencia.map(ad => calcularCorAderencia(ad)),
+                            backgroundColor: '#fbb259',
+                            borderColor: '#fbb259',
                             borderWidth: 1,
                             yAxisID: 'y1',  // Associado ao segundo eixo y
                             datalabels: {
                                 align: 'top',
                                 anchor: 'start',
-                                color: '#000',  // Cor da label para a aderência
-                                formatter: function(value) {
-                                    return value.toFixed(1) + '%';  // Exibe o valor com uma casa decimal e o símbolo de porcentagem
-                                }
+                                color: '#000'
                             }
                         }
                     ]
@@ -351,10 +344,10 @@
                         },
                         y: {
                             beginAtZero: true,
-                            max: 10,  // Define o limite para a nota média
+                            max: 100,  // Define o limite para a nota média
                             title: {
                                 display: true,
-                                text: 'Nota Média'
+                                text: 'Percentual Promotores'
                             }
                         },
                         y1: {
@@ -366,7 +359,7 @@
                             },
                             title: {
                                 display: true,
-                                text: 'Aderência (%)'
+                                text: 'Percentual Aderência'
                             }
                         }
                     }
@@ -380,81 +373,94 @@
     </script>
     <script>//Gera modal de detalhes
         function modalPerguntas(cardId) {
-            fetch(`/dashboard/detalhes-categoria:${cardId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                    } else {
-                        // Limpa o conteúdo do modal antes de adicionar novos cards
-                        const modalBody = document.getElementById('modal-body');
-                        modalBody.innerHTML = '';
+        fetch(`/dashboard/detalhes-categoria:${cardId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    const modalBody = document.getElementById('modal-body');
+                    modalBody.innerHTML = '';  // Limpa o conteúdo do modal
 
-                        // Itera sobre cada pergunta e cria um card para ela
-                        data.forEach(pergunta => {
-                            const chartId = `myChart-${pergunta.id}`; // Usando pergunta.id para um ID único
-                            const card = document.createElement('div');
-                            card.classList.add('card-modal');
+                    // Exibe as informações da categoria antes dos detalhes das perguntas
+                    const chartId = `myChart-categoria-${data.categoria.id_categoria}`
+                    const categoria = document.createElement('div');
+                    categoria.classList.add('categoria-info');
+                    categoria.innerHTML = 
+                        `<div class="modal-card-title">
+                            <span><h2>Categoria: ${data.categoria.descricao} </h2></span>
+                        </div>
+                        <div class="card-center-modal">
+                            <div class="chart-container-modal">
+                                <canvas id="${chartId}"></canvas>
+                            </div>
+                        </div>
+                        <span><h2>Perguntas:</h2></span>`
+                    ;
+                    modalBody.appendChild(categoria);
 
-                            card.innerHTML = `
-                                <div class="card-content-modal">
-                                    <!-- Lado esquerdo (dados) -->
-                                    <div class="card-left-modal">
-                                        <!-- Título -->
-                                        <div class="card-header-modal">
-                                            <h4>${pergunta.title}</h4>
-                                        </div>
+                    // Renderiza o gráfico da categoria
+                    renderChartSingleAxis(chartId, data.categoria.semanas, data.categoria.notas);
 
-                                        <!-- Barra de progresso -->
-                                        <div class="progress-bar-modal">
-                                            <div class="progress-bar-container-modal">
-                                                <div class="progress-bar-bg-modal">
-                                                    <div class="progress-fill-modal" data-nota=${pergunta.value} data-size=${pergunta.size}></div>
-                                                </div>
-                                            </div>
-                                            <div class="progress-data-modal">
-                                                <span>${pergunta.value || '-'}</span>
-                                            </div>
-                                        </div>
+                    // Itera sobre cada pergunta e cria um card para ela
+                    data.perguntas.forEach(pergunta => {
+                        const chartId = `myChart-${pergunta.id}`;
+                        const card = document.createElement('div');
+                        card.classList.add('card-modal');
 
-                                        <!-- Informações adicionais -->
-                                        <div class="card-info-modal">
-                                            <div class="info-item">
-                                                <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                                <p>${pergunta.qtd_respostas} perguntas respondidas</p>
-                                            </div>
-                                            <div class="info-item">
-                                                <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
-                                                <p>${pergunta.data_min || '-'} e ${pergunta.data_max || '-'}</p>
-                                            </div>
-                                        </div>
+                        card.innerHTML = `
+                            <div class="card-content-modal">
+                                <div class="card-left-modal">
+                                    <div class="card-header-modal">
+                                        <h4>${pergunta.title}</h4>
                                     </div>
 
-                                    <!-- Lado direito (gráfico) -->
-                                    <div class="card-right-modal">
-                                        <div class="chart-container-modal">
-                                            <canvas id="${chartId}"></canvas>
+                                    <div class="progress-bar-modal">
+                                        <div class="progress-bar-container-modal">
+                                            <div class="progress-bar-bg-modal">
+                                                <div class="progress-fill-modal" data-nota=${pergunta.value} data-size=${pergunta.size}></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-data-modal">
+                                            <span>${pergunta.value || '-'}</span>
+                                        </div>
+                                        <div class="progress-data-modal">%</div>
+                                    </div>
+
+                                    <div class="card-info-modal">
+                                        <div class="info-item">
+                                            <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
+                                            <p>${pergunta.qtd_respostas} perguntas respondidas</p>
+                                        </div>
+                                        <div class="info-item">
+                                            <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
+                                            <p>${pergunta.data_min || '-'} e ${pergunta.data_max || '-'}</p>
                                         </div>
                                     </div>
                                 </div>
 
-                            `;
-                            modalBody.appendChild(card);
+                                <div class="card-right-modal">
+                                    <div class="chart-container-modal">
+                                        <canvas id="${chartId}"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        modalBody.appendChild(card);
 
-                            // Renderiza o gráfico para cada pergunta
-                            renderChartSingleAxis(chartId, pergunta.semanas, pergunta.notas);
-                        });
+                        // Renderiza o gráfico para cada pergunta
+                        renderChartSingleAxis(chartId, pergunta.semanas, pergunta.notas);
+                    });
 
-                        // Exibe o modal
-                        document.getElementById('modalPerguntas').style.display = 'block';
-                        setTimeout(animateProgressBars, 100);
-
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao buscar os dados do card:', error);
-                    alert('Erro ao buscar os dados do card. Tente novamente.');
-                });
+                    // Exibe o modal
+                    document.getElementById('modalPerguntas').style.display = 'block';
+                    setTimeout(animateProgressBars, 100);
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao buscar os dados do card:', error);
+                alert('Erro ao buscar os dados do card. Entre em contato com o suporte.');
+            });
         }
 
         function animateProgressBars() {
@@ -486,10 +492,10 @@
                     labels: labels,  // Semanas do ano
                     datasets: [
                         {
-                            label: 'Nota média',
+                            label: 'Pecentual Promotores',
                             data: notas,  // Notas para cada semana
-                            backgroundColor: notas.map(nota => calcularCorNota(nota)),
-                            borderColor: notas.map(nota => calcularCorNota(nota)),
+                            backgroundColor: '#52d17a',
+                            borderColor: '#52d17a',
                             borderWidth: 1,
                             yAxisID: 'y',  // Apenas o primeiro eixo y
                         }
@@ -503,16 +509,16 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Semanas do Ano'
+                                text: 'Pesquisa'
                             }
                         },
                         y: {
                             beginAtZero: true,
                             min: 0,
-                            max: 10,  // Define o limite para a nota média
+                            max: 100,  // Define o limite para a nota média
                             title: {
                                 display: true,
-                                text: 'Nota Média'
+                                text: 'Percentual Promotores'
                             }
                         }
                     }

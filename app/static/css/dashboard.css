@@ -85,6 +85,7 @@
 }
 
 .progress-data {
+    display: flex;
     text-align: center;
     font-size: 1rem;
     color: #333;
@@ -128,7 +129,15 @@
     padding-top: 10px;
     min-height: 100%;
     min-width: 500px;
-    width: 67%;
+    width: 100%;
+}
+.main-grafico-modal{
+    display: block;
+    justify-content: center;
+    gap: 5px;
+    padding-top: 10px;
+    min-width: 500px;
+    width: 100%;
 }
 
 .chart-container {
@@ -201,6 +210,7 @@
 }
 
 .progress-data-detalhe {
+    display: flex;
     text-align: center;
     font-size: 1rem;
     color: #333;
@@ -342,6 +352,16 @@
     display: flex;
     align-items: center;
     margin-bottom: 10px;
+}
+.card-center-modal{
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding-top: 10px;
+    min-height: 200px;
+    min-width: 600px;
+    width: 100%;
 }
 
 .card-right-modal{

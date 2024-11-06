@@ -2,7 +2,7 @@ from flask import current_app as app, flash
 import datetime
 from app.utils.db_consultas import consulta_fk_dimensao, consulta_desc_categoria_pelo_fk_categoria, consulta_texto_perguntas,consulta_time_por_fk_gestor
 from app.utils.db_consultas import consulta_usuario_respondeu, consulta_semana_mes_media_respostas, consulta_resumo_respostas_categoria_gestor
-from app.utils.db_notas_consultas import consulta_promotores_categorias, consulta_promotores_grafico_geral
+from app.utils.db_notas_consultas import consulta_promotores_categorias, consulta_promotores_perguntas, consulta_promotores_grafico_geral, consulta_promotores_grafico_pergunta, consulta_promotores_grafico_categoria
 
 def processa_respostas_validas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_filtro=None, fk_gestor=None):
     if fk_pergunta_filtro is not None:
@@ -31,14 +31,35 @@ def gera_informacoes_respostas(dados_respostas, fk_categoria_filtro=None, fk_per
 
 def gera_grafico(fk_gestor=None, fk_categoria_filtro=None, fk_pergunta_filtro=None ):
     dados_grafico = consulta_promotores_grafico_geral(fk_gestor)
+    
+    if not dados_grafico:
+        return None,None,None
     lista_pesquisa = [pesquisa for pesquisa, _, _, _ in dados_grafico]
     lista_promotores = [
-        round(float(promotores), 1) if respondentes_unicos >= 3 else 0
+        round(float(promotores), 1) if respondentes_unicos >= 3 else None
         for _, respondentes_unicos, promotores, _ in dados_grafico
     ]
-    lista_aderencia = [round(float(aderencia),0) for _, _, _, aderencia in dados_grafico]
+    lista_aderencia = [
+        round(float(aderencia),0) if aderencia else None
+        for _, _, _, aderencia in dados_grafico]
 
     return lista_pesquisa, lista_promotores, lista_aderencia
+
+def gera_grafico_detalhes(dados, fk_pergunta_filtro):
+
+    intervalos = []
+    notas = []
+    # Filtra apenas os dados que correspondem ao fk_pergunta desejado
+    for intervalo, fk_pergunta, qtd_respondentes_unicos, percentual_promotores in dados:
+        if fk_pergunta == fk_pergunta_filtro:
+            intervalos.append(intervalo)
+            # Define a nota como None se qtd_respondentes for menor que 3, caso contrário usa o valor
+            if qtd_respondentes_unicos < 3:
+                notas.append(None)
+            else:
+                notas.append(float(percentual_promotores))  # Converte para float para simplificar
+
+    return intervalos, notas
 
 def processa_respostas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_filtro=None, fk_gestor=None):
 
@@ -151,7 +172,6 @@ def gera_main_cards(nota):
                 'data_max': nota[5],
         }
 
-
 def gera_cards(fk_gestor):
     # Consulta promotores por categoria
     dados_categorias = consulta_promotores_categorias(fk_gestor)
@@ -191,68 +211,76 @@ def gera_cards(fk_gestor):
             cards.append(card)
     return cards
 
-def gera_cards_detalhe(dados_respostas, fk_gestor,  fk_categoria_detalhe):
-    # Consulta as categorias
-    perguntas_consulta = consulta_fk_dimensao('perguntas', 'fk_pergunta', 'fk_categoria', fk_categoria_detalhe)
-    fk_perguntas = [categoria[0] for categoria in perguntas_consulta]
+def gera_cards_detalhe(fk_gestor,  fk_categoria_detalhe):
     cards = []
+    lista_semanas = []
+    #Traz os dados do gestor
+    dados_respostas = consulta_promotores_perguntas(fk_gestor, fk_categoria_detalhe)
+    
+    dados_grafico = consulta_promotores_grafico_pergunta(fk_gestor)
+    
     # Itera sobre cada categoria
-    for pergunta in fk_perguntas:
-
-        descricao_pergunta = consulta_texto_perguntas(pergunta)
-        if not dados_respostas:
+    for pergunta in dados_respostas:
+        fk_pergunta = pergunta[0]
+        descricao_pergunta = pergunta[1]
+        perc_promotores = pergunta[2]
+        qtd_promotores = pergunta[3]
+        qtd_respostas_unicas = pergunta[4]
+        qtd_respostas_totais = pergunta[5]
+        data_min = pergunta[6]
+        data_max = pergunta[7]
+        dados_grafico_pergunta = gera_grafico_detalhes(dados_grafico, fk_pergunta)
+        semanas = dados_grafico_pergunta[0]
+        notas = dados_grafico_pergunta[1]
+        if qtd_respostas_unicas < 3:
             card = {
-                'id': pergunta,
-                'title': descricao_pergunta,  # O título da categoria
-                'value': None,  # Defina o valor como 0 se não houver média
-                'size': 0,  # Defina o tamanho como 0 se não houver média
-                'qtd_respostas': 0,
-                'data_min': None,
-                'data_max': None,
-                'semanas':  [],
-                'notas': []
+            'id': fk_pergunta,
+            'title': descricao_pergunta,  
+            'value': None , 
+            'size': 0,
+            'qtd_respostas': qtd_respostas_totais,
+            'data_min': data_min,
+            'data_max': data_max,
+            'semanas':[],
+            'notas':[]
             }
             cards.append(card)
         else:
-            # Processa as respostas para a categoria atual
-            media_respostas, size, quantidade_respostas, data_min, data_max = gera_informacoes_respostas(dados_respostas, None, pergunta)
-            dados_grafico = gera_grafico(fk_gestor, None, pergunta)
-            if quantidade_respostas < 3:
-                card = {
-                    'id': pergunta,
-                    'title': descricao_pergunta,  # O título da categoria
-                    'value': None,  # Defina o valor como 0 se não houver média
-                    'size': 0,  # Defina o tamanho como 0 se não houver média
-                    'qtd_respostas': quantidade_respostas,
-                    'data_min': None,
-                    'data_max': None,
-                    'semanas':  [],
-                    'notas': []
-                }
-                cards.append(card)
-            else:
-                if dados_grafico:
-                    semanas = dados_grafico[0]
-                    notas_semana = dados_grafico[1]
-                else:
-                    semanas = []
-                    notas_semana = []
-
-                # Se as respostas forem válidas, cria um card
-                card = {
-                    'id': pergunta,
-                    'title': descricao_pergunta,  # O título da categoria
-                    'value': media_respostas if media_respostas is not None else None,  # Defina o valor como 0 se não houver média
-                    'size': size if media_respostas is not None else None,  # Defina o tamanho como 0 se não houver média
-                    'qtd_respostas': quantidade_respostas,
-                    'data_min': data_min if data_min else None,
-                    'data_max': data_max if data_max else None,
-                    'semanas':  semanas,
-                    'notas': notas_semana
-                }
-                cards.append(card)
-
+            card = {
+            'id': fk_pergunta,
+            'title': descricao_pergunta,  # O título da categoria
+            'value': perc_promotores ,  # Defina o valor como 0 se não houver média
+            'size': perc_promotores, 
+            'qtd_respostas': qtd_respostas_totais,
+            'data_min': data_min,
+            'data_max': data_max,
+            'semanas': semanas,
+            'notas': notas
+            }
+            cards.append(card)
     return cards
+
+def gera_cards_categoria(fk_gestor, fk_categoria):
+
+    dados_categoria = consulta_promotores_grafico_categoria(fk_gestor, fk_categoria)
+    app.logger.debug(dados_categoria)
+    intervalos = []
+    notas = []
+    # Filtra apenas os dados que correspondem ao fk_pergunta desejado
+    for intervalo, qtd_respondentes_unicos, percentual_promotores in dados_categoria:
+        intervalos.append(intervalo)
+        # Define a nota como None se qtd_respondentes for menor que 3, caso contrário usa o valor
+        if qtd_respondentes_unicos < 3:
+            notas.append(None)
+        else:
+            notas.append(float(percentual_promotores))  # Converte para float para simplificar    
+    
+    return {
+        'id_categoria': fk_categoria,
+        'descricao': consulta_desc_categoria_pelo_fk_categoria(fk_categoria),
+        'semanas': intervalos,
+        'notas':  notas
+    }
 
 def processa_sugestoes(base_sugestoes):
     sugestoes = []
