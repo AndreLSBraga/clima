@@ -225,6 +225,10 @@
             <div class="modal-content">
                 <span class="close" onclick="fecharModal()">&times;</span>
                 <div class="modal-header"></div>
+                <div id="loading-spinner" class="spinner">
+                    <div class="loader"></div>
+                    <p class="loading-text">Carregando</p>
+                </div>        
                 <div id="modal-body" class="modal-body">
                     <!-- Os cards das perguntas serão adicionados aqui via JavaScript -->
                 </div>
@@ -373,6 +377,10 @@
     </script>
     <script>//Gera modal de detalhes
         function modalPerguntas(cardId) {
+        document.getElementById('modalPerguntas').style.display = 'block';
+        document.getElementById('loading-spinner').style.display = 'flex';
+        document.getElementById('modal-body').innerHTML = ''; // Limpa o conteúdo anterior do modal
+
         fetch(`/dashboard/detalhes-categoria:${cardId}`)
             .then(response => response.json())
             .then(data => {
@@ -381,6 +389,8 @@
                 } else {
                     const modalBody = document.getElementById('modal-body');
                     modalBody.innerHTML = '';  // Limpa o conteúdo do modal
+                    
+                    document.getElementById('loading-spinner').style.display = 'none';
 
                     // Exibe as informações da categoria antes dos detalhes das perguntas
                     const chartId = `myChart-categoria-${data.categoria.id_categoria}`
