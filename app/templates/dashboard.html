@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="/static/css/main_dash_config.css">
     <link rel="stylesheet" href="/static/css/dashboard.css">
     <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/selectize.min.js"></script>
+    <link src="/static/css/selectize.css"></link>
+    <link src="/static/css/selectize.default.css"></link>
     
 </head>
 <body>
@@ -49,6 +53,20 @@
                 <div class="introbar-text">
                     <span><h2>Olá, {{dados.nome}}! Esse é o resultado do seu time direto.</h2></span>
                     <span class="small-text">Sua nota está baseada em {{dados.card1.qtd_respostas}} perguntas respondidas, entre os dias {{dados.card1.data_min}} e {{dados.card1.data_max}}.</span>
+                </div>
+                <div class="filtro-container">
+                    <div class="filtro-container-intervalo">
+                        <label for="intervalos">Selecione o intervalo da pesquisa:</label>
+                        <select id="intervalos" name="intervalos[]" multiple="multiple">
+                            {% for intervalo in intervalos %}
+                            <option value="{{ intervalo }}">{{ intervalo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filtro-actions">
+                        <button id="limparFiltro" class="btn-limpar">Limpar</button>
+                        <button id="aplicarFiltro" class="btn-aplicar">Aplicar Filtro</button>
+                    </div>
                 </div>
             </div>
                 <div class="dashboard-container">
@@ -239,6 +257,7 @@
     <script src="/static/js/background.js"></script>
     <script src="/static/js/chart.umd.js"></script>
     <script src="/static/js/chartjs-plugin-datalabels.js"></script>
+    
     <script>//Carrega barras
         document.addEventListener('DOMContentLoaded', function() {
             
@@ -380,8 +399,17 @@
         document.getElementById('modalPerguntas').style.display = 'block';
         document.getElementById('loading-spinner').style.display = 'flex';
         document.getElementById('modal-body').innerHTML = ''; // Limpa o conteúdo anterior do modal
+        
+        var intervalosSelecionados = $('#intervalos').val();
+        var url = `/dashboard/detalhes-categoria:${cardId}`;
+        
+        // Verifica se há intervalos selecionados e, se sim, adiciona o parâmetro `intervalos` na URL
+        if (intervalosSelecionados && intervalosSelecionados.length > 0) {
+            url += `?intervalos=${encodeURIComponent(JSON.stringify(intervalosSelecionados))}`;
+        }
 
-        fetch(`/dashboard/detalhes-categoria:${cardId}`)
+        // Realiza a requisição para obter os dados do card
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
@@ -536,6 +564,55 @@
             });
         }
     </script>
+    <script>
+        $(document).ready(function() {
+            // Inicializando o Selectize com configurações dinâmicas
+            var $select = $('#intervalos').selectize({
+                plugins: ['remove_button'],
+                placeholder: 'Selecione os intervalos de datas...',
+                closeAfterSelect: false,
+                maxItems: null,
+                hideSelected: true,
+                create: function(input) {
+                    return { value: input, text: input };
+                }
+            });
 
+            var selectize = $select[0].selectize;
+
+            // Define os intervalos selecionados como valores iniciais
+            var intervalosSelecionados = {{ intervalos_selecionados | tojson }};
+            intervalosSelecionados.forEach(function(intervalo) {
+                selectize.addOption({ value: intervalo, text: intervalo });
+                selectize.addItem(intervalo);
+        });
+
+        // Função para aplicar o filtro ao clicar no botão
+        $('#aplicarFiltro').click(function(event) {
+            event.preventDefault();
+            
+            // Captura os intervalos selecionados
+            var intervalosSelecionados = $('#intervalos').val();
+            console.log(intervalosSelecionados);
+            
+            if (intervalosSelecionados && intervalosSelecionados.length > 0) {
+                // Codifica o array como uma string JSON para enviá-lo como parâmetro
+                const intervalosJSON = encodeURIComponent(JSON.stringify(intervalosSelecionados));
+                window.location.href = `/dashboard?intervalos=${intervalosJSON}`;
+            } else {
+                alert("Por favor, selecione ao menos um intervalo.");
+            }
+        });
+
+        // Função para limpar as seleções ao clicar no botão "Limpar"
+        $('#limparFiltro').click(function() {
+            var selectize = $('#intervalos')[0].selectize;
+            selectize.clear();          // Limpa as seleções
+            $('#resultados').empty();   // Limpa a área de resultados
+            window.location.href = `/dashboard`
+        });
+    });
+    </script>
+    
 </body>
 </html>

@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, session, request, flash, redirect, url_for, current_app as app, jsonify
 from app.utils.db_consultas import consulta_dados_respostas, consulta_dados_gestor, consulta_time_por_fk_gestor
 from app.utils.db_consultas import consulta_sugestoes_por_gestor, consulta_fk_categoria_geral, consulta_desc_categoria_pelo_fk_categoria
-from app.utils.db_notas_consultas import consulta_promotores
+from app.utils.db_notas_consultas import consulta_promotores, consulta_intervalo_respostas
 from app.utils.dashboard import gera_cards, gera_cards_detalhe, gera_informacoes_respostas, processa_sugestoes
 from app.utils.dashboard import gera_grafico, gera_card_gestor_liderado, gera_main_cards, gera_cards_categoria
-
+from datetime import datetime
+import json
 dashboard = Blueprint('dashboard', __name__)
 dashboard_categoria = Blueprint('dashboard_categoria', __name__)
 dashboard_sugestoes = Blueprint('dashboard_sugestoes', __name__)
@@ -21,13 +22,38 @@ def dashboard_view():
     
     nome_completo_gestor = consulta_dados_gestor(id_gestor)[2].split(" ")
     ultimo_nome = len(nome_completo_gestor)-1
-    nome_dashboard = nome_completo_gestor[0] + ' ' + nome_completo_gestor[ultimo_nome]
+    nome_dashboard = nome_completo_gestor[0].title() + ' ' + nome_completo_gestor[ultimo_nome].title()
     ids_time = consulta_time_por_fk_gestor(fk_gestor)
 
-    nota_geral = consulta_promotores(fk_gestor)[0]
-    nota_nps = consulta_promotores(fk_gestor, 29)[0]
-    nota_pulsa = consulta_promotores(fk_gestor, 59)[0]
-    grafico_geral = gera_grafico(fk_gestor)
+    intervalo_datas = []
+    intervalos_selecionados = []
+    datas_min_max = [None, None]
+    #Gera intervalo de datas que vão estar possíveis de filtrar
+    dados_intervalo_datas = consulta_intervalo_respostas()
+    for intervalo in dados_intervalo_datas:
+        data = intervalo[0]
+        intervalo_datas.append(data)
+
+    intervalos_param = request.args.get('intervalos')
+    app.logger.debug(intervalos_param)
+    if intervalos_param:
+        datas_filtro = []
+        intervalos_selecionados = json.loads(intervalos_param)
+        #Função de retirar data miníma e máxima do filtro
+        for intervalo in intervalos_selecionados:
+            inicio, fim = intervalo.split(' - ')
+            datas_filtro.append(datetime.strptime(inicio, '%d/%m/%y').date())
+            datas_filtro.append(datetime.strptime(fim, '%d/%m/%y').date())
+
+        datas_min_max = [min(datas_filtro), max(datas_filtro)]
+    else:
+        datas_min_max = [None, None]
+
+
+    nota_geral = consulta_promotores(datas_min_max, fk_gestor)[0]
+    nota_nps = consulta_promotores(datas_min_max, fk_gestor, 29)[0]
+    nota_pulsa = consulta_promotores(datas_min_max, fk_gestor, 59)[0]
+    grafico_geral = gera_grafico(datas_min_max, fk_gestor)
     dados_main_cards = {
         'nome': nome_dashboard,
         'card1': gera_main_cards(nota_geral),
@@ -42,15 +68,28 @@ def dashboard_view():
         'aderencia': grafico_geral[2]
     }]
 
-    cards = gera_cards(fk_gestor)
-    return render_template('dashboard.html', perfil = perfil, dados=dados_main_cards, cards=cards, grafico = dados_main_grafico)
+    cards = gera_cards(datas_min_max, fk_gestor)
+    return render_template('dashboard.html', perfil = perfil, dados=dados_main_cards, cards=cards, grafico = dados_main_grafico, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados)
 
 @dashboard_categoria.route('/dashboard/detalhes-categoria:<int:card_id>', methods = ['GET', 'POST'])
 def detalhes_categoria_view(card_id):
+    datas_min_max = [None, None]
+    intervalos_param = request.args.get('intervalos')
 
+    if intervalos_param:
+        datas_filtro = []
+        intervalos_selecionados = json.loads(intervalos_param)
+        #Função de retirar data miníma e máxima do filtro
+        for intervalo in intervalos_selecionados:
+            inicio, fim = intervalo.split(' - ')
+            datas_filtro.append(datetime.strptime(inicio, '%d/%m/%y').date())
+            datas_filtro.append(datetime.strptime(fim, '%d/%m/%y').date())
+        datas_min_max = [min(datas_filtro), max(datas_filtro)]
+    else:
+        datas_min_max = [None, None]
     fk_gestor = session['fk_gestor']
-    categoria_info = gera_cards_categoria(fk_gestor, card_id)
-    cards_perguntas = gera_cards_detalhe(fk_gestor, card_id)
+    categoria_info = gera_cards_categoria(datas_min_max, fk_gestor, card_id)
+    cards_perguntas = gera_cards_detalhe(datas_min_max, fk_gestor, card_id)
 
     if cards_perguntas:
         return jsonify({
@@ -71,7 +110,7 @@ def dashboard_sugestoes_view():
     
     nome_completo_gestor = consulta_dados_gestor(id_gestor)[2].split(" ")
     ultimo_nome = len(nome_completo_gestor)-1
-    nome_dashboard = nome_completo_gestor[0] + ' ' + nome_completo_gestor[ultimo_nome]
+    nome_dashboard = nome_completo_gestor[0].title() + ' ' + nome_completo_gestor[ultimo_nome].title()
     ids_time = consulta_time_por_fk_gestor(fk_gestor)
     dados_gestor = {
         'nome': nome_dashboard,

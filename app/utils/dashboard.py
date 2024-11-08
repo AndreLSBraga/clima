@@ -29,8 +29,9 @@ def gera_informacoes_respostas(dados_respostas, fk_categoria_filtro=None, fk_per
     else:
         return None, None, 0, None, None
 
-def gera_grafico(fk_gestor=None, fk_categoria_filtro=None, fk_pergunta_filtro=None ):
-    dados_grafico = consulta_promotores_grafico_geral(fk_gestor)
+def gera_grafico(datas_min_max, fk_gestor=None, fk_categoria_filtro=None, fk_pergunta_filtro=None ):
+
+    dados_grafico = consulta_promotores_grafico_geral(datas_min_max, fk_gestor)
     
     if not dados_grafico:
         return None,None,None
@@ -172,9 +173,9 @@ def gera_main_cards(nota):
                 'data_max': nota[5],
         }
 
-def gera_cards(fk_gestor):
+def gera_cards(datas_min_max,fk_gestor):
     # Consulta promotores por categoria
-    dados_categorias = consulta_promotores_categorias(fk_gestor)
+    dados_categorias = consulta_promotores_categorias(datas_min_max, fk_gestor)
     cards = []
     # Itera sobre cada categoria
     for categoria in dados_categorias:
@@ -211,13 +212,13 @@ def gera_cards(fk_gestor):
             cards.append(card)
     return cards
 
-def gera_cards_detalhe(fk_gestor,  fk_categoria_detalhe):
+def gera_cards_detalhe(datas_min_max, fk_gestor,  fk_categoria_detalhe):
     cards = []
     lista_semanas = []
     #Traz os dados do gestor
-    dados_respostas = consulta_promotores_perguntas(fk_gestor, fk_categoria_detalhe)
+    dados_respostas = consulta_promotores_perguntas(datas_min_max, fk_gestor, fk_categoria_detalhe)
     
-    dados_grafico = consulta_promotores_grafico_pergunta(fk_gestor)
+    dados_grafico = consulta_promotores_grafico_pergunta(datas_min_max, fk_gestor, fk_categoria_detalhe)
     
     # Itera sobre cada categoria
     for pergunta in dados_respostas:
@@ -260,10 +261,9 @@ def gera_cards_detalhe(fk_gestor,  fk_categoria_detalhe):
             cards.append(card)
     return cards
 
-def gera_cards_categoria(fk_gestor, fk_categoria):
+def gera_cards_categoria(datas_min_max, fk_gestor, fk_categoria):
 
-    dados_categoria = consulta_promotores_grafico_categoria(fk_gestor, fk_categoria)
-    app.logger.debug(dados_categoria)
+    dados_categoria = consulta_promotores_grafico_categoria(datas_min_max, fk_gestor, fk_categoria)
     intervalos = []
     notas = []
     # Filtra apenas os dados que correspondem ao fk_pergunta desejado

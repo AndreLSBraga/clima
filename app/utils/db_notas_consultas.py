@@ -2,7 +2,9 @@ from app.utils.db import get_db  # Importando a função get_db
 from flask import current_app as app, flash
 
 
-def consulta_promotores(fk_gestor=None, fk_pergunta=None, fk_categoria=None):
+def consulta_promotores(datas_min_max,fk_gestor=None, fk_pergunta=None, fk_categoria=None):
+    data_min = datas_min_max[0]
+    data_max = datas_min_max[1]
     query = f'''
     SELECT
         ROUND(100.0 * SUM(CASE WHEN resposta >= 6 THEN 1 ELSE 0 END) / COUNT(*),1) AS percentual_promotores,
@@ -29,9 +31,16 @@ def consulta_promotores(fk_gestor=None, fk_pergunta=None, fk_categoria=None):
     if fk_categoria is not None:
         conditions.append('fk_categoria = %s')
         params.append(fk_categoria)
+    if data_min is not None:
+        conditions.append('data_hora >= %s')
+        params.append(data_min)
+    if data_max is not None:
+        conditions.append('data_hora <= %s')
+        params.append(data_max)
 
     if conditions:
         query += ' AND ' + ' AND '.join(conditions)
+
     db = get_db()
     cursor = db.cursor()
     cursor.execute(query, params)
@@ -42,7 +51,9 @@ def consulta_promotores(fk_gestor=None, fk_pergunta=None, fk_categoria=None):
     else:
             return None
     
-def consulta_promotores_categorias(fk_gestor):
+def consulta_promotores_categorias(datas_min_max, fk_gestor):
+    data_min = datas_min_max[0]
+    data_max = datas_min_max[1]
     query = f'''
     SELECT
         c.fk_categoria, 
@@ -65,7 +76,12 @@ def consulta_promotores_categorias(fk_gestor):
     if fk_gestor is not None:
         conditions.append('fk_gestor = %s')
         params.append(fk_gestor)
-
+    if data_min is not None:
+        conditions.append('data_hora >= %s')
+        params.append(data_min)
+    if data_max is not None:
+        conditions.append('data_hora <= %s')
+        params.append(data_max)
     if conditions:
         query += ' AND ' + ' AND '.join(conditions)
     
@@ -80,8 +96,10 @@ def consulta_promotores_categorias(fk_gestor):
     else:
             return None
 
-def consulta_promotores_perguntas(fk_gestor, fk_categoria):
-    query = f'''
+def consulta_promotores_perguntas(datas_min_max, fk_gestor, fk_categoria):
+    data_min = datas_min_max[0]
+    data_max = datas_min_max[1]
+    query = '''
     SELECT 
         p.fk_pergunta, 
         p.texto_pergunta,
@@ -94,22 +112,27 @@ def consulta_promotores_perguntas(fk_gestor, fk_categoria):
     FROM 
         pulsa.perguntas p
     LEFT JOIN 
-        pulsa.respostas r ON r.fk_pergunta = p.fk_pergunta 
+        pulsa.respostas r ON r.fk_pergunta = p.fk_pergunta
     '''
 
-    params = []
     conditions = []
-
+    params = []
     if fk_gestor is not None:
-        conditions.append('fk_gestor = %s')
+        conditions.append('r.fk_gestor = %s')
         params.append(fk_gestor)
-
+    if data_min is not None:
+        conditions.append('r.data_hora >= %s')
+        params.append(data_min)
+    if data_max is not None:
+        conditions.append('r.data_hora <= %s')
+        params.append(data_max)
+    
     if conditions:
         query += ' AND ' + ' AND '.join(conditions)
     
     query += ' WHERE p.fk_categoria = %s GROUP BY p.fk_pergunta, p.texto_pergunta'
-    #Adiciona a categoria para o último placeholder
     params.append(fk_categoria)
+    #Adiciona a categoria para o último placeholder
     db = get_db()
     cursor = db.cursor()
     cursor.execute(query, params)
@@ -120,7 +143,10 @@ def consulta_promotores_perguntas(fk_gestor, fk_categoria):
     else:
             return None
 
-def consulta_promotores_grafico_geral(fk_gestor):
+def consulta_promotores_grafico_geral(datas_min_max, fk_gestor):
+    data_min = datas_min_max[0]
+    data_max = datas_min_max[1]
+
     query = '''
     WITH intervalos AS (
         SELECT DISTINCT
@@ -129,24 +155,24 @@ def consulta_promotores_grafico_geral(fk_gestor):
                     CONCAT(
                         DATE_FORMAT(
                             DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         ),
                         ' - ',
                         DATE_FORMAT(
                             DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 + 6) DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         )
                     )
                 ELSE
                     CONCAT(
                         DATE_FORMAT(
                             DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         ),
                         ' - ',
                         DATE_FORMAT(
                             DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 + 13) DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         )
                     )
             END AS intervalo_pesquisa,
@@ -174,25 +200,38 @@ def consulta_promotores_grafico_geral(fk_gestor):
             (CASE 
                 WHEN r.data_hora < '2024-09-30' THEN 
                     i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 DAY), '%d/%m'), 
+                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 DAY), '%d/%m/%y'), 
                         ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 + 6) DAY), '%d/%m')
+                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 + 6) DAY), '%d/%m/%y')
                     )
                 ELSE 
                     i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 DAY), '%d/%m'), 
+                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 DAY), '%d/%m/%y'), 
                         ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 + 13) DAY), '%d/%m')
+                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 + 13) DAY), '%d/%m/%y')
                     )
             END)
             AND r.fk_gestor = %s
-    GROUP BY 
-        i.intervalo_pesquisa, i.data_referencia
-    ORDER BY 
-        i.data_referencia ASC;
     '''
-
+    conditions = []
     params =[fk_gestor, fk_gestor]
+    if data_min is not None:
+        conditions.append('data_hora >= %s')
+        params.append(data_min)
+    if data_max is not None:
+        conditions.append('data_hora <= %s')
+        params.append(data_max)
+
+    if conditions:
+        query += ' AND ' + ' AND '.join(conditions)
+
+    query += '''
+        GROUP BY 
+            i.intervalo_pesquisa, i.data_referencia
+        ORDER BY 
+            i.data_referencia ASC;
+    '''
+    
     db = get_db()
     cursor = db.cursor()
     cursor.execute(query, params)
@@ -202,7 +241,9 @@ def consulta_promotores_grafico_geral(fk_gestor):
             return result
     else:
             return None
-def consulta_promotores_grafico_categoria(fk_gestor, fk_categoria):
+def consulta_promotores_grafico_categoria(datas_min_max, fk_gestor, fk_categoria):
+    data_min = datas_min_max[0]
+    data_max = datas_min_max[1]
     query = '''
     WITH intervalos AS (
         SELECT DISTINCT
@@ -211,24 +252,24 @@ def consulta_promotores_grafico_categoria(fk_gestor, fk_categoria):
                     CONCAT(
                         DATE_FORMAT(
                             DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         ),
                         ' - ',
                         DATE_FORMAT(
                             DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 + 6) DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         )
                     )
                 ELSE
                     CONCAT(
                         DATE_FORMAT(
                             DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         ),
                         ' - ',
                         DATE_FORMAT(
                             DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 + 13) DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         )
                     )
             END AS intervalo_pesquisa,
@@ -252,25 +293,38 @@ def consulta_promotores_grafico_categoria(fk_gestor, fk_categoria):
             (CASE 
                 WHEN r.data_hora < '2024-09-30' THEN 
                     i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 DAY), '%d/%m'), 
+                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 DAY), '%d/%m/%y'), 
                         ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 + 6) DAY), '%d/%m')
+                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 + 6) DAY), '%d/%m/%y')
                     )
                 ELSE 
                     i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 DAY), '%d/%m'), 
+                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 DAY), '%d/%m/%y'), 
                         ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 + 13) DAY), '%d/%m')
+                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 + 13) DAY), '%d/%m/%y')
                     )
             END)
             AND r.fk_gestor = %s AND r.fk_categoria = %s
+    '''
+    
+    conditions = []
+    params =[fk_gestor, fk_categoria]
+    if data_min is not None:
+        conditions.append('r.data_hora >= %s')
+        params.append(data_min)
+    if data_max is not None:
+        conditions.append('r.data_hora <= %s')
+        params.append(data_max)
+
+    if conditions:
+        query += ' AND ' + ' AND '.join(conditions)
+
+    query += '''
     GROUP BY 
         i.intervalo_pesquisa, i.data_referencia
     ORDER BY 
         i.data_referencia ASC;
     '''
-
-    params =[fk_gestor, fk_categoria]
     db = get_db()
     cursor = db.cursor()
     cursor.execute(query, params)
@@ -281,7 +335,9 @@ def consulta_promotores_grafico_categoria(fk_gestor, fk_categoria):
     else:
             return None
     
-def consulta_promotores_grafico_pergunta(fk_gestor, fk_pergunta=None):
+def consulta_promotores_grafico_pergunta(datas_min_max, fk_gestor, fk_categoria=None):
+    data_min = datas_min_max[0]
+    data_max = datas_min_max[1]
     query = '''
     WITH intervalos AS (
         SELECT DISTINCT
@@ -290,24 +346,24 @@ def consulta_promotores_grafico_pergunta(fk_gestor, fk_pergunta=None):
                     CONCAT(
                         DATE_FORMAT(
                             DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         ),
                         ' - ',
                         DATE_FORMAT(
                             DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 + 6) DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         )
                     )
                 ELSE
                     CONCAT(
                         DATE_FORMAT(
                             DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         ),
                         ' - ',
                         DATE_FORMAT(
                             DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 + 13) DAY),
-                            '%d/%m'
+                            '%d/%m/%y'
                         )
                     )
             END AS intervalo_pesquisa,
@@ -332,28 +388,92 @@ def consulta_promotores_grafico_pergunta(fk_gestor, fk_pergunta=None):
             (CASE 
                 WHEN r.data_hora < '2024-09-30' THEN 
                     i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 DAY), '%d/%m'), 
+                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 DAY), '%d/%m/%y'), 
                         ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 + 6) DAY), '%d/%m')
+                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 + 6) DAY), '%d/%m/%y')
                     )
                 ELSE 
                     i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 DAY), '%d/%m'), 
+                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 DAY), '%d/%m/%y'), 
                         ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 + 13) DAY), '%d/%m')
+                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 + 13) DAY), '%d/%m/%y')
                     )
             END)
-            AND r.fk_gestor = %s
+            AND r.fk_gestor = %s AND r.fk_categoria = %s
+    '''
+
+    conditions = []
+    params =[fk_gestor, fk_categoria]
+    if data_min is not None:
+        conditions.append('r.data_hora >= %s')
+        params.append(data_min)
+    if data_max is not None:
+        conditions.append('r.data_hora <= %s')
+        params.append(data_max)
+
+    if conditions:
+        query += ' AND ' + ' AND '.join(conditions)
+    query += '''
     GROUP BY 
         i.intervalo_pesquisa, r.fk_pergunta, i.data_referencia
     ORDER BY 
         r.fk_pergunta ASC, i.data_referencia ASC;
     '''
-
-    params =[fk_gestor]
     db = get_db()
     cursor = db.cursor()
     cursor.execute(query, params)
+    result = cursor.fetchall()
+    cursor.close()
+    if result:
+            return result
+    else:
+            return None
+    
+
+def consulta_intervalo_respostas():
+    query = f'''
+    SELECT DISTINCT
+        CASE
+            WHEN data_hora < '2024-09-30' THEN
+                CONCAT(
+                    DATE_FORMAT(
+                        DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY),
+                        '%d/%m/%y'
+                    ),
+                    ' - ',
+                    DATE_FORMAT(
+                        DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 + 6) DAY),
+                        '%d/%m/%y'
+                    )
+                )
+            ELSE
+                CONCAT(
+                    DATE_FORMAT(
+                        DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY),
+                        '%d/%m/%y'
+                    ),
+                    ' - ',
+                    DATE_FORMAT(
+                        DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 + 13) DAY),
+                        '%d/%m/%y'
+                    )
+                )
+        END AS intervalo_pesquisa,
+        CASE
+            WHEN data_hora < '2024-09-30' THEN
+                DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY)
+            ELSE
+                DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY)
+        END AS data_referencia
+    FROM
+        pulsa.respostas
+    ORDER BY 
+        data_referencia ASC;
+    '''
+
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(query)
     result = cursor.fetchall()
     cursor.close()
     if result:

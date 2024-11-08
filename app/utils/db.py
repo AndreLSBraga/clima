@@ -5,6 +5,8 @@ from config import MYSQL_HOST, MYSQL_USER,MYSQL_PASSWORD,MYSQL_DB
 def get_db():
     if 'db' not in g:
         g.db = mysql.connector.connect(
+            pool_name= "mypool",
+            pool_size= 15,
             host=MYSQL_HOST,
             user=MYSQL_USER,
             password=MYSQL_PASSWORD,
