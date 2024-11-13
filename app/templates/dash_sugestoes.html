@@ -50,6 +50,7 @@
                 <div class="introbar-text">
                     <span><h2>Olá, {{dados_gestor.nome}}! Aqui estão suas sugestões:</h2></span>
                 </div>
+            </div>
             <div class="table-container">
                 <div>
                     {% if sugestoes %}
@@ -80,8 +81,9 @@
                     {% else %}
                         <p>Não há sugestões disponíveis no momento ou o seu time tem menos que 3 colaboradores.</p>
                     {% endif %}
-                </div>                
-        </div>        
+                </div> 
+            </div>   
+        </div>
     </div>
     
     <script src="/static/js/background.js"></script>

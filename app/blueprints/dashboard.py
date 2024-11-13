@@ -35,7 +35,6 @@ def dashboard_view():
         intervalo_datas.append(data)
 
     intervalos_param = request.args.get('intervalos')
-    app.logger.debug(intervalos_param)
     if intervalos_param:
         datas_filtro = []
         intervalos_selecionados = json.loads(intervalos_param)

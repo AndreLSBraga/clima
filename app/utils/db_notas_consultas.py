@@ -148,43 +148,6 @@ def consulta_promotores_grafico_geral(datas_min_max, fk_gestor):
     data_max = datas_min_max[1]
 
     query = '''
-    WITH intervalos AS (
-        SELECT DISTINCT
-            CASE
-                WHEN data_hora < '2024-09-30' THEN
-                    CONCAT(
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY),
-                            '%d/%m/%y'
-                        ),
-                        ' - ',
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 + 6) DAY),
-                            '%d/%m/%y'
-                        )
-                    )
-                ELSE
-                    CONCAT(
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY),
-                            '%d/%m/%y'
-                        ),
-                        ' - ',
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 + 13) DAY),
-                            '%d/%m/%y'
-                        )
-                    )
-            END AS intervalo_pesquisa,
-            CASE
-                WHEN data_hora < '2024-09-30' THEN
-                    DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY)
-                ELSE
-                    DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY)
-            END AS data_referencia
-        FROM
-            pulsa.respostas
-    )
     SELECT 
         i.intervalo_pesquisa,
         count(distinct(r.identificador)) as respondentes_unicos,
@@ -194,23 +157,10 @@ def consulta_promotores_grafico_geral(datas_min_max, fk_gestor):
                     FROM pulsa.usuarios 
                     WHERE fk_gestor = %s) * 100, 0) as aderencia
     FROM 
-        intervalos i
-    LEFT JOIN 
+        pulsa.intervalos_pesquisa_view i
+    INNER JOIN 
         pulsa.respostas r ON 
-            (CASE 
-                WHEN r.data_hora < '2024-09-30' THEN 
-                    i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 DAY), '%d/%m/%y'), 
-                        ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 + 6) DAY), '%d/%m/%y')
-                    )
-                ELSE 
-                    i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 DAY), '%d/%m/%y'), 
-                        ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 + 13) DAY), '%d/%m/%y')
-                    )
-            END)
+            r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
             AND r.fk_gestor = %s
     '''
     conditions = []
@@ -245,66 +195,15 @@ def consulta_promotores_grafico_categoria(datas_min_max, fk_gestor, fk_categoria
     data_min = datas_min_max[0]
     data_max = datas_min_max[1]
     query = '''
-    WITH intervalos AS (
-        SELECT DISTINCT
-            CASE
-                WHEN data_hora < '2024-09-30' THEN
-                    CONCAT(
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY),
-                            '%d/%m/%y'
-                        ),
-                        ' - ',
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 + 6) DAY),
-                            '%d/%m/%y'
-                        )
-                    )
-                ELSE
-                    CONCAT(
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY),
-                            '%d/%m/%y'
-                        ),
-                        ' - ',
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 + 13) DAY),
-                            '%d/%m/%y'
-                        )
-                    )
-            END AS intervalo_pesquisa,
-            CASE
-                WHEN data_hora < '2024-09-30' THEN
-                    DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY)
-                ELSE
-                    DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY)
-            END AS data_referencia
-        FROM
-            pulsa.respostas
-    )
     SELECT 
         i.intervalo_pesquisa,
         count(distinct(r.identificador)) as respondentes_unicos,
         ROUND(100.0 * COALESCE(SUM(CASE WHEN r.resposta >= 6 THEN 1 ELSE 0 END), 0) / NULLIF(COUNT(r.resposta), 0), 1) AS percentual_promotores
     FROM 
-        intervalos i
-    LEFT JOIN 
-        pulsa.respostas r ON 
-            (CASE 
-                WHEN r.data_hora < '2024-09-30' THEN 
-                    i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 DAY), '%d/%m/%y'), 
-                        ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 + 6) DAY), '%d/%m/%y')
-                    )
-                ELSE 
-                    i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 DAY), '%d/%m/%y'), 
-                        ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 + 13) DAY), '%d/%m/%y')
-                    )
-            END)
-            AND r.fk_gestor = %s AND r.fk_categoria = %s
+        intervalos_pesquisa_view i
+    INNER JOIN 
+        pulsa.respostas r ON r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
+        AND r.fk_gestor = %s AND r.fk_categoria = %s
     '''
     
     conditions = []
@@ -339,67 +238,16 @@ def consulta_promotores_grafico_pergunta(datas_min_max, fk_gestor, fk_categoria=
     data_min = datas_min_max[0]
     data_max = datas_min_max[1]
     query = '''
-    WITH intervalos AS (
-        SELECT DISTINCT
-            CASE
-                WHEN data_hora < '2024-09-30' THEN
-                    CONCAT(
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY),
-                            '%d/%m/%y'
-                        ),
-                        ' - ',
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 + 6) DAY),
-                            '%d/%m/%y'
-                        )
-                    )
-                ELSE
-                    CONCAT(
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY),
-                            '%d/%m/%y'
-                        ),
-                        ' - ',
-                        DATE_FORMAT(
-                            DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 + 13) DAY),
-                            '%d/%m/%y'
-                        )
-                    )
-            END AS intervalo_pesquisa,
-            CASE
-                WHEN data_hora < '2024-09-30' THEN
-                    DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY)
-                ELSE
-                    DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY)
-            END AS data_referencia
-        FROM
-            pulsa.respostas
-    )
     SELECT 
         i.intervalo_pesquisa,
         r.fk_pergunta,
         count(distinct(r.identificador)) as respondentes_unicos,
         ROUND(100.0 * COALESCE(SUM(CASE WHEN r.resposta >= 6 THEN 1 ELSE 0 END), 0) / NULLIF(COUNT(r.resposta), 0), 1) AS percentual_promotores
     FROM 
-        intervalos i
-    LEFT JOIN 
-        pulsa.respostas r ON 
-            (CASE 
-                WHEN r.data_hora < '2024-09-30' THEN 
-                    i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 DAY), '%d/%m/%y'), 
-                        ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-02') / 7) * 7 + 6) DAY), '%d/%m/%y')
-                    )
-                ELSE 
-                    i.intervalo_pesquisa = CONCAT(
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 DAY), '%d/%m/%y'), 
-                        ' - ', 
-                        DATE_FORMAT(DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(r.data_hora, '2024-09-30') / 14) * 14 + 13) DAY), '%d/%m/%y')
-                    )
-            END)
-            AND r.fk_gestor = %s AND r.fk_categoria = %s
+        intervalos_pesquisa_view i
+    INNER JOIN 
+        pulsa.respostas r ON r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
+        AND r.fk_gestor = %s AND r.fk_categoria = %s
     '''
 
     conditions = []
@@ -432,43 +280,7 @@ def consulta_promotores_grafico_pergunta(datas_min_max, fk_gestor, fk_categoria=
 
 def consulta_intervalo_respostas():
     query = f'''
-    SELECT DISTINCT
-        CASE
-            WHEN data_hora < '2024-09-30' THEN
-                CONCAT(
-                    DATE_FORMAT(
-                        DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY),
-                        '%d/%m/%y'
-                    ),
-                    ' - ',
-                    DATE_FORMAT(
-                        DATE_ADD('2024-09-02', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 + 6) DAY),
-                        '%d/%m/%y'
-                    )
-                )
-            ELSE
-                CONCAT(
-                    DATE_FORMAT(
-                        DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY),
-                        '%d/%m/%y'
-                    ),
-                    ' - ',
-                    DATE_FORMAT(
-                        DATE_ADD('2024-09-30', INTERVAL (FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 + 13) DAY),
-                        '%d/%m/%y'
-                    )
-                )
-        END AS intervalo_pesquisa,
-        CASE
-            WHEN data_hora < '2024-09-30' THEN
-                DATE_ADD('2024-09-02', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-02') / 7) * 7 DAY)
-            ELSE
-                DATE_ADD('2024-09-30', INTERVAL FLOOR(DATEDIFF(data_hora, '2024-09-30') / 14) * 14 DAY)
-        END AS data_referencia
-    FROM
-        pulsa.respostas
-    ORDER BY 
-        data_referencia ASC;
+    SELECT * FROM pulsa.intervalos_pesquisa_view;
     '''
 
     db = get_db()
