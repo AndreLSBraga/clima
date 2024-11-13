@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, session, request, flash, redirect, url_for, current_app as app, jsonify
 from app.utils.db_consultas import consulta_dados_respostas, consulta_dados_gestor, consulta_time_por_fk_gestor
 from app.utils.db_consultas import consulta_sugestoes_por_gestor, consulta_fk_categoria_geral, consulta_desc_categoria_pelo_fk_categoria
-from app.utils.db_notas_consultas import consulta_promotores, consulta_intervalo_respostas
+from app.utils.db_notas_consultas import consulta_promotores, consulta_intervalo_respostas, consulta_promotores_area
 from app.utils.dashboard import gera_cards, gera_cards_detalhe, gera_informacoes_respostas, processa_sugestoes
-from app.utils.dashboard import gera_grafico, gera_card_gestor_liderado, gera_main_cards, gera_cards_categoria
+from app.utils.dashboard import gera_grafico, gera_card_gestor_liderado, gera_main_cards, gera_cards_categoria,gera_grafico_area, gera_cards_area
 from datetime import datetime
 import json
 dashboard = Blueprint('dashboard', __name__)
@@ -139,33 +139,51 @@ def dashboard_gestores_view():
     
     nome_completo_gestor = consulta_dados_gestor(id_gestor)[2].split(" ")
     ultimo_nome = len(nome_completo_gestor)-1
-    nome_dashboard = nome_completo_gestor[0] + ' ' + nome_completo_gestor[ultimo_nome]
-    ids_time = consulta_time_por_fk_gestor(fk_gestor)
-    dados_gestor = {
+    nome_dashboard = nome_completo_gestor[0].title() + ' ' + nome_completo_gestor[ultimo_nome].title()
+
+    intervalo_datas = []
+    intervalos_selecionados = []
+    datas_min_max = [None, None]
+    #Gera intervalo de datas que vão estar possíveis de filtrar
+    dados_intervalo_datas = consulta_intervalo_respostas()
+    for intervalo in dados_intervalo_datas:
+        data = intervalo[0]
+        intervalo_datas.append(data)
+
+    intervalos_param = request.args.get('intervalos')
+    if intervalos_param:
+        datas_filtro = []
+        intervalos_selecionados = json.loads(intervalos_param)
+        #Função de retirar data miníma e máxima do filtro
+        for intervalo in intervalos_selecionados:
+            inicio, fim = intervalo.split(' - ')
+            datas_filtro.append(datetime.strptime(inicio, '%d/%m/%y').date())
+            datas_filtro.append(datetime.strptime(fim, '%d/%m/%y').date())
+
+        datas_min_max = [min(datas_filtro), max(datas_filtro)]
+    else:
+        datas_min_max = [None, None]
+
+
+    nota_geral = consulta_promotores_area(datas_min_max, fk_gestor)[0]
+    nota_nps = consulta_promotores_area(datas_min_max, fk_gestor, 29)[0]
+    nota_pulsa = consulta_promotores_area(datas_min_max, fk_gestor, 59)[0]
+    dados_main_cards = {
         'nome': nome_dashboard,
+        'card1': gera_main_cards(nota_geral),
+        'card2': gera_main_cards(nota_nps),
+        'card3': gera_main_cards(nota_pulsa)
     }
-    lista_gestores = []
-    cards_gestores = []
-    #Verifica se existe time
-    if ids_time:
-        for user_id in ids_time:
-            numero_id = user_id[0]
-            dados_gestor_liderado = consulta_dados_gestor(numero_id)
-            #Se existir os dados do id na base de gestores, adiciona na lista de gestores
-            if dados_gestor_liderado:
-                fk_gestor_liderado = dados_gestor_liderado[0]
-                nome_completo_liderado = consulta_dados_gestor(numero_id)[2].split(" ")
-                ultimo_nome_liderado = len(nome_completo_liderado)-1  
-                nome_dashboard_liderado = nome_completo_liderado[0] + ' ' + nome_completo_liderado[ultimo_nome_liderado]
-                gestor = {
-                    'fk_gestor': fk_gestor_liderado,
-                    'nome_liderado': nome_dashboard_liderado
-                }
-                lista_gestores.append(gestor)
-    #Se não tiver gestores na lista, já redireciona para a aba sem enviar os dados de notas
-    if not lista_gestores:
-        return render_template('dash_gestores.html', perfil = perfil, dados_gestor = dados_gestor)
-    #Pra cada gestor na lista dos gestores
-    for indice, gestor in enumerate(lista_gestores):
-        cards_gestores.append(gera_card_gestor_liderado(gestor, indice))
-    return render_template('dash_gestores.html', perfil = perfil, dados_gestor = dados_gestor, cards_gestores = cards_gestores)
+
+    app.logger.debug(nota_geral)
+
+    grafico_geral = gera_grafico_area(datas_min_max, fk_gestor)
+    app.logger.debug(grafico_geral)
+    dados_main_grafico = [{
+        'semanas': grafico_geral[0],
+        'notas': grafico_geral[1],
+        'aderencia': grafico_geral[2]
+    }]
+
+    cards = gera_cards_area(datas_min_max, fk_gestor)
+    return render_template('dashboard_area.html', perfil = perfil, dados=dados_main_cards, cards=cards, grafico = dados_main_grafico, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados)

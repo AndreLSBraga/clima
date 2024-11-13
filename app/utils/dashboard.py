@@ -2,7 +2,7 @@ from flask import current_app as app, flash
 import datetime
 from app.utils.db_consultas import consulta_fk_dimensao, consulta_desc_categoria_pelo_fk_categoria, consulta_texto_perguntas,consulta_time_por_fk_gestor
 from app.utils.db_consultas import consulta_usuario_respondeu, consulta_semana_mes_media_respostas, consulta_resumo_respostas_categoria_gestor
-from app.utils.db_notas_consultas import consulta_promotores_categorias, consulta_promotores_perguntas, consulta_promotores_grafico_geral, consulta_promotores_grafico_pergunta, consulta_promotores_grafico_categoria
+from app.utils.db_notas_consultas import consulta_promotores_categorias, consulta_promotores_perguntas, consulta_promotores_grafico_geral, consulta_promotores_grafico_pergunta, consulta_promotores_grafico_categoria, consulta_promotores_grafico_geral_area, consulta_promotores_categorias_area
 
 def processa_respostas_validas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_filtro=None, fk_gestor=None):
     if fk_pergunta_filtro is not None:
@@ -45,6 +45,24 @@ def gera_grafico(datas_min_max, fk_gestor=None, fk_categoria_filtro=None, fk_per
         for _, _, _, aderencia in dados_grafico]
 
     return lista_pesquisa, lista_promotores, lista_aderencia
+
+def gera_grafico_area(datas_min_max, fk_gestor=None, fk_categoria_filtro=None, fk_pergunta_filtro=None ):
+
+    dados_grafico = consulta_promotores_grafico_geral_area(datas_min_max, fk_gestor)
+    
+    if not dados_grafico:
+        return None,None,None
+    lista_pesquisa = [pesquisa for pesquisa, _, _, _ in dados_grafico]
+    lista_promotores = [
+        round(float(promotores), 1) if respondentes_unicos >= 3 else None
+        for _, respondentes_unicos, promotores, _ in dados_grafico
+    ]
+    lista_aderencia = [
+        round(float(aderencia),0) if aderencia else None
+        for _, _, _, aderencia in dados_grafico]
+
+    return lista_pesquisa, lista_promotores, lista_aderencia
+
 
 def gera_grafico_detalhes(dados, fk_pergunta_filtro):
 
@@ -176,6 +194,45 @@ def gera_main_cards(nota):
 def gera_cards(datas_min_max,fk_gestor):
     # Consulta promotores por categoria
     dados_categorias = consulta_promotores_categorias(datas_min_max, fk_gestor)
+    cards = []
+    # Itera sobre cada categoria
+    for categoria in dados_categorias:
+        
+        fk_categoria = categoria[0]
+        descricao_categoria = categoria[1]
+        perc_promotores = categoria[2]
+        qtd_promotores = categoria[3]
+        qtd_respostas_unicas = categoria[4]
+        qtd_respostas_totais = categoria[5]
+        data_min = categoria[6]
+        data_max = categoria[7]
+        if qtd_respostas_unicas < 3:
+            card = {
+            'id': fk_categoria,
+            'title': descricao_categoria,  # O título da categoria
+            'value': None ,  # Defina o valor como 0 se não houver média
+            'size': 0,  # Defina o tamanho como 0 se não houver média
+            'qtd_respostas': qtd_respostas_totais,
+            'data_min': data_min,
+            'data_max': data_max
+            }
+            cards.append(card)
+        else:
+            card = {
+            'id': fk_categoria,
+            'title': descricao_categoria,  # O título da categoria
+            'value': perc_promotores ,  # Defina o valor como 0 se não houver média
+            'size': perc_promotores,  # Defina o tamanho como 0 se não houver média
+            'qtd_respostas': qtd_respostas_totais,
+            'data_min': data_min,
+            'data_max': data_max
+            }
+            cards.append(card)
+    return cards
+
+def gera_cards_area(datas_min_max,fk_gestor):
+    # Consulta promotores por categoria
+    dados_categorias = consulta_promotores_categorias_area(datas_min_max, fk_gestor)
     cards = []
     # Itera sobre cada categoria
     for categoria in dados_categorias:
