@@ -115,7 +115,7 @@ def consulta_promotores_categorias(datas_min_max, fk_gestor):
         COALESCE(DATE_FORMAT(MAX(r.data_hora), '%d-%m'), '-') AS maior_data
     FROM
         pulsa.categorias c
-    LEFT JOIN 
+    INNER JOIN 
         pulsa.respostas r ON r.fk_categoria = c.fk_categoria
     '''
 
@@ -160,7 +160,7 @@ def consulta_promotores_categorias_area(datas_min_max, fk_gestor):
         COALESCE(DATE_FORMAT(MAX(r.data_hora), '%d-%m'), '-') AS maior_data
     FROM
         pulsa.categorias c
-    LEFT JOIN 
+    INNER JOIN 
         pulsa.lideres_com_liderados_respostas r ON r.fk_categoria = c.fk_categoria
     '''
 
@@ -205,7 +205,7 @@ def consulta_promotores_perguntas(datas_min_max, fk_gestor, fk_categoria):
         COALESCE(DATE_FORMAT(MAX(r.data_hora), '%d-%m'), '-') AS maior_data
     FROM 
         pulsa.perguntas p
-    LEFT JOIN 
+    INNER JOIN 
         pulsa.respostas r ON r.fk_pergunta = p.fk_pergunta
     '''
 
@@ -213,6 +213,52 @@ def consulta_promotores_perguntas(datas_min_max, fk_gestor, fk_categoria):
     params = []
     if fk_gestor is not None:
         conditions.append('r.fk_gestor = %s')
+        params.append(fk_gestor)
+    if data_min is not None:
+        conditions.append('r.data_hora >= %s')
+        params.append(data_min)
+    if data_max is not None:
+        conditions.append('r.data_hora <= %s')
+        params.append(data_max)
+    
+    if conditions:
+        query += ' AND ' + ' AND '.join(conditions)
+    
+    query += ' WHERE p.fk_categoria = %s GROUP BY p.fk_pergunta, p.texto_pergunta'
+    params.append(fk_categoria)
+    #Adiciona a categoria para o último placeholder
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(query, params)
+    result = cursor.fetchall()
+    cursor.close()
+    if result:
+            return result
+    else:
+            return None
+def consulta_promotores_perguntas_area(datas_min_max, fk_gestor, fk_categoria):
+    data_min = datas_min_max[0]
+    data_max = datas_min_max[1]
+    query = '''
+    SELECT 
+        p.fk_pergunta, 
+        p.texto_pergunta,
+        ROUND(100.0 * COALESCE(SUM(CASE WHEN r.resposta >= 6 THEN 1 ELSE 0 END), 0) / NULLIF(COUNT(r.resposta), 0), 1) AS percentual_promotores,
+        COALESCE(SUM(CASE WHEN r.resposta >= 6 THEN 1 ELSE 0 END), 0) AS promotoras,
+        COALESCE(COUNT(DISTINCT r.identificador), 0) AS respostas_unicas, 
+        COALESCE(COUNT(r.identificador), 0) AS total_respostas,
+        COALESCE(DATE_FORMAT(MIN(r.data_hora), '%d-%m'), '-') AS menor_data,
+        COALESCE(DATE_FORMAT(MAX(r.data_hora), '%d-%m'), '-') AS maior_data
+    FROM 
+        pulsa.perguntas p
+    INNER JOIN 
+        pulsa.lideres_com_liderados_respostas r ON r.fk_pergunta = p.fk_pergunta
+    '''
+
+    conditions = []
+    params = []
+    if fk_gestor is not None:
+        conditions.append('r.fk_gestor_lider = %s')
         params.append(fk_gestor)
     if data_min is not None:
         conditions.append('r.data_hora >= %s')
@@ -333,6 +379,7 @@ def consulta_promotores_grafico_geral_area(datas_min_max, fk_gestor):
         return result
     else:
         return None
+
 def consulta_promotores_grafico_categoria(datas_min_max, fk_gestor, fk_categoria):
     data_min = datas_min_max[0]
     data_max = datas_min_max[1]
@@ -346,6 +393,49 @@ def consulta_promotores_grafico_categoria(datas_min_max, fk_gestor, fk_categoria
     INNER JOIN 
         pulsa.respostas r ON r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
         AND r.fk_gestor = %s AND r.fk_categoria = %s
+    '''
+    
+    conditions = []
+    params =[fk_gestor, fk_categoria]
+    if data_min is not None:
+        conditions.append('r.data_hora >= %s')
+        params.append(data_min)
+    if data_max is not None:
+        conditions.append('r.data_hora <= %s')
+        params.append(data_max)
+
+    if conditions:
+        query += ' AND ' + ' AND '.join(conditions)
+
+    query += '''
+    GROUP BY 
+        i.intervalo_pesquisa, i.data_referencia
+    ORDER BY 
+        i.data_referencia ASC;
+    '''
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(query, params)
+    result = cursor.fetchall()
+    cursor.close()
+    if result:
+            return result
+    else:
+            return None
+    
+def consulta_promotores_grafico_categoria_area(datas_min_max, fk_gestor, fk_categoria):
+    data_min = datas_min_max[0]
+    data_max = datas_min_max[1]
+    query = '''
+    SELECT 
+        i.intervalo_pesquisa,
+        count(distinct(r.identificador)) as respondentes_unicos,
+        ROUND(100.0 * COALESCE(SUM(CASE WHEN r.resposta >= 6 THEN 1 ELSE 0 END), 0) / NULLIF(COUNT(r.resposta), 0), 1) AS percentual_promotores
+    FROM 
+        intervalos_pesquisa_view i
+    INNER JOIN 
+        pulsa.lideres_com_liderados_respostas r ON r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
+        AND r.fk_gestor_lider = %s AND r.fk_categoria = %s
     '''
     
     conditions = []
@@ -390,6 +480,49 @@ def consulta_promotores_grafico_pergunta(datas_min_max, fk_gestor, fk_categoria=
     INNER JOIN 
         pulsa.respostas r ON r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
         AND r.fk_gestor = %s AND r.fk_categoria = %s
+    '''
+
+    conditions = []
+    params =[fk_gestor, fk_categoria]
+    if data_min is not None:
+        conditions.append('r.data_hora >= %s')
+        params.append(data_min)
+    if data_max is not None:
+        conditions.append('r.data_hora <= %s')
+        params.append(data_max)
+
+    if conditions:
+        query += ' AND ' + ' AND '.join(conditions)
+    query += '''
+    GROUP BY 
+        i.intervalo_pesquisa, r.fk_pergunta, i.data_referencia
+    ORDER BY 
+        r.fk_pergunta ASC, i.data_referencia ASC;
+    '''
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(query, params)
+    result = cursor.fetchall()
+    cursor.close()
+    if result:
+            return result
+    else:
+            return None
+
+def consulta_promotores_grafico_pergunta_area(datas_min_max, fk_gestor, fk_categoria=None):
+    data_min = datas_min_max[0]
+    data_max = datas_min_max[1]
+    query = '''
+    SELECT 
+        i.intervalo_pesquisa,
+        r.fk_pergunta,
+        count(distinct(r.identificador)) as respondentes_unicos,
+        ROUND(100.0 * COALESCE(SUM(CASE WHEN r.resposta >= 6 THEN 1 ELSE 0 END), 0) / NULLIF(COUNT(r.resposta), 0), 1) AS percentual_promotores
+    FROM 
+        intervalos_pesquisa_view i
+    INNER JOIN 
+        pulsa.lideres_com_liderados_respostas r ON r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
+        AND r.fk_gestor_lider = %s AND r.fk_categoria = %s
     '''
 
     conditions = []

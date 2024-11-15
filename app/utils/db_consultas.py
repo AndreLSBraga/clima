@@ -22,6 +22,7 @@ def consulta_usuario_resposta_data(user_id):
                 return result[0]
         else:
                 return None
+
 def consulta_usuario_resposta_semana(user_id):
         db = get_db()
         cursor = db.cursor()
@@ -33,10 +34,20 @@ def consulta_usuario_resposta_semana(user_id):
         else:
                 return None
 
-def consulta_fk_pergunta_categoria():
+def consulta_fk_pergunta_categoria(fk_categoria=None):
+        query = 'SELECT fk_pergunta, fk_categoria FROM perguntas'
+        conditions = []
+        params = []
+        if fk_categoria is not None:
+                conditions.append('fk_categoria = %s')
+                params.append(fk_categoria)
+        
+        if conditions:
+            query += ' WHERE ' + ' AND '.join(conditions)
+
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT fk_pergunta, fk_categoria FROM perguntas')
+        cursor.execute(query, params)
         result = cursor.fetchall()
         cursor.close()
         return result
@@ -241,7 +252,6 @@ def consulta_semana_mes_media_respostas(fk_gestor=None, fk_categoria=None, fk_pe
 
         return result if result else None
 
-
 def consulta_time_por_fk_gestor(fk_gestor):
         db = get_db()
         cursor = db.cursor()
@@ -290,16 +300,113 @@ def consulta_pesquisa_usuario(id, unidade=None):
               return None
        
 def consulta_sugestoes_por_gestor(fk_gestor):
-       db = get_db()
-       cursor = db.cursor()
-       cursor.execute(f"SELECT id_sugestao, data_hora, fk_categoria, fk_pergunta, texto_sugestao FROM sugestoes WHERE fk_gestor = %s ORDER BY data_hora ASC LIMIT 10",(fk_gestor,))
-       result = cursor.fetchall()
-       cursor.close()
-       if result:
-              return result
-       else:
-              return None
-       
+        query = '''SELECT 
+                        s.id_sugestao, 
+                        date_format(s.data_hora, '%d-%m-%y'), 
+                        g.gestor_nome, 
+                        c.desc_categoria, 
+                        p.texto_pergunta, 
+                        s.texto_sugestao
+                FROM sugestoes s
+                INNER JOIN
+                        gestores g ON s.fk_gestor = g.fk_gestor
+                INNER JOIN
+                categorias c ON s.fk_categoria = c.fk_categoria
+                INNER JOIN
+                        perguntas p ON s.fk_pergunta = p.fk_pergunta
+                WHERE s.fk_gestor = %s  
+                ORDER BY data_hora ASC
+        '''
+        params = [fk_gestor,]
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, params)
+        result = cursor.fetchall()
+        cursor.close()
+        if result:
+                return result
+        else:
+                return None
+
+def consulta_sugestoes_por_gestor_area(fk_gestor):
+        query = '''SELECT 
+                        s.id_sugestao, 
+                        date_format(s.data_hora, '%d-%m-%y'), 
+                        g.gestor_nome, 
+                        c.desc_categoria, 
+                        p.texto_pergunta, 
+                        s.texto_sugestao
+                FROM lideres_com_liderados_sugestoes s
+                INNER JOIN
+                        gestores g ON s.fk_gestor_liderado = g.fk_gestor
+                INNER JOIN
+                categorias c ON s.fk_categoria = c.fk_categoria
+                INNER JOIN
+                        perguntas p ON s.fk_pergunta = p.fk_pergunta
+                WHERE s.fk_gestor_lider = %s
+                ORDER BY data_hora ASC
+        '''
+        params = [fk_gestor,]
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, params)
+        result = cursor.fetchall()
+        cursor.close()
+        if result:
+                return result
+        else:
+                return None
+
+def consulta_qtd_sugestoes(fk_gestor, fk_categoria=None, fk_pergunta=None):
+        conditions = []
+        params = []
+        query = '''SELECT count(*) FROM sugestoes'''
+        if fk_gestor:
+               conditions.append('fk_gestor = %s')
+               params.append(fk_gestor)
+        if fk_categoria:
+               conditions.append('fk_categoria = %s')
+               params.append(fk_categoria)
+        if fk_pergunta:
+               conditions.append('fk_pergunta = %s')
+               params.append(fk_pergunta)
+        if conditions:
+                query += ' WHERE ' + ' AND '.join(conditions)
+
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, params)
+        result = cursor.fetchone()
+        if result:
+               return result
+        else:
+               return None
+
+def consulta_qtd_sugestoes_area(fk_gestor, fk_categoria=None, fk_pergunta=None):
+        conditions = []
+        params = []
+        query = '''SELECT count(*) FROM lideres_com_liderados_sugestoes'''
+        if fk_gestor:
+               conditions.append('fk_gestor_lider = %s')
+               params.append(fk_gestor)
+        if fk_categoria:
+               conditions.append('fk_categoria = %s')
+               params.append(fk_categoria)
+        if fk_pergunta:
+               conditions.append('fk_pergunta = %s')
+               params.append(fk_pergunta)
+        if conditions:
+                query += ' WHERE ' + ' AND '.join(conditions)
+
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(query, params)
+        result = cursor.fetchone()
+        if result:
+               return result
+        else:
+               return None
+
 def consulta_resumo_respostas_categoria_gestor(fk_gestor):
        db = get_db()
        cursor = db.cursor()

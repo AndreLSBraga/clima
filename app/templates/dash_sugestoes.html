@@ -20,11 +20,23 @@
             <li><a href="{{ url_for('gestor.gestor_view') }}"class="active">Gestor</a></li>
         </ul>
     </nav>
+    <div id="loading-spinner-global" class="spinner">
+        <div class="loader"></div>
+        <p class="loading-text">Buscando seus dados</p>
+    </div>   
     <nav class="sidebar">
         <ul class="sidebar-menu">
             <li><a href="{{ url_for('dashboard.dashboard_view') }}">
                 <span class="icon"><img src="/static/images/icons/time.svg" alt="Dashboard Icon"></span>
                 <span class="text_sidebar">Time</span>
+            </a></li>
+            <li><a href="{{ url_for('dashboard_area.dashboard_area_view') }}">
+                <span class="icon"><img src="/static/images/icons/area.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">Área</span>
+            </a></li>
+            <li><a href="{{ url_for('dashboard_lideres.dashboard_lideres_view') }}">
+                <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
+                <span class="text_sidebar">Líderes</span>
             </a></li>
             <li class="active"><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view') }}">
                 <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Dashboard Icon"></span>
@@ -50,6 +62,14 @@
                 <div class="introbar-text">
                     <span><h2>Olá, {{dados_gestor.nome}}! Aqui estão suas sugestões:</h2></span>
                 </div>
+                <div class="filtro-sugestoes">
+                    <button id="timeFiltro" class="btn-time active">
+                        <img src="/static/images/icons/time.svg">Time
+                    </button>
+                    <button id="areaFiltro" class="btn-area">
+                        <img src="/static/images/icons/area.svg">Área
+                    </button>
+                </div>
             </div>
             <div class="table-container">
                 <div>
@@ -58,6 +78,7 @@
                             <thead>
                                 <tr>
                                     <th>Data</th>
+                                    <th>Gestor</th>
                                     <th>Categoria</th>
                                     <th>Pergunta</th>
                                     <th>Sugestão</th>
@@ -66,14 +87,15 @@
                             <tbody>
                                 {% for row in sugestoes %}
                                 <tr>
-                                    <td>{{ row.data_sugestao }}</td>
-                                    <td>{{ row.texto_categoria }}</td>
-                                    {% if row.texto_pergunta != None %}
-                                        <td>{{ row.texto_pergunta }}</td>
+                                    <td>{{ row[1]}}</td>
+                                    <td>{{ row[2] }}</td>
+                                    <td>{{ row[3] }}</td>
+                                    {% if row[4] != None %}
+                                        <td>{{ row[4] }}</td>
                                     {% else %}
                                         <td>Sugestão enviada diretamente</td>
                                     {% endif %}
-                                    <td>{{ row.texto_sugestao }}</td>
+                                    <td>{{ row[5] }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -109,7 +131,8 @@
                 },
                 "dom": '<"top"fl>rt<"bottom"ip><"clear">',
                 "columns": [
-                    { "width": "6%" },  // Definindo a largura da primeira coluna
+                    { "width": "10%" },
+                    { "width": "10%" },  // Definindo a largura da primeira coluna
                     { "width": "15%" },  // Segunda coluna
                     { "width": "20%" },  // Terceira coluna
                     { "width": "35%" }   // Quarta coluna
@@ -117,6 +140,60 @@
             });
         });
     </script>
-        
+    <script>
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function(event) {
+                document.getElementById('loading-spinner-global').style.display = 'flex';
+            });
+        });
+
+        window.addEventListener('load', function() {
+            document.getElementById('loading-spinner-global').style.display = 'none';
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Configura os botões
+            const timeButton = document.getElementById('timeFiltro');
+            const areaButton = document.getElementById('areaFiltro');
+    
+            // Função para alternar a classe 'active'
+            function setActiveButton(button) {
+                // Remove 'active' de todos os botões
+                document.querySelectorAll('.filtro-sugestoes button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+    
+                // Adiciona 'active' ao botão clicado
+                button.classList.add('active');
+            }
+    
+            // Verifica o parâmetro 'filtro' na URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const filtro = urlParams.get('filtro');
+    
+            if (filtro === 'area') {
+                setActiveButton(areaButton); // Define Área como ativo
+            } else {
+                setActiveButton(timeButton); // Define Time como ativo (padrão)
+            }
+    
+            // Adiciona o evento de clique ao botão Time
+            timeButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                document.getElementById('loading-spinner-global').style.display = 'flex';
+                setActiveButton(this); // Define Time como ativo
+                window.location.href = `/dashboard_sugestoes`; // Redireciona sem filtro
+            });
+    
+            // Adiciona o evento de clique ao botão Área
+            areaButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                document.getElementById('loading-spinner-global').style.display = 'flex';
+                setActiveButton(this); // Define Área como ativo
+                window.location.href = `/dashboard_sugestoes?filtro=area`; // Redireciona com filtro 'area'
+            });
+        });    
+    </script>  
 </body>
 </html>

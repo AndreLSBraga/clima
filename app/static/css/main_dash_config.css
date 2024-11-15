@@ -217,6 +217,55 @@ body, html {
 .btn-limpar:hover {
     background-color: #d9d9d9;
 }
+
+.filtro-sugestoes {
+    display: flex; /* Alinha os botões em linha */
+    gap: 10px; /* Espaçamento entre os botões */
+}
+
+.filtro-sugestoes button {
+    display: flex;
+    align-items: center; /* Alinha verticalmente */
+    justify-content: center; /* Centraliza horizontalmente */
+    background-color: #f0f0f0; /* Cor de fundo padrão */
+    color: #333; /* Cor do texto padrão */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Suaviza as mudanças */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: auto; /* Adapta a largura ao conteúdo */
+}
+
+.filtro-sugestoes button img {
+    height: 20px; /* Define a altura do ícone */
+    width: auto; /* Proporção do ícone */
+    margin-right: 10px; /* Espaçamento entre o ícone e o texto */
+    transition: filter 0.3s ease; /* Suaviza o efeito do ícone */
+}
+
+.filtro-sugestoes button:hover {
+    background-color: #2AB7CA; /* Cor de fundo ao passar o mouse */
+    color: white; /* Cor do texto ao passar o mouse */
+    transform: scale(1.05); /* Leve aumento do botão */
+}
+
+.filtro-sugestoes button:hover img {
+    filter: invert(1); /* Inverte as cores do ícone ao passar o mouse */
+}
+
+.filtro-sugestoes button.active {
+    background-color: #2AB7CA; /* Cor de fundo do botão ativo */
+    color: white; /* Cor do texto do botão ativo */
+}
+
+.filtro-sugestoes button.active img {
+    filter: invert(1); /* Inverte as cores do ícone para o botão ativo */
+}
+
 .selectize-control.multi .selectize-input {
     background-color: #f9f9f9;       /* Fundo mais claro */
     border: 1px solid #ccc;          /* Borda sutil */
@@ -291,4 +340,52 @@ body, html {
 .selectize-control.multi .selectize-dropdown .option:hover {
     background: #2AB7CA;
     color: #fff;
+}
+
+.spinner {
+    position: fixed; /* Alterado para fixed para cobrir toda a tela */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Ocupa toda a largura da tela */
+    height: 100vh; /* Ocupa toda a altura da tela */
+    background-color: rgba(0, 0, 0, 0.5); /* Fundo semi-transparente */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Certifique-se de que o spinner fique acima dos outros elementos */
+    text-align: center;
+}
+
+.loader {
+    border: 8px solid #f3f3f3; /* Cor de fundo do loader */
+    border-top: 8px solid #000; /* Cor da borda de cima */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    color: #fff;
+    margin-top: 10px;
+}
+
+.loading-text::after {
+    content: "";
+    display: inline-block;
+    animation: dotAppear 1.5s steps(3, end) infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Animação para os três pontos */
+@keyframes dotAppear {
+    0% { content: ""; }
+    33% { content: "."; }
+    66% { content: ".."; }
+    100% { content: "..."; }
 }

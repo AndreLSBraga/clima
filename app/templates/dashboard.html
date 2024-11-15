@@ -24,15 +24,23 @@
             <li><a href="{{ url_for('gestor.gestor_view') }}"class="active">Gestor</a></li>
         </ul>
     </nav>
+    <div id="loading-spinner-global" class="spinner">
+        <div class="loader"></div>
+        <p class="loading-text">Buscando seus dados</p>
+    </div>   
     <nav class="sidebar">
         <ul class="sidebar-menu">
             <li class="active"><a href="{{ url_for('dashboard.dashboard_view') }}">
                 <span class="icon"><img src="/static/images/icons/time.svg" alt="Dashboard Icon"></span>
                 <span class="text_sidebar">Time</span>
             </a></li>
-            <li><a href="{{ url_for('dashboard_gestores.dashboard_gestores_view') }}">
+            <li><a href="{{ url_for('dashboard_area.dashboard_area_view') }}">
                 <span class="icon"><img src="/static/images/icons/area.svg" alt="Dashboard Icon"></span>
                 <span class="text_sidebar">Área</span>
+            </a></li>
+            <li><a href="{{ url_for('dashboard_lideres.dashboard_lideres_view') }}">
+                <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
+                <span class="text_sidebar">Líderes</span>
             </a></li>
             <li><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view') }}">
                 <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
@@ -56,7 +64,7 @@
             <div class="introbar">
                 <div class="introbar-text">
                     <span><h2>Olá, {{dados.nome}}! Esse é o resultado do seu time direto.</h2></span>
-                    <span class="small-text">Sua nota está baseada em {{dados.card1.qtd_respostas}} perguntas respondidas, entre os dias {{dados.card1.data_min}} e {{dados.card1.data_max}}.</span>
+                    <span class="small-text">Seu percentual de promotores está baseado em {{dados.card1.qtd_respostas}} perguntas respondidas por {{dados.card1.respondentes_unicos}} respondentes únicos entre os dias {{dados.card1.data_min}} e {{dados.card1.data_max}}.</span>
                 </div>
                 <div class="filtro-container">
                     <div class="filtro-container-intervalo">
@@ -227,6 +235,10 @@
                                     <p>{{ card.qtd_respostas }} perguntas respondidas</p>
                                 </div>
                                 <div class="info-item-detalhe">
+                                    <img class="icon-small" src="/static/images/icons/sugestoes.svg" alt="Icone Respostas">
+                                    <p>{{ card.qtd_sugestoes }} sugestões recebidas</p>
+                                </div>
+                                <div class="info-item-detalhe">
                                     <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
                                     {% if card.data_min != None %}
                                         <p>{{ card.data_min }} e {{ card.data_max }}</p>
@@ -242,14 +254,14 @@
                         {% endfor %}
                     </div>
                 </div>
-        </div>
+        </div> 
         <div id="modalPerguntas" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="fecharModal()">&times;</span>
                 <div class="modal-header"></div>
                 <div id="loading-spinner" class="spinner">
                     <div class="loader"></div>
-                    <p class="loading-text">Carregando</p>
+                    <p class="loading-text">Buscando seus dados</p>
                 </div>        
                 <div id="modal-body" class="modal-body">
                     <!-- Os cards das perguntas serão adicionados aqui via JavaScript -->
@@ -474,6 +486,10 @@
                                             <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
                                             <p>${pergunta.qtd_respostas} perguntas respondidas</p>
                                         </div>
+                                        <div class="info-item-detalhe">
+                                            <img class="icon-small" src="/static/images/icons/sugestoes.svg" alt="Icone Respostas">
+                                            <p>${pergunta.qtd_sugestoes} sugestões recebidas</p>
+                                        </div>
                                         <div class="info-item">
                                             <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
                                             <p>${pergunta.data_min || '-'} e ${pergunta.data_max || '-'}</p>
@@ -594,10 +610,9 @@
         // Função para aplicar o filtro ao clicar no botão
         $('#aplicarFiltro').click(function(event) {
             event.preventDefault();
-            
+            document.getElementById('loading-spinner-global').style.display = 'flex';
             // Captura os intervalos selecionados
             var intervalosSelecionados = $('#intervalos').val();
-            console.log(intervalosSelecionados);
             
             if (intervalosSelecionados && intervalosSelecionados.length > 0) {
                 // Codifica o array como uma string JSON para enviá-lo como parâmetro
@@ -605,6 +620,7 @@
                 window.location.href = `/dashboard?intervalos=${intervalosJSON}`;
             } else {
                 alert("Por favor, selecione ao menos um intervalo.");
+                document.getElementById('loading-spinner-global').style.display = 'none';
             }
         });
 
@@ -612,11 +628,22 @@
         $('#limparFiltro').click(function() {
             var selectize = $('#intervalos')[0].selectize;
             selectize.clear();          // Limpa as seleções
+            document.getElementById('loading-spinner-global').style.display = 'flex';
             $('#resultados').empty();   // Limpa a área de resultados
             window.location.href = `/dashboard`
         });
     });
     </script>
-    
+    <script>
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function(event) {
+                document.getElementById('loading-spinner-global').style.display = 'flex';
+            });
+        });
+
+        window.addEventListener('load', function() {
+            document.getElementById('loading-spinner-global').style.display = 'none';
+        });
+    </script>
 </body>
 </html>

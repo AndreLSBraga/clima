@@ -1,15 +1,18 @@
 from flask import Blueprint, render_template, session, request, flash, redirect, url_for, current_app as app, jsonify
 from app.utils.db_consultas import consulta_dados_respostas, consulta_dados_gestor, consulta_time_por_fk_gestor
-from app.utils.db_consultas import consulta_sugestoes_por_gestor, consulta_fk_categoria_geral, consulta_desc_categoria_pelo_fk_categoria
+from app.utils.db_consultas import consulta_sugestoes_por_gestor, consulta_fk_categoria_geral, consulta_desc_categoria_pelo_fk_categoria, consulta_sugestoes_por_gestor_area
 from app.utils.db_notas_consultas import consulta_promotores, consulta_intervalo_respostas, consulta_promotores_area
 from app.utils.dashboard import gera_cards, gera_cards_detalhe, gera_informacoes_respostas, processa_sugestoes
-from app.utils.dashboard import gera_grafico, gera_card_gestor_liderado, gera_main_cards, gera_cards_categoria,gera_grafico_area, gera_cards_area
+from app.utils.dashboard import gera_grafico, gera_card_gestor_liderado, gera_main_cards, gera_cards_categoria,gera_grafico_area, gera_cards_area, gera_cards_categoria_area, gera_cards_detalhe_area
+
 from datetime import datetime
 import json
 dashboard = Blueprint('dashboard', __name__)
 dashboard_categoria = Blueprint('dashboard_categoria', __name__)
 dashboard_sugestoes = Blueprint('dashboard_sugestoes', __name__)
-dashboard_gestores = Blueprint('dashboard_gestores', __name__)
+dashboard_area = Blueprint('dashboard_area', __name__)
+dashboard_categoria_area = Blueprint('dashboard_categoria_area', __name__)
+dashboard_lideres = Blueprint('dashboard_lideres', __name__)
 
 @dashboard.route('/dashboard', methods = ['GET', 'POST'])
 def dashboard_view():
@@ -23,7 +26,6 @@ def dashboard_view():
     nome_completo_gestor = consulta_dados_gestor(id_gestor)[2].split(" ")
     ultimo_nome = len(nome_completo_gestor)-1
     nome_dashboard = nome_completo_gestor[0].title() + ' ' + nome_completo_gestor[ultimo_nome].title()
-    ids_time = consulta_time_por_fk_gestor(fk_gestor)
 
     intervalo_datas = []
     intervalos_selecionados = []
@@ -114,22 +116,23 @@ def dashboard_sugestoes_view():
     dados_gestor = {
         'nome': nome_dashboard,
     }
-    base_sugestoes = consulta_sugestoes_por_gestor(fk_gestor)
-
     if ids_time:
         tamanho_time = len(ids_time)
     else:
         tamanho_time = 0
 
-    if tamanho_time < 3 or not base_sugestoes:
+    if tamanho_time < 3:
         return render_template('dash_sugestoes.html', dados_gestor = dados_gestor)
     
-    
-    sugestoes = processa_sugestoes(base_sugestoes)
+    selecao_sugestao = request.args.get('filtro')
+    if selecao_sugestao:
+        sugestoes = consulta_sugestoes_por_gestor_area(fk_gestor)
+    else:
+        sugestoes = consulta_sugestoes_por_gestor(fk_gestor)
     return render_template('dash_sugestoes.html', perfil = perfil, dados_gestor = dados_gestor, sugestoes = sugestoes)
 
-@dashboard_gestores.route('/dashboard_gestores', methods = ['GET', 'POST'])
-def dashboard_gestores_view():
+@dashboard_area.route('/dashboard_area', methods = ['GET', 'POST'])
+def dashboard_area_view():
     if 'logged_in' not in session:
         flash("É necessário fazer login primeiro.", "error")
         return redirect(url_for('gestor.gestor_view'))
@@ -175,10 +178,7 @@ def dashboard_gestores_view():
         'card3': gera_main_cards(nota_pulsa)
     }
 
-    app.logger.debug(nota_geral)
-
     grafico_geral = gera_grafico_area(datas_min_max, fk_gestor)
-    app.logger.debug(grafico_geral)
     dados_main_grafico = [{
         'semanas': grafico_geral[0],
         'notas': grafico_geral[1],
@@ -187,3 +187,73 @@ def dashboard_gestores_view():
 
     cards = gera_cards_area(datas_min_max, fk_gestor)
     return render_template('dashboard_area.html', perfil = perfil, dados=dados_main_cards, cards=cards, grafico = dados_main_grafico, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados)
+
+@dashboard_categoria_area.route('/dashboard_area/detalhes-categoria:<int:card_id>', methods = ['GET', 'POST'])
+def detalhes_categoria_area_view(card_id):
+    datas_min_max = [None, None]
+    intervalos_param = request.args.get('intervalos')
+
+    if intervalos_param:
+        datas_filtro = []
+        intervalos_selecionados = json.loads(intervalos_param)
+        #Função de retirar data miníma e máxima do filtro
+        for intervalo in intervalos_selecionados:
+            inicio, fim = intervalo.split(' - ')
+            datas_filtro.append(datetime.strptime(inicio, '%d/%m/%y').date())
+            datas_filtro.append(datetime.strptime(fim, '%d/%m/%y').date())
+        datas_min_max = [min(datas_filtro), max(datas_filtro)]
+    else:
+        datas_min_max = [None, None]
+    fk_gestor = session['fk_gestor']
+    categoria_info = gera_cards_categoria_area(datas_min_max, fk_gestor, card_id)
+    cards_perguntas = gera_cards_detalhe_area(datas_min_max, fk_gestor, card_id)
+
+    if cards_perguntas:
+        return jsonify({
+            'categoria': categoria_info,
+            'perguntas': cards_perguntas
+        })
+    else:
+        return jsonify({"error": "Categoria não encontrada"}), 404
+    
+@dashboard_lideres.route('/dashboard_lideres', methods = ['GET', 'POST'])
+def dashboard_lideres_view():
+    if 'logged_in' not in session:
+        flash("É necessário fazer login primeiro.", "error")
+        return redirect(url_for('gestor.gestor_view'))
+    perfil = session['perfil']
+    id_gestor = session['id_gestor']
+    fk_gestor = session['fk_gestor']
+    
+    nome_completo_gestor = consulta_dados_gestor(id_gestor)[2].split(" ")
+    ultimo_nome = len(nome_completo_gestor)-1
+    nome_dashboard = nome_completo_gestor[0].title() + ' ' + nome_completo_gestor[ultimo_nome].title()
+
+    intervalo_datas = []
+    intervalos_selecionados = []
+    datas_min_max = [None, None]
+    #Gera intervalo de datas que vão estar possíveis de filtrar
+    dados_intervalo_datas = consulta_intervalo_respostas()
+    for intervalo in dados_intervalo_datas:
+        data = intervalo[0]
+        intervalo_datas.append(data)
+
+    intervalos_param = request.args.get('intervalos')
+    if intervalos_param:
+        datas_filtro = []
+        intervalos_selecionados = json.loads(intervalos_param)
+        #Função de retirar data miníma e máxima do filtro
+        for intervalo in intervalos_selecionados:
+            inicio, fim = intervalo.split(' - ')
+            datas_filtro.append(datetime.strptime(inicio, '%d/%m/%y').date())
+            datas_filtro.append(datetime.strptime(fim, '%d/%m/%y').date())
+
+        datas_min_max = [min(datas_filtro), max(datas_filtro)]
+    else:
+        datas_min_max = [None, None]
+
+    dados_main_cards = {
+        'nome': nome_dashboard
+    }
+
+    return render_template('dash_gestores.html', perfil = perfil, dados=dados_main_cards, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados)
