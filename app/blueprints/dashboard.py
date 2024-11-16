@@ -3,7 +3,7 @@ from app.utils.db_consultas import consulta_dados_respostas, consulta_dados_gest
 from app.utils.db_consultas import consulta_sugestoes_por_gestor, consulta_fk_categoria_geral, consulta_desc_categoria_pelo_fk_categoria, consulta_sugestoes_por_gestor_area
 from app.utils.db_notas_consultas import consulta_promotores, consulta_intervalo_respostas, consulta_promotores_area
 from app.utils.dashboard import gera_cards, gera_cards_detalhe, gera_informacoes_respostas, processa_sugestoes
-from app.utils.dashboard import gera_grafico, gera_card_gestor_liderado, gera_main_cards, gera_cards_categoria,gera_grafico_area, gera_cards_area, gera_cards_categoria_area, gera_cards_detalhe_area
+from app.utils.dashboard import gera_grafico, gera_tabela_liderados, gera_main_cards, gera_cards_categoria,gera_grafico_area, gera_cards_area, gera_cards_categoria_area, gera_cards_detalhe_area
 
 from datetime import datetime
 import json
@@ -255,5 +255,5 @@ def dashboard_lideres_view():
     dados_main_cards = {
         'nome': nome_dashboard
     }
-
-    return render_template('dash_gestores.html', perfil = perfil, dados=dados_main_cards, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados)
+    dados_gestores = gera_tabela_liderados(datas_min_max, fk_gestor)
+    return render_template('dash_gestores.html', perfil = perfil, dados=dados_main_cards, dados_gestores = dados_gestores, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados)

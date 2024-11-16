@@ -566,3 +566,150 @@ def consulta_intervalo_respostas():
             return result
     else:
             return None
+    
+def consulta_promotores_por_categoria_gestor(datas_min_max, fk_gestor_lider):
+     
+    data_min = datas_min_max[0]
+    data_max = datas_min_max[1]
+
+    query = '''SELECT
+        ll.fk_gestor_liderado,
+        CONCAT(
+            SUBSTRING_INDEX(g.gestor_nome, ' ', 1), ' ',
+            SUBSTRING_INDEX(g.gestor_nome, ' ', -1)
+        ) AS nome_completo,
+        ROUND(
+            100.0 * CASE 
+                WHEN COUNT(DISTINCT r.identificador) >= 3 
+                THEN COALESCE(SUM(CASE WHEN r.resposta >= 6 THEN 1 ELSE 0 END), 0) 
+                    / NULLIF(COUNT(r.resposta), 0)
+                ELSE NULL
+            END,
+            1
+        ) AS percentual_promotores,
+        ROUND(
+            100.0 * CASE 
+                WHEN COUNT(DISTINCT CASE WHEN c.fk_categoria = 1 THEN r.identificador END) >= 3 
+                THEN COALESCE(SUM(CASE WHEN c.fk_categoria = 1 AND r.resposta >= 6 THEN 1 ELSE 0 END), 0)
+                    / NULLIF(COUNT(CASE WHEN c.fk_categoria = 1 THEN 1 END), 0)
+                ELSE NULL
+            END,
+            1
+        ) AS Engagement,
+        ROUND(
+            100.0 * CASE 
+                WHEN COUNT(DISTINCT CASE WHEN c.fk_categoria = 2 THEN r.identificador END) >= 3 
+                THEN COALESCE(SUM(CASE WHEN c.fk_categoria = 2 AND r.resposta >= 6 THEN 1 ELSE 0 END), 0)
+                    / NULLIF(COUNT(CASE WHEN c.fk_categoria = 2 THEN 1 END), 0)
+                ELSE NULL
+            END,
+            1
+        ) AS Eficacia_gestor,
+        ROUND(
+            100.0 * CASE 
+                WHEN COUNT(DISTINCT CASE WHEN c.fk_categoria = 3 THEN r.identificador END) >= 3 
+                THEN COALESCE(SUM(CASE WHEN c.fk_categoria = 3 AND r.resposta >= 6 THEN 1 ELSE 0 END), 0)
+                    / NULLIF(COUNT(CASE WHEN c.fk_categoria = 3 THEN 1 END), 0)
+                ELSE NULL
+            END,
+            1
+        ) AS Funcoes_desempenhadas,
+        ROUND(
+            100.0 * CASE 
+                WHEN COUNT(DISTINCT CASE WHEN c.fk_categoria = 4 THEN r.identificador END) >= 3 
+                THEN COALESCE(SUM(CASE WHEN c.fk_categoria = 4 AND r.resposta >= 6 THEN 1 ELSE 0 END), 0)
+                    / NULLIF(COUNT(CASE WHEN c.fk_categoria = 4 THEN 1 END), 0)
+                ELSE NULL
+            END,
+            1
+        ) AS Plano_carreira,
+        ROUND(
+            100.0 * CASE 
+                WHEN COUNT(DISTINCT CASE WHEN c.fk_categoria = 5 THEN r.identificador END) >= 3 
+                THEN COALESCE(SUM(CASE WHEN c.fk_categoria = 5 AND r.resposta >= 6 THEN 1 ELSE 0 END), 0)
+                    / NULLIF(COUNT(CASE WHEN c.fk_categoria = 5 THEN 1 END), 0)
+                ELSE NULL
+            END,
+            1
+        ) AS Ambientes_ferramentas,
+        ROUND(
+            100.0 * CASE 
+                WHEN COUNT(DISTINCT CASE WHEN c.fk_categoria = 6 THEN r.identificador END) >= 3 
+                THEN COALESCE(SUM(CASE WHEN c.fk_categoria = 6 AND r.resposta >= 6 THEN 1 ELSE 0 END), 0)
+                    / NULLIF(COUNT(CASE WHEN c.fk_categoria = 6 THEN 1 END), 0)
+                ELSE NULL
+            END,
+            1
+        ) AS Salarios_beneficios,
+        ROUND(
+            100.0 * CASE 
+                WHEN COUNT(DISTINCT CASE WHEN c.fk_categoria = 7 THEN r.identificador END) >= 3 
+                THEN COALESCE(SUM(CASE WHEN c.fk_categoria = 7 AND r.resposta >= 6 THEN 1 ELSE 0 END), 0)
+                    / NULLIF(COUNT(CASE WHEN c.fk_categoria = 7 THEN 1 END), 0)
+                ELSE NULL
+            END,
+            1
+        ) AS Feedback_reconhecimento,
+        ROUND(
+            100.0 * CASE 
+                WHEN COUNT(DISTINCT CASE WHEN c.fk_categoria = 8 THEN r.identificador END) >= 3 
+                THEN COALESCE(SUM(CASE WHEN c.fk_categoria = 8 AND r.resposta >= 6 THEN 1 ELSE 0 END), 0)
+                    / NULLIF(COUNT(CASE WHEN c.fk_categoria = 8 THEN 1 END), 0)
+                ELSE NULL
+            END,
+            1
+        ) AS Comunicacao_colaboracao,
+        ROUND(
+            100.0 * CASE 
+                WHEN COUNT(DISTINCT CASE WHEN c.fk_categoria = 9 THEN r.identificador END) >= 3 
+                THEN COALESCE(SUM(CASE WHEN c.fk_categoria = 9 AND r.resposta >= 6 THEN 1 ELSE 0 END), 0)
+                    / NULLIF(COUNT(CASE WHEN c.fk_categoria = 9 THEN 1 END), 0)
+                ELSE NULL
+            END,
+            1
+        ) AS Servicos_gerais,
+        ROUND(
+            100.0 * CASE 
+                WHEN COUNT(DISTINCT CASE WHEN c.fk_categoria = 10 THEN r.identificador END) >= 3 
+                THEN COALESCE(SUM(CASE WHEN c.fk_categoria = 10 AND r.resposta >= 6 THEN 1 ELSE 0 END), 0)
+                    / NULLIF(COUNT(CASE WHEN c.fk_categoria = 10 THEN 1 END), 0)
+                ELSE NULL
+            END,
+            1
+        ) AS Seguranca_psicologica
+    FROM
+        pulsa.categorias c
+    JOIN 
+        pulsa.lideres_com_liderados_respostas r ON r.fk_categoria = c.fk_categoria
+    JOIN
+        pulsa.lideres_com_liderados ll ON ll.fk_gestor_liderado = r.fk_gestor_liderado
+    JOIN
+        pulsa.gestores g ON ll.fk_gestor_liderado = g.fk_gestor
+    WHERE ll.fk_gestor_lider = %s
+    '''
+    conditions = []
+    params =[fk_gestor_lider]
+    if data_min is not None:
+        conditions.append('r.data_hora >= %s')
+        params.append(data_min)
+    if data_max is not None:
+        conditions.append('r.data_hora <= %s')
+        params.append(data_max)
+    
+    if conditions:
+        query += ' AND ' + ' AND '.join(conditions)
+
+    query += '''GROUP BY
+        ll.fk_gestor_liderado, g.gestor_nome
+    ORDER BY
+        g.gestor_nome ASC
+    '''
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(query, params)
+    result = cursor.fetchall()
+    cursor.close()
+    if result:
+            return result
+    else:
+            return None

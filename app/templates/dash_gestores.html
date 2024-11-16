@@ -39,7 +39,7 @@
                 <span class="text_sidebar">Área</span>
             </a></li>
             <li class="active"><a href="{{ url_for('dashboard_lideres.dashboard_lideres_view') }}">
-                <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
+                <span class="icon"><img src="/static/images/icons/lideranca.svg" alt="Sugestoes Icon"></span>
                 <span class="text_sidebar">Líderes</span>
             </a></li>
             <li><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view') }}">
@@ -64,6 +64,7 @@
             <div class="introbar">
                 <div class="introbar-text">
                     <span><h2>Olá, {{dados.nome}}! Aqui estão o resultado dos seus liderados:</h2></span>
+                    <span class="small-text">Esse é seu resultado de promotores por gestor.</span>
                 </div>
                 <div class="filtro-container">
                     <div class="filtro-container-intervalo">
@@ -82,7 +83,7 @@
             </div>
             <div class="table-container">
                 <div>
-                    {% if cards_gestores %}
+                    {% if dados_gestores %}
                         <table>
                             <thead>
                                 <tr>
@@ -101,16 +102,92 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- {% for card in cards_gestores %}
-                                <tr id = gestor-{{card.id}}>
-                                    <td>{{ card.nome_gestor }}</td>
-                                    {% for categoria in card.categorias %}
-                                        {% if categoria[3] != None %}
-                                            <td id=" id = gestor-{{card.id}}-fk_categoria-{{categoria[0]}}" data = {{categoria[3]}}>{{ categoria[3]}}</td>
+                                {% for dados in dados_gestores %}
+                                <tr id="gestor-{{dados[0]}}">
+                                    <td>
+                                        {% if dados[1] != None %}
+                                            {{ dados[1] }}
                                         {% else %}
-                                            <td>-</td>
+                                            -
                                         {% endif %}
-                                    {% endfor %} -->
+                                    </td>
+                                    <td data="{{ dados[2] }}">
+                                        {% if dados[2] != None %}
+                                            {{ dados[2] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td data="{{ dados[3] }}">
+                                        {% if dados[3] != None %}
+                                            {{ dados[3] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td data="{{ dados[4] }}">
+                                        {% if dados[4] != None %}
+                                            {{ dados[4] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td data="{{ dados[5] }}">
+                                        {% if dados[5] != None %}
+                                            {{ dados[5] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td data="{{ dados[6] }}">
+                                        {% if dados[6] != None %}
+                                            {{ dados[6] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td data="{{ dados[7] }}">
+                                        {% if dados[7] != None %}
+                                            {{ dados[7] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td data="{{ dados[8] }}">
+                                        {% if dados[8] != None %}
+                                            {{ dados[8] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td data="{{ dados[9] }}">
+                                        {% if dados[9] != None %}
+                                            {{ dados[9] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td data="{{ dados[10] }}">
+                                        {% if dados[10] != None %}
+                                            {{ dados[10] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td data="{{ dados[11] }}">
+                                        {% if dados[11] != None %}
+                                            {{ dados[11] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td data="{{ dados[12] }}">
+                                        {% if dados[12] != None %}
+                                            {{ dados[12] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -124,6 +201,7 @@
     <script src="/static/js/background.js"></script>
     <script src="/static/js/chart.umd.js"></script>
     <link href="/static/css/datatables.css" rel="stylesheet">
+    <script type="text/javascript" src="/static/js/datatables.js"></script>
     <script>
         $(document).ready(function() {
             // Inicializando o Selectize com configurações dinâmicas
@@ -157,7 +235,7 @@
             if (intervalosSelecionados && intervalosSelecionados.length > 0) {
                 // Codifica o array como uma string JSON para enviá-lo como parâmetro
                 const intervalosJSON = encodeURIComponent(JSON.stringify(intervalosSelecionados));
-                window.location.href = `/dashboard?intervalos=${intervalosJSON}`;
+                window.location.href = `/dashboard_lideres?intervalos=${intervalosJSON}`;
             } else {
                 alert("Por favor, selecione ao menos um intervalo.");
                 document.getElementById('loading-spinner-global').style.display = 'none';
@@ -170,7 +248,7 @@
             selectize.clear();          // Limpa as seleções
             document.getElementById('loading-spinner-global').style.display = 'flex';
             $('#resultados').empty();   // Limpa a área de resultados
-            window.location.href = `/dashboard`
+            window.location.href = `/dashboard_lideres`
         });
     });
     </script>
@@ -219,16 +297,18 @@
     });
 
     function calcularCorNota(nota) {
-        if (nota <= 2) {
+        if (nota <= 20) {
             return '#FE4A49';
-        } else if (nota <= 4) {
+        } else if (nota <= 40) {
             return '#FF8679';
-        } else if (nota <= 6) {
+        } else if (nota <= 60) {
             return '#FED766';
-        } else if (nota <= 8) {
+        } else if (nota <= 80) {
             return '#7bda94';
-        } else {
+        } else if (nota > 80){
             return '#2AC96A'; 
+        } else {
+            return '#fff'
         }
     }
     </script>

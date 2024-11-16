@@ -3,7 +3,7 @@ import datetime
 from app.utils.db_consultas import consulta_fk_dimensao, consulta_desc_categoria_pelo_fk_categoria, consulta_texto_perguntas,consulta_time_por_fk_gestor, consulta_fk_pergunta_categoria, consulta_qtd_sugestoes, consulta_qtd_sugestoes_area
 from app.utils.db_consultas import consulta_usuario_respondeu, consulta_semana_mes_media_respostas, consulta_resumo_respostas_categoria_gestor, consulta_desc_categoria_pelo_fk_categoria, consulta_fk_categoria_geral
 from app.utils.db_notas_consultas import consulta_promotores_categorias, consulta_promotores_perguntas, consulta_promotores_grafico_geral, consulta_promotores_grafico_pergunta, consulta_promotores_grafico_categoria
-from app.utils.db_notas_consultas import consulta_promotores_grafico_geral_area, consulta_promotores_categorias_area, consulta_promotores_grafico_categoria_area, consulta_promotores_perguntas_area, consulta_promotores_grafico_pergunta_area
+from app.utils.db_notas_consultas import consulta_promotores_grafico_geral_area, consulta_promotores_categorias_area, consulta_promotores_grafico_categoria_area, consulta_promotores_perguntas_area, consulta_promotores_grafico_pergunta_area, consulta_promotores_por_categoria_gestor
 
 def processa_respostas_validas(dados_respostas, fk_categoria_filtro=None, fk_pergunta_filtro=None, fk_gestor=None):
     if fk_pergunta_filtro is not None:
@@ -570,17 +570,9 @@ def processa_sugestoes(base_sugestoes):
 
     return sugestoes
 
-def gera_card_gestor_liderado(dados_gestor, indice):
-    fk_gestor = dados_gestor['fk_gestor']
-    nome_gestor = dados_gestor['nome_liderado']
-    respostas_categoria = consulta_resumo_respostas_categoria_gestor(fk_gestor)
-    card = {
-        'id': indice,
-        'nome_gestor': nome_gestor,
-        'qtd_respostas': 100,  # O título da categoria
-        'qtd_sugestoes': 100,
-        'perc_promotores': 50,
-        'categorias': respostas_categoria
-    }
-
-    return card
+def gera_tabela_liderados(datas_min_max, fk_gestor_lider):
+    dados_promotores = consulta_promotores_por_categoria_gestor(datas_min_max, fk_gestor_lider)
+    if dados_promotores:
+        return dados_promotores
+    else:
+        return None
