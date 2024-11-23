@@ -66,21 +66,21 @@ def insert_resposta(dados_usuario, resposta, tipo):
                     id_sugestao, data_hora, data_contratacao, data_nascimento, data_ultima_movimentacao,
                     fk_area, fk_banda, fk_cargo, fk_fte, fk_gestor, fk_genero, fk_subarea,
                     fk_tipo_cargo, fk_unidade, fk_pergunta, fk_categoria, texto_sugestao, respondido,
-                    auto_identificacao, globalId
+                    auto_identificacao, globalId, resposta
                 )
             VALUES 
                 (
                     %s, %s, %s, %s, %s, 
                     %s, %s, %s, %s, %s, %s, %s,
                     %s, %s, %s, %s, %s, %s,
-                    %s, %s
+                    %s, %s, %s
                 )
                 ''',
                 (
                     id_sugestao, data_hora, data_contratacao, data_nascimento, data_ultima_movimentacao,
                     fk_area, fk_banda, fk_cargo, fk_fte, fk_gestor, fk_genero, fk_subarea,
                     fk_tipo_cargo, fk_unidade, fk_pergunta, fk_categoria, texto_sugestao, 0,
-                    auto_identificacao, globalId
+                    auto_identificacao, globalId, valor_resposta
                 )
             )
         db.commit()

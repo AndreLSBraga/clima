@@ -15,18 +15,27 @@ def navegar_perguntas(num_pergunta_atual, botao, total_perguntas):
         elif botao in ['proxima', 'pular'] and num_pergunta_atual < (total_perguntas - 1):
                 return num_pergunta_atual + 1
 
-def sorteia_perguntas(grupo_perguntas, num_perguntas = 10):
-        perguntas_selecionadas = []
-        # Seleciona uma pergunta de cada grupo
-        for grupo in grupo_perguntas.values():
-                selecionadas = random.sample(grupo, min(1, len(grupo)))
-                perguntas_selecionadas += selecionadas
-
-        # Verifica se o total de perguntas selecionadas é maior ou igual ao número desejado
-        if len(perguntas_selecionadas) >= num_perguntas:
-                perguntas_pesquisa = random.sample(perguntas_selecionadas, num_perguntas)
-        else:
-                perguntas_pesquisa = perguntas_selecionadas
-
-        return perguntas_pesquisa
+def sorteia_perguntas(grupo_perguntas, num_perguntas):
+    perguntas_selecionadas = []
+    
+    # Seleciona uma pergunta de cada grupo
+    for grupo in grupo_perguntas.values():
+        selecionadas = random.sample(grupo, min(1, len(grupo)))
+        perguntas_selecionadas += selecionadas
+    
+    # Verifica se o total de perguntas selecionadas é menor que o número desejado
+    if len(perguntas_selecionadas) < num_perguntas:
+        # Combina todas as perguntas restantes que não foram selecionadas
+        todas_perguntas = [pergunta for grupo in grupo_perguntas.values() for pergunta in grupo]
+        perguntas_disponiveis = list(set(todas_perguntas) - set(perguntas_selecionadas))
+        
+        # Sorteia perguntas extras até atingir o número desejado
+        adicionais = random.sample(perguntas_disponiveis, min(len(perguntas_disponiveis), num_perguntas - len(perguntas_selecionadas)))
+        perguntas_selecionadas += adicionais
+    
+    # Se já há mais do que o necessário, seleciona um subconjunto
+    if len(perguntas_selecionadas) > num_perguntas:
+        perguntas_selecionadas = random.sample(perguntas_selecionadas, num_perguntas)
+    
+    return perguntas_selecionadas
 

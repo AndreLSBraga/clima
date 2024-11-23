@@ -16,22 +16,23 @@ def responder_view():
     fk_perguntas_categorias = consulta_fk_pergunta_categoria()
     #Cria grupo de perguntas que serão sorteadas
     grupo_perguntas = cria_grupos_perguntas(fk_perguntas_categorias)
-
+    
     semana_atual = datetime.now().isocalendar()[1]
     
     if 'perguntas_selecionadas' not in session:
         # Verifica se a semana é múltipla de 4 e define perguntas fixas
         if semana_atual % 4 == 0 or semana_atual == 36 or semana_atual == 38 or (semana_atual >=40 and semana_atual <=43):
-            perguntas_fixas = [50, 51, 52, 53, 54, 55, 56, 57, 58, 59]
+            perguntas_fixas = [1,2,3,4,5,6,7,8,9,40,41,42,43]
             shuffle(perguntas_fixas)  # Embaralha a lista de perguntas fixas
             session['pergunta_atual'] = 0
             session['perguntas_selecionadas'] = perguntas_fixas
         else:
             # Sorteia as perguntas e salva dados da sessão
             session['pergunta_atual'] = 0
-            session['perguntas_selecionadas'] = sorteia_perguntas(grupo_perguntas)
+            session['perguntas_selecionadas'] = sorteia_perguntas(grupo_perguntas, 13)
     
     perguntas_selecionadas = session['perguntas_selecionadas']
+    app.logger.debug(f'Grupo perguntas: {grupo_perguntas}, perguntas selecionadas: {perguntas_selecionadas}')
     num_pergunta_atual = session['pergunta_atual']
     fk_pergunta_atual = perguntas_selecionadas[num_pergunta_atual]
     fk_categoria = consulta_fk_categoria(fk_pergunta_atual)
@@ -92,4 +93,4 @@ def responder_view():
     fk_pergunta_atual = perguntas_selecionadas[num_pergunta_atual]
     fk_categoria = consulta_fk_categoria(fk_pergunta_atual)
     texto_pergunta = consulta_texto_perguntas(fk_pergunta_atual, fk_pais)
-    return render_template('responder.html', pergunta = texto_pergunta, pergunta_num = num_pergunta_atual + 1, total_perguntas = 10)
+    return render_template('responder.html', pergunta = texto_pergunta, pergunta_num = num_pergunta_atual + 1, total_perguntas = 13)
