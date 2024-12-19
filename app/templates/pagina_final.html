@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_locale }} ">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,19 +14,37 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}"  class="active">Responder</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view') }}">Gestor</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=request.args.get('lang')) }}"  class="active">{{_("Responder")}}</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=request.args.get('lang')) }}">{{_("Gestor")}}</a></li>
         </ul>
+        <div class="navbar-lang">
+            <form method="GET" action="{{ url_for('pagina_final.pagina_final_view', lang=request.args.get('lang')) }}">
+                <div class="dropdown">
+                    <label for="lang">Idioma:</label>
+                    <button class="dropdown-btn">
+                        <img src="/static/images/flags/{{ lang }}.png" alt="Idioma Selecionado" class="selected-flag">
+                    </button>
+                    <div class="dropdown-content">
+                        <button type="submit" class="lang-option" name="lang" value="pt">
+                            <img src="/static/images/flags/pt.png" alt="Português">
+                        </button>
+                        <button type="submit" class="lang-option" name="lang" value="es">
+                            <img src="/static/images/flags/es.png" alt="Español">
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </nav>
     <div  class="container_respondido">
-        <h2>Você respondeu a Pulsa desta semana!</h2>
+        <h2>{{_("Você respondeu a Pulsa desta semana!")}}</h2>
         <img class="logo" src="/static/images/logos/final.svg">
     </div>
     <div class="container_sugestao">
-        <form action="/Sugerir" method="POST">
-            <h2> Deixe aqui um comentário/sugestão</h2>
+        <form action="/Sugerir?lang={{lang}}" method="POST">
+            <h2>{{_("Deixe aqui um comentário/sugestão")}}</h2>
             <select name="categoria" id="categoria" class="custom-select" required>
-                <option value="" disabled selected hidden>Selecione a categoria</option>
+                <option value="" disabled selected hidden>{{_("Selecione a categoria")}}</option>
                 {% for categoria in categorias %}
                     <option value="{{ categoria }}">{{ categoria }}</option>
                 {% endfor %}
@@ -36,7 +54,7 @@
             </div>
             <div class="checkbox-container">
                 <input type="checkbox" id="auto_identificacao" name="auto_identificacao" value="auto_identificacao">
-                <label for="auto_identificacao"><i>Desejo me identificar no comentário/sugestão</i></label>
+                <label for="auto_identificacao"><i>{{_("Desejo me identificar no comentário/sugestão")}}</i></label>
             </div>
             <div class="buttons">
                 <button type="submit" name="responder">
@@ -48,7 +66,7 @@
             {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">{{ message | safe }}</div>
+                            <div class="alert alert-{{ category }}">{{ _(message) | safe }}</div>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}

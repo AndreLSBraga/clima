@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_locale }} ">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,29 +14,47 @@
                 <img class="logo" src="/static/images/logos/logo_completa.svg">
             </div>
             <ul class="navbar-menu">
-                <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}"  class="active">Responder</a></li>
-                <li><a href="{{ url_for('gestor.gestor_view') }}">Gestor</a></li>
+                <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view',lang=session.get('lang', 'pt')) }}"  class="active">{{_("Responder")}}</a></li>
+                <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}">{{_("Gestor")}}</a></li>
             </ul>
+            <div class="navbar-lang">
+                <form method="GET" action="{{ url_for('pagina_inicial.pagina_inicial_view',lang=session.get('lang', 'pt')) }}">
+                    <div class="dropdown">
+                        <label for="lang">Idioma:</label>
+                        <button class="dropdown-btn">
+                            <img src="/static/images/flags/{{ lang }}.png" alt="Idioma Selecionado" class="selected-flag">
+                        </button>
+                        <div class="dropdown-content">
+                            <button type="submit" class="lang-option" name="lang" value="pt">
+                                <img src="/static/images/flags/pt.png" alt="Português">
+                            </button>
+                            <button type="submit" class="lang-option" name="lang" value="es">
+                                <img src="/static/images/flags/es.png" alt="Español">
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>          
         </nav>
         <div class="container">
             <img class="logo" src="/static/images/logos/logo_completa.svg">
             <form action="/" method="POST">
-                <h3>Digite seu ID:</h3>
+                <h3>{{_("Digite seu ID:")}}</h3>
                 <input type="text" name="user_id" placeholder="Digite seu ID"> 
-                <h3>Selecione sua data de nascimento:</h3>
+                <h3>{{_("Selecione sua data de nascimento:")}}</h3>
                 <input type="date" name="data_nascimento" placeholder="DD/MM/AAAA" required> 
                 <div class="buttons">
                     <button type="submit" name="responder">
                         <img class="icon" src="/static/images/icons/direita.svg" alt="Direita">
                     </button>
                 </div> 
-                <div><h5>Os dados desta pesquisa são confidenciais.</h5></div>
+                <div><h5>{{_("Os dados desta pesquisa são confidenciais.")}}</h5></div>
             </form>
             <div class="alerts">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}
                             {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">{{ message | safe }}</div>
+                                <div class="alert alert-{{ category }}">{{ _(message) | safe }}</div>
                             {% endfor %}
                         {% endif %}
                     {% endwith %}

@@ -1,4 +1,5 @@
 from flask import current_app as app, flash
+from flask_babel import _
 from app.utils.db import get_db  # Importando a função get_db
 from app.utils.db_consultas import consulta_usuario_id, consulta_usuario_resposta_semana, consulta_usuario_resposta_data # Importando a função get_db
 from datetime import datetime, timedelta
@@ -8,7 +9,7 @@ import bcrypt
 def valida_id(user_id):
     #Verifica se ID é número
     if not user_id.isdigit():
-        flash("Digite apenas números no ID.","error")
+        flash(_("Digite apenas números no ID."),"error")
         return False
     
     usuario = consulta_usuario_id(user_id)
@@ -17,17 +18,20 @@ def valida_id(user_id):
         return True        
     #Se não, o id não existe na base
     else:
-        flash("Usuário não está cadastrado.<br>Entre em contato com seu gestor<br> ou time de gente da unidade.","error")
+        flash(_("Usuário não está cadastrado.<br>Entre em contato com seu gestor<br> ou time de gente da unidade."),"error")
         return False
     
 def valida_data_nascimento(usuario, data_nascimento_formulario):
+    if len(data_nascimento_formulario)>10:
+        flash(_("Digite uma data de nascimento válida"),"error")
+        return False
     data_nascimento = usuario[3]
     data_nascimento_formulario_formatada = datetime.strptime(data_nascimento_formulario, '%Y-%m-%d').date()
     #Compara data nascimento do formulário com a data de nascimento do banco
     if(data_nascimento == data_nascimento_formulario_formatada):
         return True
     else:
-        flash("Dados preenchidos não conferem.<br>Verifique os dados preenchidos.","warning")
+        flash(_("Dados preenchidos não conferem.<br>Verifique os dados preenchidos."),"warning")
         return False
 
 def consulta_gestor_cadastrado(user_id):
@@ -49,7 +53,7 @@ def usuario_is_gestor(user_id):
         if result:
                return True
         else:
-               flash("Usuário não está cadastrado como gestor.<br>Entre em contato com o time de gente da unidade.","error")
+               flash(_("Usuário não está cadastrado como gestor.<br>Entre em contato com o time de gente da unidade."),"error")
                return False
         
 def codifica_id(user_id):
@@ -85,9 +89,6 @@ def verifica_resposta_usuario(user_id):
     
     diferenca_dias_resposta_usuario = (data_ultima_resposta_usuario - data_inicio_pesquisa).days    
     ciclo_resposta = diferenca_dias_resposta_usuario // 14  # Ciclo da última resposta
-    app.logger.debug(f'Data atual {data_atual}, diferenca_dias: {diferenca_dias}, ciclo_atual: {ciclo_atual}')
-
-    app.logger.debug(f'Data resposta: {data_ultima_resposta_usuario}, diferenca_dias_usuario: {diferenca_dias_resposta_usuario}, ciclo_resposta: {ciclo_resposta}')
     # Se o ciclo da última resposta for igual ao ciclo atual, o usuário já respondeu nesta quinzena
     if ciclo_atual == ciclo_resposta:
         return True  # Já respondeu nesta quinzena

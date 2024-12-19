@@ -1,0 +1,215 @@
+# Spanish translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-12-19 13:55-0300\n"
+"PO-Revision-Date: 2024-12-19 14:11-0300\n"
+"Last-Translator: \n"
+"Language-Team: es <LL@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.16.0\n"
+"X-Generator: Poedit 3.5\n"
+
+#: app/blueprints/gestor.py:42 app/blueprints/gestor.py:48
+msgid "A senha digitada está incorreta.<br>Tente novamente com a senha correta"
+msgstr ""
+"La contraseña que ha introducido es incorrecta. <br>Inténtelo de nuevo con "
+"la contraseña correcta"
+
+#: app/blueprints/gestor.py:61
+msgid "É necessário fazer login primeiro"
+msgstr "Primero tienes que conectarte"
+
+#: app/blueprints/gestor.py:71
+msgid "A senha padrão está incorreta.<br>Tente novamente com a senha correta"
+msgstr ""
+"La contraseña por defecto es incorrecta. <br> Inténtelo de nuevo con la "
+"contraseña correcta"
+
+#: app/blueprints/gestor.py:75
+msgid "As senhas digitadas não conferem.<br>Digite as senhas corretamente"
+msgstr ""
+"Las contraseñas introducidas no coinciden.<br> Introduzca las contraseñas "
+"correctamente"
+
+#: app/blueprints/gestor.py:80
+msgid "Senha nova cadastrada"
+msgstr "Nueva contraseña registrada"
+
+#: app/blueprints/pagina_inicial.py:17
+msgid "Preencha todos os campos"
+msgstr "Rellenar todos los campos"
+
+#: app/templates/configura_senha.html:17 app/templates/gestor.html:17
+#: app/templates/pagina_final.html:17 app/templates/pagina_inicial.html:17
+#: app/templates/responder.html:17
+msgid "Responder"
+msgstr "Responder"
+
+#: app/templates/configura_senha.html:18 app/templates/gestor.html:18
+#: app/templates/pagina_final.html:18 app/templates/pagina_inicial.html:18
+#: app/templates/responder.html:18
+msgid "Gestor"
+msgstr "Gestor"
+
+#: app/templates/configura_senha.html:24
+msgid "Configuração Nova Senha"
+msgstr "Configuración de la nueva contraseña"
+
+#: app/templates/configura_senha.html:26
+msgid "Senha Padrão:"
+msgstr "Contraseña por defecto:"
+
+#: app/templates/configura_senha.html:30
+msgid "Nova Senha:"
+msgstr "Nueva contraseña:"
+
+#: app/templates/configura_senha.html:34
+msgid "Confirme sua nova senha:"
+msgstr "Confirma tu nueva contraseña:"
+
+#: app/templates/gestor.html:23 app/templates/pagina_final.html:23
+#: app/templates/responder.html:24
+msgid "Idioma:"
+msgstr "Idioma:"
+
+#: app/templates/gestor.html:47 app/templates/pagina_inicial.html:45
+msgid "Digite seu ID:"
+msgstr "Introduzca su ID:"
+
+#: app/templates/gestor.html:51
+msgid "Digite sua senha:"
+msgstr "Introduzca su contraseña:"
+
+#: app/templates/pagina_final.html:43
+msgid "Você respondeu a Pulsa desta semana!"
+msgstr "¡Has respondido a la Pulsa de esta semana!"
+
+#: app/templates/pagina_final.html:48
+msgid "Deixe aqui um comentário/sugestão"
+msgstr "Deje aquí su comentario/sugerencia"
+
+#: app/templates/pagina_final.html:50
+msgid "Selecione a categoria"
+msgstr "Seleccione la categoría"
+
+#: app/templates/pagina_final.html:60 app/templates/responder.html:81
+msgid "Desejo me identificar no comentário/sugestão"
+msgstr "Deseo identificarme en el comentario/sugerencia"
+
+#: app/templates/pagina_inicial.html:47
+msgid "Selecione sua data de nascimento:"
+msgstr "Seleccione su fecha de nacimiento:"
+
+#: app/templates/pagina_inicial.html:54
+msgid "Os dados desta pesquisa são confidenciais."
+msgstr "Los datos de esta encuesta son confidenciales."
+
+#: app/templates/responder.html:59
+msgid "Discordo Totalmente"
+msgstr "Totalmente en desacuerdo"
+
+#: app/templates/responder.html:62
+msgid "Não Concordo"
+msgstr "Em desacuerdo"
+
+#: app/templates/responder.html:65
+msgid "Não concordo e Não discordo"
+msgstr "No estoy de acuerdo y No estoy en desacuerdo"
+
+#: app/templates/responder.html:68
+msgid "Concordo"
+msgstr "De acuerdo"
+
+#: app/templates/responder.html:71
+msgid "Concordo Totalmente"
+msgstr "Totalmente de acuerdo"
+
+#: app/templates/responder.html:77
+msgid "Comentário/Sugestões:"
+msgstr "Deje aquí su comentario/sugerencia:"
+
+#: app/templates/responder.html:85
+msgid "Pergunta"
+msgstr "Pregunta"
+
+#: app/templates/responder.html:85
+msgid "de"
+msgstr "de"
+
+#: app/templates/responder.html:89
+msgid "Anterior"
+msgstr "Anterior"
+
+#: app/templates/responder.html:93
+msgid "Pular e Enviar"
+msgstr "Saltar y enviar"
+
+#: app/templates/responder.html:94
+msgid "Responder e Enviar"
+msgstr "Responder y enviar"
+
+#: app/templates/responder.html:96
+msgid "Pular"
+msgstr "Saltar"
+
+#: app/templates/responder.html:97
+msgid "Próxima"
+msgstr "Proxima"
+
+#: app/templates/responder.html:103
+msgid "Confirmar Envio"
+msgstr "Confirmar envío"
+
+#: app/templates/responder.html:104
+msgid "Você tem certeza de que deseja enviar suas respostas?"
+msgstr "¿Está seguro de que quiere enviar sus respuestas?"
+
+#: app/templates/responder.html:106
+msgid "Cancelar"
+msgstr "Cancelar"
+
+#: app/templates/responder.html:107
+msgid "Confirmar"
+msgstr "Confirmar"
+
+#: app/templates/responder.html:113
+msgid "Enviando respostas e comentários"
+msgstr "Envío de respuestas y comentarios"
+
+#: app/utils/auth.py:12
+msgid "Digite apenas números no ID."
+msgstr "Ingrese solo números en el ID."
+
+#: app/utils/auth.py:21
+msgid ""
+"Usuário não está cadastrado.<br>Entre em contato com seu gestor<br> ou time "
+"de gente da unidade."
+msgstr ""
+"El usuario no está registrado.<br>Póngase en contacto con su gestor<br> o "
+"equipo de personal de la unidad."
+
+#: app/utils/auth.py:26
+msgid "Digite uma data de nascimento válida"
+msgstr "Ingrese una fecha de nacimiento válida"
+
+#: app/utils/auth.py:34
+msgid "Dados preenchidos não conferem.<br>Verifique os dados preenchidos."
+msgstr "Los datos ingresados no coinciden.<br>Verifique los datos ingresados."
+
+#: app/utils/auth.py:56
+msgid ""
+"Usuário não está cadastrado como gestor.<br>Entre em contato com o time de "
+"gente da unidade."
+msgstr ""
+"El usuario no está registrado como gestor.<br>Póngase en contacto con el "
+"equipo de personal de la unidad."

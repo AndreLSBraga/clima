@@ -53,9 +53,9 @@ body, html {
     width: 100%;
     background-color: #E6E6EA;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 15px 40px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: fixed;
     top: 0;
@@ -197,3 +197,109 @@ h4 {
     background-color: #FECB34;
     color: #000;
 }
+
+.spinner {
+    position: fixed; /* Alterado para fixed para cobrir toda a tela */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Ocupa toda a largura da tela */
+    height: 100vh; /* Ocupa toda a altura da tela */
+    background-color: rgba(0, 0, 0, 0.5); /* Fundo semi-transparente */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Certifique-se de que o spinner fique acima dos outros elementos */
+    text-align: center;
+}
+
+.loader {
+    border: 8px solid #f3f3f3; /* Cor de fundo do loader */
+    border-top: 8px solid #000; /* Cor da borda de cima */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    color: #fff;
+    margin-top: 10px;
+}
+
+.loading-text::after {
+    content: "";
+    display: inline-block;
+    animation: dotAppear 1.5s steps(3, end) infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Animação para os três pontos */
+@keyframes dotAppear {
+    0% { content: ""; }
+    33% { content: "."; }
+    66% { content: ".."; }
+    100% { content: "..."; }
+}
+
+.navbar-lang {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.dropdown-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.dropdown-btn img {
+    width: 100%;
+    height: auto;
+    border: 2px solid #ccc;
+    transition: border-color 0.3s;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #E6E6EA;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    padding: 5px 0;
+}
+
+.dropdown-content .lang-option {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+}
+
+.dropdown-btn img,
+.lang-option img {
+    width: auto;
+    height: auto;
+    display: block;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+

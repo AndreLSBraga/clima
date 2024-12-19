@@ -2,3 +2,4 @@ Flask==2.0.2
 Werkzeug==2.0.2
 mysql-connector-python==8.0.28
 bcrypt==3.2.0
+Flask-Babel>=2.0

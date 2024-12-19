@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, request, session
 import logging
+from flask_babel import Babel, _
 from app.blueprints.pagina_inicial import pagina_inicial
 from app.blueprints.pagina_final import pagina_final
 from app.blueprints.sugestao import sugestao
@@ -10,13 +11,33 @@ from app.blueprints.dashboard import dashboard, dashboard_categoria, dashboard_s
 from app.blueprints.responder import responder
 from app.utils.db import close_db
 
+def get_locale():
+    supported_languages = ['pt', 'es']  # Lista de idiomas suportados
+    lang = request.args.get('lang')
+
+    if lang and lang in supported_languages:
+        session['lang'] = lang
+    else:
+        lang = session.get('lang', request.accept_languages.best_match(supported_languages))
+        if not lang:
+            lang = 'pt'
+        session['lang'] = lang 
+
+    app.logger.debug(f'Selected language: {session["lang"]}')
+    return session['lang']
+
 def create_app():
     app = Flask(__name__,  static_url_path='/static')
     
+    # Configuração de Babel
+    app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
+    babel = Babel(app, locale_selector=get_locale)
+
     # Configuração de chave secreta
     app.secret_key = 'your_secret_key'
     logging.basicConfig(level=logging.DEBUG)
     app.logger.setLevel(logging.DEBUG)
+
     # Registro de Blueprints
     app.register_blueprint(pagina_inicial)
     app.register_blueprint(sugestao)
@@ -38,7 +59,6 @@ def create_app():
     app.register_blueprint(configuracoes_pesquisa_gestor)
     # Finaliza a conexão com o banco de dados
     app.teardown_appcontext(close_db)
-    
     return app
 
 app = create_app()

@@ -17,7 +17,6 @@ COPY . .
 # Defina a variável de ambiente para o Flask
 ENV FLASK_APP=app
 
-
 # Exponha a porta que o Flask usa
 EXPOSE 5000
 

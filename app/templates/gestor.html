@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_locale }} ">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,20 +14,38 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view') }}"class="active">Gestor</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=request.args.get('lang')) }}">{{_("Responder")}}</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=request.args.get('lang')) }}"class="active">{{_("Gestor")}}</a></li>
         </ul>
+        <div class="navbar-lang">
+            <form method="GET" action="{{ url_for('gestor.gestor_view', lang=request.args.get('lang')) }}">
+                <div class="dropdown">
+                    <label for="lang">Idioma:</label>
+                    <button class="dropdown-btn">
+                        <img src="/static/images/flags/{{ lang }}.png" alt="Idioma Selecionado" class="selected-flag">
+                    </button>
+                    <div class="dropdown-content">
+                        <button type="submit" class="lang-option" name="lang" value="pt">
+                            <img src="/static/images/flags/pt.png" alt="Português">
+                        </button>
+                        <button type="submit" class="lang-option" name="lang" value="es">
+                            <img src="/static/images/flags/es.png" alt="Español">
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </nav>
-    <form action="/gestor" method="POST">
+    <form action="/gestor?lang={{lang}}" method="POST">
         <div class="container">
             <img class="logo" src="/static/images/logos/logo_completa.svg">
             <div class="login">
                 <div class="input-group">
-                    <h3>Digite seu ID:</h3>
+                    <h3>{{_("Digite seu ID:")}}</h3>
                     <input type="text" name="username" id="username" placeholder="Digite seu id..." required>
                 </div>
                 <div class="input-group">
-                    <h3>Digite sua senha:</h3>
+                    <h3>{{ _('Digite sua senha:')}}</h3>
                     <input type="password" name="password" id="password"  placeholder="Digite sua senha..." required>
                 </div>
             </div>
@@ -40,7 +58,7 @@
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">{{ message | safe}}</div>
+                            <div class="alert alert-{{ category }}">{{ _(message) | safe}}</div>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}

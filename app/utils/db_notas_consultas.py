@@ -292,19 +292,18 @@ def consulta_promotores_grafico_geral(datas_min_max, fk_gestor):
         i.intervalo_pesquisa,
         count(distinct(r.identificador)) as respondentes_unicos,
         ROUND(100.0 * COALESCE(SUM(CASE WHEN r.resposta >= 6 THEN 1 ELSE 0 END), 0) / NULLIF(COUNT(r.resposta), 0), 2) AS percentual_promotores,
-        ROUND(count(distinct(r.identificador)) / 
-                    (SELECT COUNT(globalId) 
-                    FROM pulsa.usuarios 
-                    WHERE fk_gestor = %s) * 100, 0) as aderencia
+        ROUND(
+            (SELECT count(*) FROM pulsa.respondentes_por_pesquisa where fk_gestor = %s and data between i.data_referencia_min and i.data_referencia_max) /
+            (SELECT COUNT(globalId) FROM pulsa.usuarios WHERE fk_gestor = %s) * 100, 0) as aderencia
     FROM 
         pulsa.intervalos_pesquisa_view i
     INNER JOIN 
         pulsa.respostas r ON
-            r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
+            r.data_hora BETWEEN i.data_referencia_min AND i.data_referencia_max
             AND r.fk_gestor = %s
     '''
     conditions = []
-    params =[fk_gestor, fk_gestor]
+    params =[fk_gestor, fk_gestor, fk_gestor]
     if data_min is not None:
         conditions.append('data_hora >= %s')
         params.append(data_min)
@@ -317,11 +316,10 @@ def consulta_promotores_grafico_geral(datas_min_max, fk_gestor):
 
     query += '''
         GROUP BY 
-            i.intervalo_pesquisa, i.data_referencia
+            i.intervalo_pesquisa, i.data_referencia_min, i.data_referencia_max
         ORDER BY 
-            i.data_referencia ASC;
+            i.data_referencia_min ASC;
     '''
-    
     db = get_db()
     cursor = db.cursor()
     cursor.execute(query, params)
@@ -341,19 +339,18 @@ def consulta_promotores_grafico_geral_area(datas_min_max, fk_gestor):
         i.intervalo_pesquisa,
         count(distinct(r.identificador)) as respondentes_unicos,
         ROUND(100.0 * COALESCE(SUM(CASE WHEN r.resposta >= 6 THEN 1 ELSE 0 END), 0) / NULLIF(COUNT(r.resposta), 0), 2) AS percentual_promotores,
-        ROUND(count(distinct(r.identificador)) / 
-                    (SELECT SUM(tamanho_time) 
-                    FROM pulsa.lideres_com_liderados 
-                    WHERE fk_gestor_lider = %s) * 100, 0) as aderencia
+        ROUND(
+            (SELECT count(*) FROM pulsa.respondentes_por_pesquisa where fk_gestor = %s and data between i.data_referencia_min and i.data_referencia_max) /
+            (SELECT COUNT(globalId) FROM pulsa.usuarios WHERE fk_gestor = %s) * 100, 0) as aderencia
     FROM 
         pulsa.intervalos_pesquisa_view i
     INNER JOIN 
         pulsa.lideres_com_liderados_respostas r ON
-            r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
+            r.data_hora BETWEEN i.data_referencia_min AND i.data_referencia_max
             AND r.fk_gestor_lider = %s
     '''
     conditions = []
-    params =[fk_gestor, fk_gestor]
+    params =[fk_gestor, fk_gestor, fk_gestor]
     if data_min is not None:
         conditions.append('data_hora >= %s')
         params.append(data_min)
@@ -366,9 +363,9 @@ def consulta_promotores_grafico_geral_area(datas_min_max, fk_gestor):
 
     query += '''
         GROUP BY 
-            i.intervalo_pesquisa, i.data_referencia
+            i.intervalo_pesquisa, i.data_referencia_min, i.data_referencia_max
         ORDER BY 
-            i.data_referencia ASC;
+            i.data_referencia_min ASC;
     '''
     db = get_db()
     cursor = db.cursor()
@@ -391,7 +388,7 @@ def consulta_promotores_grafico_categoria(datas_min_max, fk_gestor, fk_categoria
     FROM 
         intervalos_pesquisa_view i
     INNER JOIN 
-        pulsa.respostas r ON r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
+        pulsa.respostas r ON r.data_hora BETWEEN i.data_referencia_min AND i.data_referencia_max
         AND r.fk_gestor = %s AND r.fk_categoria = %s
     '''
     
@@ -409,9 +406,9 @@ def consulta_promotores_grafico_categoria(datas_min_max, fk_gestor, fk_categoria
 
     query += '''
     GROUP BY 
-        i.intervalo_pesquisa, i.data_referencia
+        i.intervalo_pesquisa, i.data_referencia_min
     ORDER BY 
-        i.data_referencia ASC;
+        i.data_referencia_min ASC;
     '''
     db = get_db()
     cursor = db.cursor()
@@ -434,7 +431,7 @@ def consulta_promotores_grafico_categoria_area(datas_min_max, fk_gestor, fk_cate
     FROM 
         intervalos_pesquisa_view i
     INNER JOIN 
-        pulsa.lideres_com_liderados_respostas r ON r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
+        pulsa.lideres_com_liderados_respostas r ON r.data_hora BETWEEN i.data_referencia_min AND i.data_referencia_max
         AND r.fk_gestor_lider = %s AND r.fk_categoria = %s
     '''
     
@@ -452,9 +449,9 @@ def consulta_promotores_grafico_categoria_area(datas_min_max, fk_gestor, fk_cate
 
     query += '''
     GROUP BY 
-        i.intervalo_pesquisa, i.data_referencia
+        i.intervalo_pesquisa, i.data_referencia_min
     ORDER BY 
-        i.data_referencia ASC;
+        i.data_referencia_min ASC;
     '''
     db = get_db()
     cursor = db.cursor()
@@ -478,7 +475,7 @@ def consulta_promotores_grafico_pergunta(datas_min_max, fk_gestor, fk_categoria=
     FROM 
         intervalos_pesquisa_view i
     INNER JOIN 
-        pulsa.respostas r ON r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
+        pulsa.respostas r ON r.data_hora BETWEEN i.data_referencia_min AND i.data_referencia_max
         AND r.fk_gestor = %s AND r.fk_categoria = %s
     '''
 
@@ -495,9 +492,9 @@ def consulta_promotores_grafico_pergunta(datas_min_max, fk_gestor, fk_categoria=
         query += ' AND ' + ' AND '.join(conditions)
     query += '''
     GROUP BY 
-        i.intervalo_pesquisa, r.fk_pergunta, i.data_referencia
+        i.intervalo_pesquisa, r.fk_pergunta, i.data_referencia_min
     ORDER BY 
-        r.fk_pergunta ASC, i.data_referencia ASC;
+        r.fk_pergunta ASC, i.data_referencia_min ASC;
     '''
     db = get_db()
     cursor = db.cursor()
@@ -521,7 +518,7 @@ def consulta_promotores_grafico_pergunta_area(datas_min_max, fk_gestor, fk_categ
     FROM 
         intervalos_pesquisa_view i
     INNER JOIN 
-        pulsa.lideres_com_liderados_respostas r ON r.data_hora BETWEEN i.data_referencia AND DATE_ADD(i.data_referencia, INTERVAL 6 DAY)
+        pulsa.lideres_com_liderados_respostas r ON r.data_hora BETWEEN i.data_referencia_min AND i.data_referencia_max
         AND r.fk_gestor_lider = %s AND r.fk_categoria = %s
     '''
 
@@ -538,9 +535,11 @@ def consulta_promotores_grafico_pergunta_area(datas_min_max, fk_gestor, fk_categ
         query += ' AND ' + ' AND '.join(conditions)
     query += '''
     GROUP BY 
-        i.intervalo_pesquisa, r.fk_pergunta, i.data_referencia
+        i.intervalo_pesquisa, r.fk_pergunta, i.data_referencia_min
+    HAVING 
+        COUNT(DISTINCT r.identificador) >= 3
     ORDER BY 
-        r.fk_pergunta ASC, i.data_referencia ASC;
+        r.fk_pergunta ASC, i.data_referencia_min ASC;
     '''
     db = get_db()
     cursor = db.cursor()

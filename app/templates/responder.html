@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_locale }} ">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,13 +14,31 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}"  class="active">Responder</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view') }}">Gestor</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=session.get('lang', 'pt')) }}"  class="active">{{_("Responder")}}</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}">{{_("Gestor")}}</a></li>
         </ul>
+        <div class="navbar-lang">
+            <form method="GET" action="{{ url_for('responder.responder_view', lang=session.get('lang', 'pt')) }}">
+                <div class="dropdown">
+                    <label for="lang">Idioma:</label>
+                    <button class="dropdown-btn">
+                        <img src="/static/images/flags/{{ lang }}.png" alt="Idioma Selecionado" class="selected-flag">
+                    </button>
+                    <div class="dropdown-content">
+                        <button type="submit" class="lang-option" name="lang" value="pt">
+                            <img src="/static/images/flags/pt.png" alt="Português">
+                        </button>
+                        <button type="submit" class="lang-option" name="lang" value="es">
+                            <img src="/static/images/flags/es.png" alt="Español">
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </nav>
     <div class="container">
-        <div class="question">{{ pergunta }}</div>
-        <form id="formPerguntas" action="/responder" method="POST">
+        <div class="question">{{ _(pergunta) }}</div>
+        <form id="formPerguntas" action="/responder?lang={{lang}}" method="POST">
             <input type="hidden" name="action" id="actionInput">
             <div class="slider-container">
                 <input type="range" name="resposta" min="0" max="10" step="0.01" value="5" class="slider" id="resposta">
@@ -34,64 +52,68 @@
                 </div>
                 <div class="slider-scale-container">
                     <div class="slide-scale-container-text">
-                        <span>Discordo Totalmente</span>
+                        <span>{{_("Discordo Totalmente")}}</span>
                     </div>
                     <div class="slide-scale-container-text">
-                        <span>Não Concordo</span>
+                        <span>{{_("Não Concordo")}}</span>
                     </div>
                     <div class="slide-scale-container-text">
-                        <span>Não concordo e Não discordo</span>
+                        <span>{{_("Não concordo e Não discordo")}}</span>
                     </div>
                     <div class="slide-scale-container-text">
-                        <span>Concordo</span>
+                        <span>{{_("Concordo")}}</span>
                     </div>
                     <div class="slide-scale-container-text">
-                        <span>Concordo Totalmente</span>
+                        <span>{{_("Concordo Totalmente")}}</span>
                     </div>
                 </div>
             </div>
             <div class="suggestion">
                 <div class ="suggestion text">
-                    <label for="sugestao">Comentário/Sugestões:</label>
+                    <label for="sugestao">{{_("Comentário/Sugestões:")}}</label>
                 </div>
                 <div class="checkbox-container">
                     <input type="checkbox" id="auto_identificacao" name="auto_identificacao" value="auto_identificacao">
-                    <label for="auto_identificacao"><i>Desejo me identificar no comentário/sugestão</i></label>
+                    <label for="auto_identificacao"><i>{{_("Desejo me identificar no comentário/sugestão")}}</i></label>
                 </div>
                 <textarea name="sugestao" id="sugestao" placeholder="Digite sua sugestão aqui..."></textarea>
             </div>
-            <div class="question-number">Pergunta {{ pergunta_num }} de {{ total_perguntas }}</div>
+            <div class="question-number">{{_("Pergunta")}} {{ pergunta_num }} {{_("de")}} {{ total_perguntas }}</div>
             <input type="hidden" id="actionInput" name="acao">
             <div class="buttons">
                 <button type="submit" name="anterior">
-                    <img class="imagem" src="/static/images/icons/esquerda.svg"> Anterior
+                    <img class="imagem" src="/static/images/icons/esquerda.svg"> {{_("Anterior")}}
                 </button>
             
                 {% if pergunta_num == total_perguntas %}
-                    <button type="button" name="pular" onclick="abrirModal('pular')">Pular e Enviar<img class="imagem" src="/static/images/icons/pular.svg"></button>
-                    <button type="button" name="proxima" onclick="abrirModal('proxima')">Responder e Enviar <img class="imagem" src="/static/images/icons/direita.svg"></button>
+                    <button type="button" name="pular" onclick="abrirModal('pular')">{{_("Pular e Enviar")}}<img class="imagem" src="/static/images/icons/pular.svg"></button>
+                    <button type="button" name="proxima" onclick="abrirModal('proxima')">{{_("Responder e Enviar")}} <img class="imagem" src="/static/images/icons/direita.svg"></button>
                 {% else %}
-                    <button type="submit" name="pular">Pular<img class="imagem" src="/static/images/icons/pular.svg"></button>
-                    <button type="submit" name="proxima">Próxima<img class="imagem" src="/static/images/icons/direita.svg"></button>
+                    <button type="submit" name="pular">{{_("Pular")}}<img class="imagem" src="/static/images/icons/pular.svg"></button>
+                    <button type="submit" name="proxima">{{_("Próxima")}}<img class="imagem" src="/static/images/icons/direita.svg"></button>
                 {% endif %}
             </div>      
             
             <div id="myModal" class="modal">
                 <div class="modal-content">
-                    <h2>Confirmar Envio</h2>
-                    <p>Você tem certeza de que deseja enviar suas respostas?</p>
+                    <h2>{{_("Confirmar Envio")}}</h2>
+                    <p>{{_("Você tem certeza de que deseja enviar suas respostas?")}}</p>
                     <div class="buttons">
-                        <button type="button" name="pular" onclick="fecharModal()">Cancelar</button>
-                        <button type="submit" name="enviar" onclick="enviarFormulario()">Confirmar<img class="imagem" src="/static/images/icons/enviar.svg"></button>
+                        <button type="button" name="pular" onclick="fecharModal()">{{_("Cancelar")}}</button>
+                        <button type="submit" name="enviar" onclick="enviarFormulario()">{{_("Confirmar")}}<img class="imagem" src="/static/images/icons/enviar.svg"></button>
                     </div>
                 </div>
             </div>
+            <div id="loading-spinner-global" class="spinner" style="display: none;">
+                <div class="loader"></div>
+                <p class="loading-text">{{_("Enviando respostas e comentários")}}</p>
+            </div> 
         </form>
         <div class="alerts">
             {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">{{ message | safe }}</div>
+                            <div class="alert alert-{{ category }}">{{  _(message) | safe }}</div>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
@@ -99,6 +121,7 @@
     </div>
     
     <script src="/static/js/background.js"></script>
+    
     <script>
         function abrirModal(acao) {
             document.getElementById('actionInput').value = acao;
@@ -118,6 +141,7 @@
         function enviarFormulario() {
             var form = document.getElementById("formPerguntas");
             if (form) {
+                document.getElementById('loading-spinner-global').style.display = 'flex';
                 form.submit();
             }
         }

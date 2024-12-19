@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session, current_app as app
+from flask_babel import _
 from app.utils.auth import valida_id, valida_data_nascimento, consulta_usuario_id, codifica_id, verifica_resposta_usuario
 import datetime
 
@@ -7,15 +8,17 @@ pagina_inicial = Blueprint('pagina_inicial', __name__)
 @pagina_inicial.route('/', methods=['GET', 'POST'])
 def pagina_inicial_view():
     
-    #Limpa o cache quando acessa a tela da página inicial
+    lang = session.get('lang', 'pt') 
     session.clear()
+    session['lang'] = lang
 
     if request.method == 'POST':
         user_id = request.form['user_id']
         data_nascimento = request.form['data_nascimento'] 
         if not user_id or not data_nascimento:
-            flash("Preencha todos os campos", "warning")
-        
+            flash(_("Preencha todos os campos"), "warning")
+            return redirect(url_for('pagina_inicial.pagina_inicial_view', lang=lang))
+                        
         #Verifica se o ID existe
         if valida_id(user_id):  
             #Usa o id respondido no formulário para ser codificado mas consulta o banco antes
@@ -60,7 +63,9 @@ def pagina_inicial_view():
                 #Verica se o usuário já respondeu na semana
                 usuario_respondeu_semana = verifica_resposta_usuario(user_id)
                 if usuario_respondeu_semana == True:
-                    return redirect(url_for('pagina_final.pagina_final_view'))
-                return redirect(url_for('responder.responder_view'))
+                    return redirect(url_for('pagina_final.pagina_final_view', lang=lang))
+                app.logger.debug(session)
+                return redirect(url_for('responder.responder_view', lang=lang))
 
-    return render_template('pagina_inicial.html')
+        return redirect(url_for('pagina_inicial.pagina_inicial_view',lang=lang))
+    return render_template('pagina_inicial.html', lang=lang)

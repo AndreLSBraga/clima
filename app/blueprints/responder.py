@@ -4,14 +4,23 @@ from app.utils.db_consultas import consulta_fk_pergunta_categoria, consulta_fk_c
 from app.utils.db_dml import insert_resposta,insert_usuario_respondeu
 from datetime import datetime
 from random import shuffle
+from flask_babel import _
 
 responder = Blueprint('responder', __name__)
 
 @responder.route('/responder', methods=['GET', 'POST'])
 def responder_view():
+    lang = session.get('lang', 'pt') 
     #Coloca em uma variável os dados do session
     dados_usuario = session['dados']
     fk_pais = dados_usuario.get('fk_pais', 3)
+
+    if lang:
+        if lang == 'pt':
+            fk_pais = 3
+        if lang =='es':
+            fk_pais = 1
+    app.logger.debug(lang)
     #Consulta db para trazer as perguntas e categoria
     fk_perguntas_categorias = consulta_fk_pergunta_categoria()
     #Cria grupo de perguntas que serão sorteadas
@@ -32,7 +41,6 @@ def responder_view():
             session['perguntas_selecionadas'] = sorteia_perguntas(grupo_perguntas, 13)
     
     perguntas_selecionadas = session['perguntas_selecionadas']
-    app.logger.debug(f'Grupo perguntas: {grupo_perguntas}, perguntas selecionadas: {perguntas_selecionadas}')
     num_pergunta_atual = session['pergunta_atual']
     fk_pergunta_atual = perguntas_selecionadas[num_pergunta_atual]
     fk_categoria = consulta_fk_categoria(fk_pergunta_atual)
@@ -40,7 +48,7 @@ def responder_view():
     if request.method in ['POST','GET']:
         action = request.form.get('action')
         if num_pergunta_atual >= len(perguntas_selecionadas):
-            return redirect(url_for('pagina_final.pagina_final_view'))
+            return redirect(url_for('pagina_final.pagina_final_view', lang=lang))
 
         if 'respostas' not in session:
             session['respostas'] = []
@@ -87,10 +95,10 @@ def responder_view():
                 if resposta['sugestao']:
                     insert_resposta(dados_usuario,resposta, 'sugestao')
             insert_usuario_respondeu(dados_usuario)
-            return redirect(url_for('pagina_final.pagina_final_view'))
+            return redirect(url_for('pagina_final.pagina_final_view', lang=lang))
 
     #Carrega o fk da pergunta e o texto da pergunta
     fk_pergunta_atual = perguntas_selecionadas[num_pergunta_atual]
     fk_categoria = consulta_fk_categoria(fk_pergunta_atual)
     texto_pergunta = consulta_texto_perguntas(fk_pergunta_atual, fk_pais)
-    return render_template('responder.html', pergunta = texto_pergunta, pergunta_num = num_pergunta_atual + 1, total_perguntas = 13)
+    return render_template('responder.html', pergunta = texto_pergunta, pergunta_num = num_pergunta_atual + 1, total_perguntas = 13, lang=lang)

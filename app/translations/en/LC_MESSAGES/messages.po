@@ -1,0 +1,44 @@
+# English translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-12-18 10:13-0300\n"
+"PO-Revision-Date: 2024-12-18 10:14-0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: app/blueprints/pagina_inicial.py:14
+msgid "Preencha todos os campos"
+msgstr "Fill in all fields"
+
+#: app/templates/pagina_inicial.html:17
+msgid "Responder"
+msgstr "Answer"
+
+#: app/templates/pagina_inicial.html:18
+msgid "Gestor"
+msgstr "Manager"
+
+#: app/templates/pagina_inicial.html:24
+msgid "Digite seu ID:"
+msgstr "Enter your ID:"
+
+#: app/templates/pagina_inicial.html:26
+msgid "Selecione sua data de nascimento:"
+msgstr "Select your birth date"
+
+#: app/templates/pagina_inicial.html:33
+msgid "Os dados desta pesquisa são confidenciais."
+msgstr "The data in this survey is confidential"
+

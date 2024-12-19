@@ -1,0 +1,204 @@
+# Translations template for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-12-19 13:55-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: app/blueprints/gestor.py:42 app/blueprints/gestor.py:48
+msgid "A senha digitada está incorreta.<br>Tente novamente com a senha correta"
+msgstr ""
+
+#: app/blueprints/gestor.py:61
+msgid "É necessário fazer login primeiro"
+msgstr ""
+
+#: app/blueprints/gestor.py:71
+msgid "A senha padrão está incorreta.<br>Tente novamente com a senha correta"
+msgstr ""
+
+#: app/blueprints/gestor.py:75
+msgid "As senhas digitadas não conferem.<br>Digite as senhas corretamente"
+msgstr ""
+
+#: app/blueprints/gestor.py:80
+msgid "Senha nova cadastrada"
+msgstr ""
+
+#: app/blueprints/pagina_inicial.py:17
+msgid "Preencha todos os campos"
+msgstr ""
+
+#: app/templates/configura_senha.html:17 app/templates/gestor.html:17
+#: app/templates/pagina_final.html:17 app/templates/pagina_inicial.html:17
+#: app/templates/responder.html:17
+msgid "Responder"
+msgstr ""
+
+#: app/templates/configura_senha.html:18 app/templates/gestor.html:18
+#: app/templates/pagina_final.html:18 app/templates/pagina_inicial.html:18
+#: app/templates/responder.html:18
+msgid "Gestor"
+msgstr ""
+
+#: app/templates/configura_senha.html:24
+msgid "Configuração Nova Senha"
+msgstr ""
+
+#: app/templates/configura_senha.html:26
+msgid "Senha Padrão:"
+msgstr ""
+
+#: app/templates/configura_senha.html:30
+msgid "Nova Senha:"
+msgstr ""
+
+#: app/templates/configura_senha.html:34
+msgid "Confirme sua nova senha:"
+msgstr ""
+
+#: app/templates/gestor.html:23 app/templates/pagina_final.html:23
+#: app/templates/responder.html:24
+msgid "Idioma:"
+msgstr ""
+
+#: app/templates/gestor.html:47 app/templates/pagina_inicial.html:45
+msgid "Digite seu ID:"
+msgstr ""
+
+#: app/templates/gestor.html:51
+msgid "Digite sua senha:"
+msgstr ""
+
+#: app/templates/pagina_final.html:43
+msgid "Você respondeu a Pulsa desta semana!"
+msgstr ""
+
+#: app/templates/pagina_final.html:48
+msgid "Deixe aqui um comentário/sugestão"
+msgstr ""
+
+#: app/templates/pagina_final.html:50
+msgid "Selecione a categoria"
+msgstr ""
+
+#: app/templates/pagina_final.html:60 app/templates/responder.html:81
+msgid "Desejo me identificar no comentário/sugestão"
+msgstr ""
+
+#: app/templates/pagina_inicial.html:47
+msgid "Selecione sua data de nascimento:"
+msgstr ""
+
+#: app/templates/pagina_inicial.html:54
+msgid "Os dados desta pesquisa são confidenciais."
+msgstr ""
+
+#: app/templates/responder.html:59
+msgid "Discordo Totalmente"
+msgstr ""
+
+#: app/templates/responder.html:62
+msgid "Não Concordo"
+msgstr ""
+
+#: app/templates/responder.html:65
+msgid "Não concordo e Não discordo"
+msgstr ""
+
+#: app/templates/responder.html:68
+msgid "Concordo"
+msgstr ""
+
+#: app/templates/responder.html:71
+msgid "Concordo Totalmente"
+msgstr ""
+
+#: app/templates/responder.html:77
+msgid "Comentário/Sugestões:"
+msgstr ""
+
+#: app/templates/responder.html:85
+msgid "Pergunta"
+msgstr ""
+
+#: app/templates/responder.html:85
+msgid "de"
+msgstr ""
+
+#: app/templates/responder.html:89
+msgid "Anterior"
+msgstr ""
+
+#: app/templates/responder.html:93
+msgid "Pular e Enviar"
+msgstr ""
+
+#: app/templates/responder.html:94
+msgid "Responder e Enviar"
+msgstr ""
+
+#: app/templates/responder.html:96
+msgid "Pular"
+msgstr ""
+
+#: app/templates/responder.html:97
+msgid "Próxima"
+msgstr ""
+
+#: app/templates/responder.html:103
+msgid "Confirmar Envio"
+msgstr ""
+
+#: app/templates/responder.html:104
+msgid "Você tem certeza de que deseja enviar suas respostas?"
+msgstr ""
+
+#: app/templates/responder.html:106
+msgid "Cancelar"
+msgstr ""
+
+#: app/templates/responder.html:107
+msgid "Confirmar"
+msgstr ""
+
+#: app/templates/responder.html:113
+msgid "Enviando respostas e comentários"
+msgstr ""
+
+#: app/utils/auth.py:12
+msgid "Digite apenas números no ID."
+msgstr ""
+
+#: app/utils/auth.py:21
+msgid ""
+"Usuário não está cadastrado.<br>Entre em contato com seu gestor<br> ou "
+"time de gente da unidade."
+msgstr ""
+
+#: app/utils/auth.py:26
+msgid "Digite uma data de nascimento válida"
+msgstr ""
+
+#: app/utils/auth.py:34
+msgid "Dados preenchidos não conferem.<br>Verifique os dados preenchidos."
+msgstr ""
+
+#: app/utils/auth.py:56
+msgid ""
+"Usuário não está cadastrado como gestor.<br>Entre em contato com o time "
+"de gente da unidade."
+msgstr ""
+

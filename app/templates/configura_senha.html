@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_locale }} ">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,24 +14,45 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view') }}" class="active">Gestor</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=request.args.get('lang')) }}">{{_("Responder")}}</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=request.args.get('lang')) }}" class="active">{{_("Gestor")}}</a></li>
         </ul>
+        <div class="navbar-lang">
+            <form method="GET" action="{{ url_for('gestor.gestor_view', lang=request.args.get('lang')) }}">
+                <div class="dropdown">
+                    <label for="lang">{{_("Idioma:")}}</label>
+                    <button class="dropdown-btn">
+                        <img src="/static/images/flags/{{ lang }}.png" alt="Idioma Selecionado" class="selected-flag">
+                    </button>
+                    <div class="dropdown-content">
+                        <button type="submit" class="lang-option" name="lang" value="pt">
+                            <img src="/static/images/flags/pt.png" alt="Português">
+                        </button>
+                        <button type="submit" class="lang-option" name="lang" value="en">
+                            <img src="/static/images/flags/en.png" alt="English">
+                        </button>
+                        <button type="submit" class="lang-option" name="lang" value="es">
+                            <img src="/static/images/flags/es.png" alt="Español">
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </nav>
     <div class="container">
         <form action="/configura_senha" method="POST">
             <img class="logo" src="/static/images/logos/logo_completa.svg">
-            <h2>Configuração Nova Senha</h2>
+            <h2>{{_("Configuração Nova Senha")}}</h2>
             <div class="input-group">
-                <h3>Senha Padrão:</h3>
+                <h3>{{_("Senha Padrão:")}}</h3>
                 <input type="password" name="senha_padrao" id="senha_padrao" placeholder="Digite a senha padrão" required>
             </div>
             <div class="input-group">
-                <h3>Nova Senha:</h3>
+                <h3>{{_("Nova Senha:")}}</h3>
                 <input type="password" name="senha_nova" id="senha_nova" placeholder="Digite a nova senha" required>
             </div>
             <div class="input-group">
-                <h3>Confirme sua nova senha:</h3>
+                <h3>{{_("Confirme sua nova senha:")}}</h3>
                 <input type="password" name="senha_confirmacao" id="senha_confirmacao" placeholder="Confirme sua nova senha" required>
             </div>
             <div class="buttons">
@@ -43,7 +64,7 @@
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">{{ message | safe }}</div>
+                            <div class="alert alert-{{ category }}">{{ _(message) | safe }}</div>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
