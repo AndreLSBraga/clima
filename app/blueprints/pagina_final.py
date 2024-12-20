@@ -9,8 +9,12 @@ pagina_final = Blueprint('pagina_final', __name__)
 def pagina_final_view():
 
     lang = session.get('lang', 'pt')
-
-    grupo_categorias = consulta_categorias()
+    if lang:
+        if lang == 'pt':
+            fk_pais = 3
+        if lang =='es':
+            fk_pais = 1
+    grupo_categorias = consulta_categorias(fk_pais)
     categorias = []
 
     for categoria in grupo_categorias:

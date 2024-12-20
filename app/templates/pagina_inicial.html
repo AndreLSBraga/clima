@@ -22,7 +22,7 @@
                     <div class="dropdown">
                         <label for="lang">Idioma:</label>
                         <button class="dropdown-btn">
-                            <img src="/static/images/flags/{{ lang }}.png" alt="Idioma Selecionado" class="selected-flag">
+                            <img src="/static/images/flags/{{ session.get('lang', 'pt') }}.png" alt="Idioma Selecionado" class="selected-flag">
                         </button>
                         <div class="dropdown-content">
                             <button type="submit" class="lang-option" name="lang" value="pt">
@@ -40,7 +40,8 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
             <form action="/" method="POST">
                 <h3>{{_("Digite seu ID:")}}</h3>
-                <input type="text" name="user_id" placeholder="Digite seu ID"> 
+                {% set user_id_placeholder = _("Digite seu ID...") %}
+                <input type="text" name="user_id" placeholder="{{ user_id_placeholder }}">
                 <h3>{{_("Selecione sua data de nascimento:")}}</h3>
                 <input type="date" name="data_nascimento" placeholder="DD/MM/AAAA" required> 
                 <div class="buttons">

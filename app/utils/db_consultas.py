@@ -79,26 +79,35 @@ def consulta_texto_perguntas(fk_pergunta, fk_pais=3):
         cursor.close()
         return result
 
-def consulta_categorias():
+def consulta_categorias(fk_pais = 3):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT desc_categoria FROM categorias')
+        if fk_pais != 3:
+               cursor.execute('SELECT desc_categoria_es FROM categorias')
+        else:
+                cursor.execute('SELECT desc_categoria FROM categorias')
         result = cursor.fetchall()
         cursor.close()
         return result
 
-def consulta_fk_categoria_pela_desc_categoria(desc_categoria):
+def consulta_fk_categoria_pela_desc_categoria(desc_categoria, fk_pais = 3):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT fk_categoria FROM categorias where desc_categoria = %s',(desc_categoria,))
+        if fk_pais != 3:
+               cursor.execute('SELECT fk_categoria FROM categorias where desc_categoria_es = %s',(desc_categoria,))
+        else:
+                cursor.execute('SELECT fk_categoria FROM categorias where desc_categoria = %s',(desc_categoria,))
         result = cursor.fetchone()[0]
         cursor.close()
         return result
 
-def consulta_desc_categoria_pelo_fk_categoria(fk_categoria):
+def consulta_desc_categoria_pelo_fk_categoria(fk_categoria, fk_pais = 3):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT desc_categoria FROM categorias where fk_categoria = %s',(fk_categoria,))
+        if fk_pais != 3:
+               cursor.execute('SELECT desc_categoria_es FROM categorias where fk_categoria = %s',(fk_categoria,))
+        else:
+                cursor.execute('SELECT desc_categoria FROM categorias where fk_categoria = %s',(fk_categoria,))
         result = cursor.fetchone()[0]
         cursor.close()
         return result

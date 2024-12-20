@@ -20,9 +20,27 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view') }}"class="active">Gestor</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=session.get('lang', 'pt')) }}">Responder</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}"class="active">Gestor</a></li>
         </ul>
+        <div class="navbar-lang">
+            <form method="GET" action="{{ url_for('dashboard.dashboard_view', lang=session.get('lang', 'pt')) }}">
+                <div class="dropdown">
+                    <label for="lang">Idioma:</label>
+                    <button class="dropdown-btn">
+                        <img src="/static/images/flags/{{ session.get('lang', 'pt') }}.png" alt="Idioma Selecionado" class="selected-flag">
+                    </button>
+                    <div class="dropdown-content">
+                        <button type="submit" class="lang-option" name="lang" value="pt">
+                            <img src="/static/images/flags/pt.png" alt="Português">
+                        </button>
+                        <button type="submit" class="lang-option" name="lang" value="es">
+                            <img src="/static/images/flags/es.png" alt="Español">
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </nav>
     <div id="loading-spinner-global" class="spinner">
         <div class="loader"></div>
@@ -30,29 +48,29 @@
     </div>   
     <nav class="sidebar">
         <ul class="sidebar-menu">
-            <li class="active"><a href="{{ url_for('dashboard.dashboard_view') }}">
+            <li class="active"><a href="{{ url_for('dashboard.dashboard_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/time.svg" alt="Dashboard Icon"></span>
                 <span class="text_sidebar">Time</span>
             </a></li>
-            <li><a href="{{ url_for('dashboard_area.dashboard_area_view') }}">
+            <li><a href="{{ url_for('dashboard_area.dashboard_area_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/area.svg" alt="Dashboard Icon"></span>
                 <span class="text_sidebar">Área</span>
             </a></li>
-            <li><a href="{{ url_for('dashboard_lideres.dashboard_lideres_view') }}">
+            <li><a href="{{ url_for('dashboard_lideres.dashboard_lideres_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/lideranca.svg" alt="Sugestoes Icon"></span>
                 <span class="text_sidebar">Líderes</span>
             </a></li>
-            <li><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view') }}">
+            <li><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
                 <span class="text_sidebar">Sugestões</span>
             </a></li>
             {% if perfil == 'administrador' %}
-                <li><a href="{{ url_for('configuracoes.configuracoes_view') }}">
+                <li><a href="{{ url_for('configuracoes.configuracoes_view', lang=session.get('lang', 'pt')) }}">
                     <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
                     <span class="text_sidebar">Configurações</span>
                 </a></li>
             {% endif %}
-                <li><a href="{{ url_for('gestor.gestor_view') }}">
+                <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}">
                     <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
                     <span class="text_sidebar">Sair</span>
                 </a></li>
@@ -82,100 +100,6 @@
                 </div>
             </div>
                 <div class="dashboard-container">
-                    <!-- <div class="main-cards">
-                        <div class="card card-principal geral">
-                            <div class="card-header">
-                                <img class="icon" src="/static/images/icons/nota_geral.svg" alt="Icone Nota Geral">
-                                <h4>Nota Geral:</h4>
-                            </div>
-                            <div class="card-content">
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-fill" data-nota="{{ dados.card1.valor }}" data-size="{{ dados.card1.valor }}"></div>
-                                    </div>
-                                </div>
-                                <div class="progress-data">
-                                    {% if dados.card1.valor != None %}
-                                        <span>{{ dados.card1.valor }}</span>
-                                    {% else %}
-                                        <span>-</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="card-info">
-                                <div class="info-item">
-                                    <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                    <p>{{ dados.card1.qtd_respostas }} perguntas respondidas</p>
-                                </div>
-                                <div class="info-item">
-                                    <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
-                                    <p>{{ dados.card1.data_min }} e {{ dados.card1.data_max }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card card-principal nps">
-                            <div class="card-header">
-                                <img class="icon" src="/static/images/icons/nps.svg" alt="Icone NPS">
-                                <h4>NPS:</h4>
-                            </div>
-                            <div class="card-content">
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-fill" data-nota="{{ dados.card2.valor }}" data-size="{{ dados.card2.valor }}"></div>
-                                    </div>
-                                </div>
-                                <div class="progress-data">
-                                    {% if dados.card2.valor != None %}
-                                        <span>{{ dados.card2.valor }}</span>
-                                    {% else %}
-                                        <span>-</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="card-info">
-                                <div class="info-item">
-                                    <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                    <p>{{ dados.card2.qtd_respostas }} perguntas respondidas</p>
-                                </div>
-                                <div class="info-item">
-                                    <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
-                                    <p>{{ dados.card2.data_min }} e {{ dados.card2.data_max}}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card card-principal eficacia">
-                            <div class="card-header">
-                                <img class="icon" src="/static/images/icons/nps_pulsa.svg" alt="Icone Eficácia Gestor">
-                                <h4>Pulsa Supply:</h4>
-                            </div>
-                            <div class="card-content">
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-fill" data-nota="{{ dados.card3.valor }}" data-size="{{ dados.card3.valor }}"></div>
-                                    </div>
-                                </div>
-                                <div class="progress-data">
-                                    {% if dados.card3.valor != None %}
-                                        <span>{{ dados.card3.valor }}</span>
-                                    {% else %}
-                                        <span> - </span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="card-info">
-                                <div class="info-item">
-                                    <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                    <p> {{ dados.card3.qtd_respostas}} perguntas respondidas</p>
-                                </div>
-                                <div class="info-item">
-                                    <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
-                                    <p>{{ dados.card3.data_min }} e {{ dados.card3.data_max }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
                     <div class="main-grafico">
                         <div class="chart-container">
                             <canvas id="myChart"></canvas>

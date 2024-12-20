@@ -22,7 +22,7 @@
                 <div class="dropdown">
                     <label for="lang">Idioma:</label>
                     <button class="dropdown-btn">
-                        <img src="/static/images/flags/{{ lang }}.png" alt="Idioma Selecionado" class="selected-flag">
+                        <img src="/static/images/flags/{{ session.get('lang', 'pt') }}.png" alt="Idioma Selecionado" class="selected-flag">
                     </button>
                     <div class="dropdown-content">
                         <button type="submit" class="lang-option" name="lang" value="pt">
@@ -76,7 +76,8 @@
                     <input type="checkbox" id="auto_identificacao" name="auto_identificacao" value="auto_identificacao">
                     <label for="auto_identificacao"><i>{{_("Desejo me identificar no comentário/sugestão")}}</i></label>
                 </div>
-                <textarea name="sugestao" id="sugestao" placeholder="Digite sua sugestão aqui..."></textarea>
+                {% set sugestao_placeholder = _("Digite seu comentário/sugestão aqui...") %}
+                <textarea name="sugestao" id="sugestao" placeholder="{{ sugestao_placeholder }}"></textarea>
             </div>
             <div class="question-number">{{_("Pergunta")}} {{ pergunta_num }} {{_("de")}} {{ total_perguntas }}</div>
             <input type="hidden" id="actionInput" name="acao">

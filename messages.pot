@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-19 13:55-0300\n"
+"POT-Creation-Date: 2024-12-20 09:56-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,23 +21,23 @@ msgstr ""
 msgid "A senha digitada está incorreta.<br>Tente novamente com a senha correta"
 msgstr ""
 
-#: app/blueprints/gestor.py:61
+#: app/blueprints/gestor.py:59
 msgid "É necessário fazer login primeiro"
 msgstr ""
 
-#: app/blueprints/gestor.py:71
+#: app/blueprints/gestor.py:69
 msgid "A senha padrão está incorreta.<br>Tente novamente com a senha correta"
 msgstr ""
 
-#: app/blueprints/gestor.py:75
+#: app/blueprints/gestor.py:73
 msgid "As senhas digitadas não conferem.<br>Digite as senhas corretamente"
 msgstr ""
 
-#: app/blueprints/gestor.py:80
+#: app/blueprints/gestor.py:78
 msgid "Senha nova cadastrada"
 msgstr ""
 
-#: app/blueprints/pagina_inicial.py:17
+#: app/blueprints/pagina_inicial.py:19
 msgid "Preencha todos os campos"
 msgstr ""
 
@@ -53,128 +53,135 @@ msgstr ""
 msgid "Gestor"
 msgstr ""
 
-#: app/templates/configura_senha.html:24
-msgid "Configuração Nova Senha"
-msgstr ""
-
-#: app/templates/configura_senha.html:26
-msgid "Senha Padrão:"
-msgstr ""
-
-#: app/templates/configura_senha.html:30
-msgid "Nova Senha:"
-msgstr ""
-
-#: app/templates/configura_senha.html:34
-msgid "Confirme sua nova senha:"
-msgstr ""
-
-#: app/templates/gestor.html:23 app/templates/pagina_final.html:23
-#: app/templates/responder.html:24
+#: app/templates/configura_senha.html:23
 msgid "Idioma:"
 msgstr ""
 
-#: app/templates/gestor.html:47 app/templates/pagina_inicial.html:45
+#: app/templates/configura_senha.html:45
+msgid "Configuração Nova Senha"
+msgstr ""
+
+#: app/templates/configura_senha.html:47
+msgid "Senha Padrão:"
+msgstr ""
+
+#: app/templates/configura_senha.html:51
+msgid "Nova Senha:"
+msgstr ""
+
+#: app/templates/configura_senha.html:55
+msgid "Confirme sua nova senha:"
+msgstr ""
+
+#: app/templates/gestor.html:44 app/templates/pagina_inicial.html:42
 msgid "Digite seu ID:"
 msgstr ""
 
-#: app/templates/gestor.html:51
+#: app/templates/gestor.html:48
 msgid "Digite sua senha:"
 msgstr ""
 
-#: app/templates/pagina_final.html:43
+#: app/templates/pagina_final.html:40
 msgid "Você respondeu a Pulsa desta semana!"
 msgstr ""
 
-#: app/templates/pagina_final.html:48
+#: app/templates/pagina_final.html:45
 msgid "Deixe aqui um comentário/sugestão"
 msgstr ""
 
-#: app/templates/pagina_final.html:50
-msgid "Selecione a categoria"
+#: app/templates/pagina_final.html:47
+msgid "Selecione a categoria..."
 msgstr ""
 
-#: app/templates/pagina_final.html:60 app/templates/responder.html:81
+#: app/templates/pagina_final.html:54 app/templates/responder.html:79
+msgid "Digite seu comentário/sugestão aqui..."
+msgstr ""
+
+#: app/templates/pagina_final.html:59 app/templates/responder.html:77
 msgid "Desejo me identificar no comentário/sugestão"
 msgstr ""
 
-#: app/templates/pagina_inicial.html:47
+#: app/templates/pagina_inicial.html:43
+msgid "Digite seu ID..."
+msgstr ""
+
+#: app/templates/pagina_inicial.html:45
 msgid "Selecione sua data de nascimento:"
 msgstr ""
 
-#: app/templates/pagina_inicial.html:54
+#: app/templates/pagina_inicial.html:52
 msgid "Os dados desta pesquisa são confidenciais."
 msgstr ""
 
-#: app/templates/responder.html:59
+#: app/templates/responder.html:55
 msgid "Discordo Totalmente"
 msgstr ""
 
-#: app/templates/responder.html:62
+#: app/templates/responder.html:58
 msgid "Não Concordo"
 msgstr ""
 
-#: app/templates/responder.html:65
+#: app/templates/responder.html:61
 msgid "Não concordo e Não discordo"
 msgstr ""
 
-#: app/templates/responder.html:68
+#: app/templates/responder.html:64
 msgid "Concordo"
 msgstr ""
 
-#: app/templates/responder.html:71
+#: app/templates/responder.html:67
 msgid "Concordo Totalmente"
 msgstr ""
 
-#: app/templates/responder.html:77
+#: app/templates/responder.html:73
 msgid "Comentário/Sugestões:"
 msgstr ""
 
-#: app/templates/responder.html:85
+#: app/templates/responder.html:82
 msgid "Pergunta"
 msgstr ""
 
-#: app/templates/responder.html:85
+#: app/templates/responder.html:82
 msgid "de"
 msgstr ""
 
-#: app/templates/responder.html:89
+#: app/templates/responder.html:86
 msgid "Anterior"
 msgstr ""
 
-#: app/templates/responder.html:93
+#: app/templates/responder.html:90
 msgid "Pular e Enviar"
 msgstr ""
 
-#: app/templates/responder.html:94
+#: app/templates/responder.html:91
 msgid "Responder e Enviar"
 msgstr ""
 
-#: app/templates/responder.html:96
+#: app/templates/responder.html:93
 msgid "Pular"
 msgstr ""
 
-#: app/templates/responder.html:97
+#: app/templates/responder.html:94
 msgid "Próxima"
 msgstr ""
 
-#: app/templates/responder.html:103
+#: app/templates/responder.html:100
 msgid "Confirmar Envio"
 msgstr ""
 
-#: app/templates/responder.html:104
+#: app/templates/responder.html:101
 msgid "Você tem certeza de que deseja enviar suas respostas?"
 msgstr ""
 
-#: app/templates/responder.html:106
+#: app/templates/responder.html:103
 msgid "Cancelar"
 msgstr ""
 
-#: app/templates/responder.html:107
+#: app/templates/responder.html:104
 msgid "Confirmar"
 msgstr ""
 
-#: app/templates/responder.html:113
+#: app/templates/responder.html:110
 msgid "Enviando respostas e comentários"
 msgstr ""
 

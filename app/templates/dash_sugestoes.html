@@ -16,9 +16,27 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view') }}"class="active">Gestor</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=session.get('lang', 'pt')) }}">Responder</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}"class="active">Gestor</a></li>
         </ul>
+        <div class="navbar-lang">
+            <form method="GET" action="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view', lang=session.get('lang', 'pt')) }}">
+                <div class="dropdown">
+                    <label for="lang">Idioma:</label>
+                    <button class="dropdown-btn">
+                        <img src="/static/images/flags/{{ session.get('lang', 'pt') }}.png" alt="Idioma Selecionado" class="selected-flag">
+                    </button>
+                    <div class="dropdown-content">
+                        <button type="submit" class="lang-option" name="lang" value="pt">
+                            <img src="/static/images/flags/pt.png" alt="Português">
+                        </button>
+                        <button type="submit" class="lang-option" name="lang" value="es">
+                            <img src="/static/images/flags/es.png" alt="Español">
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </nav>
     <div id="loading-spinner-global" class="spinner">
         <div class="loader"></div>
@@ -26,32 +44,32 @@
     </div>   
     <nav class="sidebar">
         <ul class="sidebar-menu">
-            <li><a href="{{ url_for('dashboard.dashboard_view') }}">
+            <li><a href="{{ url_for('dashboard.dashboard_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/time.svg" alt="Dashboard Icon"></span>
                 <span class="text_sidebar">Time</span>
             </a></li>
-            <li><a href="{{ url_for('dashboard_area.dashboard_area_view') }}">
+            <li><a href="{{ url_for('dashboard_area.dashboard_area_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/area.svg" alt="Dashboard Icon"></span>
                 <span class="text_sidebar">Área</span>
             </a></li>
-            <li><a href="{{ url_for('dashboard_lideres.dashboard_lideres_view') }}">
+            <li><a href="{{ url_for('dashboard_lideres.dashboard_lideres_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/lideranca.svg" alt="Sugestoes Icon"></span>
                 <span class="text_sidebar">Líderes</span>
             </a></li>
-            <li class="active"><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view') }}">
+            <li class="active"><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Dashboard Icon"></span>
                 <span class="text_sidebar">Sugestões</span>
             </a></li>
             {% if perfil == 'administrador' %}
-                <li><a href="{{ url_for('configuracoes.configuracoes_view') }}">
+                <li><a href="{{ url_for('configuracoes.configuracoes_view', lang=session.get('lang', 'pt')) }}">
                     <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
                     <span class="text_sidebar">Configurações</span>
                 </a></li>
             {% endif %}
-                <li><a href="{{ url_for('gestor.gestor_view') }}">
-                    <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
-                    <span class="text_sidebar">Sair</span>
-                </a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}">
+                <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
+                <span class="text_sidebar">Sair</span>
+            </a></li>
         </ul>
     </nav>
     

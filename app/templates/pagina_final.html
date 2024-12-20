@@ -14,15 +14,15 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=request.args.get('lang')) }}"  class="active">{{_("Responder")}}</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view', lang=request.args.get('lang')) }}">{{_("Gestor")}}</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=session.get('lang', 'pt')) }}"  class="active">{{_("Responder")}}</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}">{{_("Gestor")}}</a></li>
         </ul>
         <div class="navbar-lang">
-            <form method="GET" action="{{ url_for('pagina_final.pagina_final_view', lang=request.args.get('lang')) }}">
+            <form method="GET" action="{{ url_for('pagina_final.pagina_final_view', lang=session.get('lang', 'pt')) }}">
                 <div class="dropdown">
                     <label for="lang">Idioma:</label>
                     <button class="dropdown-btn">
-                        <img src="/static/images/flags/{{ lang }}.png" alt="Idioma Selecionado" class="selected-flag">
+                        <img src="/static/images/flags/{{ session.get('lang', 'pt') }}.png" alt="Idioma Selecionado" class="selected-flag">
                     </button>
                     <div class="dropdown-content">
                         <button type="submit" class="lang-option" name="lang" value="pt">
@@ -44,13 +44,15 @@
         <form action="/Sugerir?lang={{lang}}" method="POST">
             <h2>{{_("Deixe aqui um comentário/sugestão")}}</h2>
             <select name="categoria" id="categoria" class="custom-select" required>
-                <option value="" disabled selected hidden>{{_("Selecione a categoria")}}</option>
+                {% set categoria_placeholder = _("Selecione a categoria...") %}
+                <option value="" disabled selected hidden>{{_(categoria_placeholder)}}</option>
                 {% for categoria in categorias %}
-                    <option value="{{ categoria }}">{{ categoria }}</option>
+                    <option value="{{ categoria }}">{{ _(categoria) }}</option>
                 {% endfor %}
             </select>
             <div class="suggestion">
-                <textarea name="sugestao" id="sugestao" placeholder="Digite seu comentário/sugestão aqui..."></textarea>
+                {% set sugestao_placeholder = _("Digite seu comentário/sugestão aqui...") %}
+                <textarea name="sugestao" id="sugestao" placeholder="{{ sugestao_placeholder }}"></textarea>
             </div>
             <div class="checkbox-container">
                 <input type="checkbox" id="auto_identificacao" name="auto_identificacao" value="auto_identificacao">

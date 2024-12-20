@@ -106,6 +106,7 @@ def dashboard_sugestoes_view():
         flash("É necessário fazer login primeiro.", "error")
         return redirect(url_for('gestor.gestor_view'))
     perfil = session['perfil']
+    app.logger.debug(perfil)
     id_gestor = session['id_gestor']
     fk_gestor = session['fk_gestor']
     

@@ -14,15 +14,15 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=request.args.get('lang')) }}">{{_("Responder")}}</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view', lang=request.args.get('lang')) }}"class="active">{{_("Gestor")}}</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=session.get('lang', 'pt')) }}">{{_("Responder")}}</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}"class="active">{{_("Gestor")}}</a></li>
         </ul>
         <div class="navbar-lang">
-            <form method="GET" action="{{ url_for('gestor.gestor_view', lang=request.args.get('lang')) }}">
+            <form method="GET" action="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}">
                 <div class="dropdown">
                     <label for="lang">Idioma:</label>
                     <button class="dropdown-btn">
-                        <img src="/static/images/flags/{{ lang }}.png" alt="Idioma Selecionado" class="selected-flag">
+                        <img src="/static/images/flags/{{ session.get('lang', 'pt') }}.png" alt="Idioma Selecionado" class="selected-flag">
                     </button>
                     <div class="dropdown-content">
                         <button type="submit" class="lang-option" name="lang" value="pt">
