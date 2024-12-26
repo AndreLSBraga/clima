@@ -6,6 +6,7 @@
     <title>Pulsa Supply</title>
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/main_dash_config.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
     <link rel="stylesheet" href="/static/css/configuracoes.css">
     <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
 </head>
@@ -15,24 +16,56 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view') }}"class="active">Gestor</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=session.get('lang', 'pt')) }}">{{_("Responder")}}</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}"class="active">{{_("Gestor")}}</a></li>
         </ul>
+        <div class="navbar-lang">
+            <form method="GET" action="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', lang=session.get('lang', 'pt')) }}">
+                <div class="dropdown">
+                    <label for="lang">{{_("Idioma:")}}</label>
+                    <button class="dropdown-btn">
+                        <img src="/static/images/flags/{{ session.get('lang', 'pt') }}.png" alt="Idioma Selecionado" class="selected-flag">
+                    </button>
+                    <div class="dropdown-content">
+                        <button type="submit" class="lang-option" name="lang" value="pt">
+                            <img src="/static/images/flags/pt.png" alt="Português">
+                        </button>
+                        <button type="submit" class="lang-option" name="lang" value="es">
+                            <img src="/static/images/flags/es.png" alt="Español">
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </nav>
     <nav class="sidebar">
         <ul class="sidebar-menu">
-            <li ><a href="{{ url_for('dashboard.dashboard_view') }}">
-                <span class="icon"><img src="/static/images/icons/dashboard.svg" alt="Dashboard Icon"></span>
-                <span class="text_sidebar">Dashboard</span>
+            <li><a href="{{ url_for('dashboard.dashboard_view', lang=session.get('lang', 'pt')) }}">
+                <span class="icon"><img src="/static/images/icons/time.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">{{_("Time")}}</span>
             </a></li>
-            <li class="active"><a href="{{ url_for('configuracoes.configuracoes_view') }}">
-                <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
-                <span class="text_sidebar">Configurações</span>
+            <li><a href="{{ url_for('dashboard_area.dashboard_area_view', lang=session.get('lang', 'pt')) }}">
+                <span class="icon"><img src="/static/images/icons/area.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">{{_("Área")}}</span>
             </a></li>
-            <li><a href="{{ url_for('gestor.gestor_view') }}">
-                <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
-                <span class="text_sidebar">Sair</span>
+            <li><a href="{{ url_for('dashboard_lideres.dashboard_lideres_view', lang=session.get('lang', 'pt')) }}">
+                <span class="icon"><img src="/static/images/icons/lideranca.svg" alt="Sugestoes Icon"></span>
+                <span class="text_sidebar">{{_("Líderes")}}</span>
             </a></li>
+            <li><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view', lang=session.get('lang', 'pt')) }}">
+                <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
+                <span class="text_sidebar">{{_("Sugestões")}}</span>
+            </a></li>
+            {% if perfil == 'administrador' %}
+                <li class="active"><a href="{{ url_for('configuracoes.configuracoes_view', lang=session.get('lang', 'pt')) }}">
+                    <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
+                    <span class="text_sidebar">{{_("Configurações")}}</span>
+                </a></li>
+            {% endif %}
+                <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}">
+                    <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
+                    <span class="text_sidebar">{{_("Sair")}}</span>
+                </a></li>
         </ul>
     </nav>
     
@@ -41,26 +74,26 @@
             <div class="bar">
                 <div class="bar-options">
                     <div class="bar-options-voltar">
-                        <a href="{{ url_for('configuracoes.configuracoes_view') }}">
+                        <a href="{{ url_for('configuracoes.configuracoes_view', lang=session.get('lang', 'pt')) }}">
                             <span class="icon"><img src="/static/images/icons/esquerda.svg" alt="Dashboard Icon"></span>
                         </a>
                     </div>
-                    <span><h1>Cadastro/Edição de Usuários</h1></span>
+                    <span><h1>{{_("Cadastro/Edição de Usuários")}}</h1></span>
                     <div class="bar-options-cadastrar">
                         <button id="cadastrar_usuario" class="cadastrar_usuario" type="button" onclick="abrirModal()">
                             <img src="/static/images/icons/detalhes.svg" alt="Cadastrar">
-                            Cadastrar Novo Usuário
+                            {{_("Cadastrar Novo Usuário")}}
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="tabela-container">
-                <div class="tabela">                
+            <div class="tabela-configuracoes-container">
+                <div class="tabela-configuracoes">                
                     <table>
                         <thead>
                             <tr>
-                                <th class="tabela-titulo-imagem">
+                                <th class="tabela-configuracoes-titulo-imagem">
                                     Global Id
                                     <button id="pesquisa_id" class="filtro_tabela">
                                         <img src="/static/images/icons/pesquisa.svg" alt="Filtro">
@@ -75,17 +108,17 @@
                                             <input type="number" id="id_input" placeholder="Digite o ID" required>
                                         </div>
                                         <div class="botao_pesquisa">
-                                            <button id="limpar_pesquisa"><a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view') }}">Limpar</a></button>
-                                            <button id="pesquisar_btn">Pesquisar</button>
+                                            <button id="limpar_pesquisa"><a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', lang=session.get('lang', 'pt')) }}">{{_("Limpar")}}</a></button>
+                                            <button id="pesquisar_btn">{{_("Pesquisar")}}</button>
                                         </div>
                                         
                                     </div>
                                 </th>
-                                <th>Email</th>
-                                <th>Nome</th>
-                                <th>Unidade</th>
-                                <th>ID Gestor</th> 
-                                <th>Editar</th> 
+                                <th>{{_("Email")}}</th>
+                                <th>{{_("Nome")}}</th>
+                                <th>{{_("Unidade")}}</th>
+                                <th>{{_("ID Gestor")}}</th> 
+                                <th>{{_("Editar")}}</th> 
                             </tr>
                         </thead>
                 {%if usuarios %}
@@ -109,9 +142,9 @@
                     <div class="pagination-center" id="pagination">
                         {% if pagina > 10 %}
                             {% if modo == 'pesquisa' %}
-                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', pagina=pagina-10, globalId=request.args.get('globalId')) }}" id="retorno">
+                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', lang=session.get('lang', 'pt'), pagina=pagina-10, globalId=request.args.get('globalId')) }}" id="retorno">
                             {% else %}
-                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina-10) }}" id="retorno">
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', lang=session.get('lang', 'pt'), pagina=pagina-10) }}" id="retorno">
                             {% endif %}
                                 <img src="/static/images/icons/retorno.svg" alt="retorno Icon">
                             </a>
@@ -119,21 +152,21 @@
                         
                         {% if pagina > 1 %}
                             {% if modo == 'pesquisa' %}
-                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', pagina=pagina-1, globalId=request.args.get('globalId')) }}" id="anterior">
+                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', lang=session.get('lang', 'pt'), pagina=pagina-1, globalId=request.args.get('globalId')) }}" id="anterior">
                             {% else %}
-                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina-1) }}" id="anterior">
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', lang=session.get('lang', 'pt'), pagina=pagina-1) }}" id="anterior">
                             {% endif %}
                                 <img src="/static/images/icons/esquerda.svg" alt="Anterior Icon">
                             </a>
                         {% endif %}
                         
-                        <span>Página {{ pagina }} de {{ total_paginas }}</span>
+                        <span>{{_("Página")}} {{ pagina }} {{_("de")}} {{ total_paginas }}</span>
                         
                         {% if pagina < total_paginas %}
                             {% if modo == 'pesquisa' %}
-                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', pagina=pagina+1, globalId=request.args.get('globalId')) }}" id="proximo">
+                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', lang=session.get('lang', 'pt'), pagina=pagina+1, globalId=request.args.get('globalId')) }}" id="proximo">
                             {% else %}
-                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina+1) }}" id="proximo">
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', lang=session.get('lang', 'pt'), pagina=pagina+1) }}" id="proximo">
                             {% endif %}
                                 <img src="/static/images/icons/direita.svg" alt="Próximo Icon">
                             </a>
@@ -141,9 +174,9 @@
                         
                         {% if pagina < (total_paginas - 10) %}
                             {% if modo == 'pesquisa' %}
-                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', pagina=pagina+10, globalId=request.args.get('globalId')) }}" id="avanco">
+                                <a href="{{ url_for('configuracoes_usuario.pesquisar_usuario', lang=session.get('lang', 'pt'), pagina=pagina+10, globalId=request.args.get('globalId')) }}" id="avanco">
                             {% else %}
-                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', pagina=pagina+10) }}" id="avanco">
+                                <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', lang=session.get('lang', 'pt'), pagina=pagina+10) }}" id="avanco">
                             {% endif %}
                                 <img src="/static/images/icons/avanco.svg" alt="avanco Icon">
                             </a>
@@ -151,42 +184,42 @@
                     </div>
                     
                 {% else %}
-                    <p> Não há usuários cadastrados para a unidade</p>
+                    <p> {{_("Não há usuários cadastrados para a unidade")}}</p>
                 {% endif %}
                 </div>
             </div>
             <div id="usuarioModal" class="modal">
                 <div class="modal-content">
                     <span class="close" onclick="fecharModal()">&times;</span>
-                    <h2>Dados do Usuário</h2>
+                    <h2>{{_("Dados do Usuário")}}</h2>
                     <div class="modal-body">
                         <input type="hidden" id="modal-original-globalId">
                         <div class="form-group">
-                            <label for="modal-globalId">Global ID:</label>
+                            <label for="modal-globalId">{{_("Global ID:")}}</label>
                             <input type="number" maxlength="8" id="modal-globalId" required>
                         </div>
                         <div class="form-group">
-                            <label for="modal-email">Email:</label>
+                            <label for="modal-email">{{_("Email:")}}</label>
                             <input type="email" id="modal-email" required>
                         </div>
                         <div class="form-group">
-                            <label for="modal-nome">Nome:</label>
+                            <label for="modal-nome">{{_("Nome:")}}</label>
                             <input type="text" id="modal-nome" required> 
                         </div>
                         <div class="form-group">
-                            <label for="modal-data_nascimento">Data Nascimento:</label>
+                            <label for="modal-data_nascimento">{{_("Data Nascimento:")}}</label>
                             <input type="date" id="modal-data_nascimento" required>
                         </div>
                         <div class="form-group">
-                            <label for="modal-data_ultima_movimentacao">Data Última Movimentação:</label>
+                            <label for="modal-data_ultima_movimentacao">{{_("Data Última Movimentação:")}}</label>
                             <input type="date" id="modal-data_ultima_movimentacao" required>
                         </div>
                         <div class="form-group">
-                            <label for="modal-data_contratacao">Data Contratação:</label>
+                            <label for="modal-data_contratacao">{{_("Data Contratação:")}}</label>
                             <input type="date" id="modal-data_contratacao" required>
                         </div>
                         <div class="form-group">
-                            <label for="modal-banda">Banda:</label>
+                            <label for="modal-banda">{{_("Banda:")}}</label>
                             <select id="modal-banda" required> 
                                 {% for banda in selecao[0].bandas %}
                                     <option value="{{ banda }}">{{ banda }}</option>
@@ -194,7 +227,7 @@
                             </select>                                    
                         </div>
                         <div class="form-group">
-                            <label for="modal-tipo_cargo">Tipo Cargo:</label>
+                            <label for="modal-tipo_cargo">{{_("Tipo Cargo:")}}</label>
                             <select id="modal-tipo_cargo" required>
                                 {% for tipo_cargo in selecao[0].tipo_cargos %}
                                     <option value="{{ tipo_cargo }}">{{ tipo_cargo }}</option>
@@ -202,7 +235,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="modal-fte">FTE:</label>
+                            <label for="modal-fte">{{_("FTE:")}}</label>
                             <select id="modal-fte" required>
                                 {% for fte in selecao[0].ftes %}
                                     <option value="{{ fte }}">{{ fte }}</option>
@@ -210,7 +243,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="modal-cargo">Cargo:</label>
+                            <label for="modal-cargo">{{_("Cargo:")}}</label>
                             <select id="modal-cargo" required>
                                 {% for cargo in selecao[0].cargos %}
                                     <option value="{{ cargo }}">{{ cargo }}</option>
@@ -218,7 +251,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="modal-unidade">Unidade:</label>
+                            <label for="modal-unidade">{{_("Unidade:")}}</label>
                             <select id="modal-unidade" required>
                                 {% for unidade in selecao[0].unidades %}
                                     <option value="{{ unidade }}">{{ unidade }}</option>
@@ -226,7 +259,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="modal-area">Área:</label>
+                            <label for="modal-area">{{_("Área:")}}</label>
                             <select id="modal-area" required>
                                 {% for area in selecao[0].areas %}
                                     <option value="{{ area }}">{{ area }}</option>
@@ -235,7 +268,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="modal-subarea">Subárea:</label>
+                            <label for="modal-subarea">{{_("Subárea:")}}</label>
                             <select id="modal-subarea" required>
                                 {% for subarea in selecao[0].subareas %}
                                     <option value="{{ subarea }}">{{ subarea }}</option>
@@ -244,11 +277,11 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="modal-id_gestor">ID Gestor:</label>
+                            <label for="modal-id_gestor">{{_("ID Gestor:")}}</label>
                             <input type="text" id="modal-id_gestor" required>
                         </div>
                         <div class="form-group">
-                            <label for="modal-genero">Gênero:</label>
+                            <label for="modal-genero">{{_("Gênero:")}}</label>
                             <select id="modal-genero" required>
                                 {% for genero in selecao[0].generos %}
                                     <option value="{{ genero }}">{{ genero }}</option>
@@ -258,7 +291,7 @@
                         
                     </div>
                     <div class="buttons">
-                        <button type ="submit" id="modal-save-button">Salvar Alterações</button>
+                        <button type ="submit" id="modal-save-button">{{_("Salvar Alterações")}}</button>
                     </div>
                     <div class="alerts">
                         <!-- As mensagens de alerta aparecerão aqui -->

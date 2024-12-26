@@ -267,7 +267,6 @@ def atualizar_gestor(coluna, dados_alteracao, global_id):
                 globalId = %s
         '''
     cursor.execute(query, (novo, global_id))
-    app.logger.debug(query)
     # Verificar o número de linhas afetadas
     if cursor.rowcount > 0:
         status = "success"

@@ -14,7 +14,7 @@
                 <img class="logo" src="/static/images/logos/logo_completa.svg">
             </div>
             <ul class="navbar-menu">
-                <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view',lang=session.get('lang', 'pt')) }}"  class="active">{{_("Responder")}}</a></li>
+                <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view',lang=session.get('lang', 'pt')) }}" class="active">{{_("Responder")}}</a></li>
                 <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}">{{_("Gestor")}}</a></li>
             </ul>
             <div class="navbar-lang">
@@ -36,9 +36,13 @@
                 </form>
             </div>          
         </nav>
+        <div id="loading-spinner-global" class="spinner" style="display: none;">
+            <div class="loader"></div>
+            <p class="loading-text">{{_("Montando sua pesquisa")}}</p>
+        </div>
         <div class="container">
             <img class="logo" src="/static/images/logos/logo_completa.svg">
-            <form action="/" method="POST">
+            <form id="responder" action="/" method="POST">
                 <h3>{{_("Digite seu ID:")}}</h3>
                 {% set user_id_placeholder = _("Digite seu ID...") %}
                 <input type="text" name="user_id" placeholder="{{ user_id_placeholder }}">
@@ -53,14 +57,26 @@
             </form>
             <div class="alerts">
                 {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">{{ _(message) | safe }}</div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ _(message) | safe }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
             </div>
         </div>
         <script src="/static/js/background.js"></script>
     </body>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("responder");
+            const spinner = document.getElementById("loading-spinner-global");
+
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();  // Impede a submissão imediata do formulário
+                spinner.style.display = 'flex';  // Exibe o spinner
+                form.submit();
+            });
+        });
+    </script>
 </html>

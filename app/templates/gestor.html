@@ -36,7 +36,11 @@
             </form>
         </div>
     </nav>
-    <form action="/gestor?lang={{lang}}" method="POST">
+    <div id="loading-spinner-global" class="spinner" style="display: none;">
+        <div class="loader"></div>
+        <p class="loading-text">{{_("Buscando seus dados")}}</p>
+    </div>
+    <form id="gestor" action="/gestor?lang={{lang}}" method="POST">
         <div class="container">
             <img class="logo" src="/static/images/logos/logo_completa.svg">
             <div class="login">
@@ -67,4 +71,16 @@
     </form>
     <script src="/static/js/background.js"></script>
 </body>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("gestor");
+            const spinner = document.getElementById("loading-spinner-global");
+
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();  // Impede a submissão imediata do formulário
+                spinner.style.display = 'flex';  // Exibe o spinner
+                form.submit();
+            });
+        });
+    </script>
 </html>

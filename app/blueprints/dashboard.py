@@ -4,6 +4,7 @@ from app.utils.db_consultas import consulta_sugestoes_por_gestor, consulta_fk_ca
 from app.utils.db_notas_consultas import consulta_promotores, consulta_intervalo_respostas, consulta_promotores_area
 from app.utils.dashboard import gera_cards, gera_cards_detalhe, gera_informacoes_respostas, processa_sugestoes
 from app.utils.dashboard import gera_grafico, gera_tabela_liderados, gera_main_cards, gera_cards_categoria,gera_grafico_area, gera_cards_area, gera_cards_categoria_area, gera_cards_detalhe_area
+from flask_babel import _
 
 from datetime import datetime
 import json
@@ -16,9 +17,14 @@ dashboard_lideres = Blueprint('dashboard_lideres', __name__)
 
 @dashboard.route('/dashboard', methods = ['GET', 'POST'])
 def dashboard_view():
+    lang = session.get('lang', 'pt')
+    fk_pais = 3
+    if lang == 'es':
+        fk_pais = 1
+    
     if 'logged_in' not in session:
-        flash("É necessário fazer login primeiro.", "error")
-        return redirect(url_for('gestor.gestor_view'))
+        flash(_("É necessário fazer login primeiro."), "error")
+        return redirect(url_for('gestor.gestor_view', lang=lang))
     perfil = session['perfil']
     id_gestor = session['id_gestor']
     fk_gestor = session['fk_gestor']
@@ -69,11 +75,15 @@ def dashboard_view():
         'aderencia': grafico_geral[2]
     }]
 
-    cards = gera_cards(datas_min_max, fk_gestor)
-    return render_template('dashboard.html', perfil = perfil, dados=dados_main_cards, cards=cards, grafico = dados_main_grafico, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados)
+    cards = gera_cards(datas_min_max, fk_gestor, fk_pais)
+    return render_template('dashboard.html',lang=lang, perfil = perfil, dados=dados_main_cards, cards=cards, grafico = dados_main_grafico, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados)
 
 @dashboard_categoria.route('/dashboard/detalhes-categoria:<int:card_id>', methods = ['GET', 'POST'])
 def detalhes_categoria_view(card_id):
+    lang = session.get('lang', 'pt')
+    fk_pais = 3
+    if lang == 'es':
+        fk_pais = 1
     datas_min_max = [None, None]
     intervalos_param = request.args.get('intervalos')
 
@@ -90,7 +100,7 @@ def detalhes_categoria_view(card_id):
         datas_min_max = [None, None]
     fk_gestor = session['fk_gestor']
     categoria_info = gera_cards_categoria(datas_min_max, fk_gestor, card_id)
-    cards_perguntas = gera_cards_detalhe(datas_min_max, fk_gestor, card_id)
+    cards_perguntas = gera_cards_detalhe(datas_min_max, fk_gestor, card_id, fk_pais)
 
     if cards_perguntas:
         return jsonify({
@@ -102,11 +112,14 @@ def detalhes_categoria_view(card_id):
  
 @dashboard_sugestoes.route('/dashboard_sugestoes', methods = ['GET', 'POST'])
 def dashboard_sugestoes_view():
+    lang = session.get('lang', 'pt')
+    fk_pais = 3
+    if lang == 'es':
+        fk_pais = 1
     if 'logged_in' not in session:
-        flash("É necessário fazer login primeiro.", "error")
+        flash(_("É necessário fazer login primeiro."), "error")
         return redirect(url_for('gestor.gestor_view'))
     perfil = session['perfil']
-    app.logger.debug(perfil)
     id_gestor = session['id_gestor']
     fk_gestor = session['fk_gestor']
     
@@ -123,19 +136,25 @@ def dashboard_sugestoes_view():
         tamanho_time = 0
 
     if tamanho_time < 3:
-        return render_template('dash_sugestoes.html', dados_gestor = dados_gestor)
+        return render_template('dash_sugestoes.html', perfil= perfil, dados_gestor = dados_gestor)
     
     selecao_sugestao = request.args.get('filtro')
     if selecao_sugestao:
         sugestoes = consulta_sugestoes_por_gestor_area(fk_gestor)
     else:
         sugestoes = consulta_sugestoes_por_gestor(fk_gestor)
+
+    app.logger.debug(sugestoes)
     return render_template('dash_sugestoes.html', perfil = perfil, dados_gestor = dados_gestor, sugestoes = sugestoes)
 
 @dashboard_area.route('/dashboard_area', methods = ['GET', 'POST'])
 def dashboard_area_view():
+    lang = session.get('lang', 'pt')
+    fk_pais = 3
+    if lang == 'es':
+        fk_pais = 1
     if 'logged_in' not in session:
-        flash("É necessário fazer login primeiro.", "error")
+        flash(_("É necessário fazer login primeiro."), "error")
         return redirect(url_for('gestor.gestor_view'))
     perfil = session['perfil']
     id_gestor = session['id_gestor']
@@ -186,14 +205,17 @@ def dashboard_area_view():
         'aderencia': grafico_geral[2]
     }]
 
-    cards = gera_cards_area(datas_min_max, fk_gestor)
+    cards = gera_cards_area(datas_min_max, fk_gestor, fk_pais)
     return render_template('dashboard_area.html', perfil = perfil, dados=dados_main_cards, cards=cards, grafico = dados_main_grafico, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados)
 
 @dashboard_categoria_area.route('/dashboard_area/detalhes-categoria:<int:card_id>', methods = ['GET', 'POST'])
 def detalhes_categoria_area_view(card_id):
     datas_min_max = [None, None]
     intervalos_param = request.args.get('intervalos')
-
+    lang = session.get('lang', 'pt')
+    fk_pais = 3
+    if lang == 'es':
+        fk_pais = 1
     if intervalos_param:
         datas_filtro = []
         intervalos_selecionados = json.loads(intervalos_param)
@@ -207,7 +229,7 @@ def detalhes_categoria_area_view(card_id):
         datas_min_max = [None, None]
     fk_gestor = session['fk_gestor']
     categoria_info = gera_cards_categoria_area(datas_min_max, fk_gestor, card_id)
-    cards_perguntas = gera_cards_detalhe_area(datas_min_max, fk_gestor, card_id)
+    cards_perguntas = gera_cards_detalhe_area(datas_min_max, fk_gestor, card_id, fk_pais)
 
     if cards_perguntas:
         return jsonify({
@@ -220,7 +242,7 @@ def detalhes_categoria_area_view(card_id):
 @dashboard_lideres.route('/dashboard_lideres', methods = ['GET', 'POST'])
 def dashboard_lideres_view():
     if 'logged_in' not in session:
-        flash("É necessário fazer login primeiro.", "error")
+        flash(_("É necessário fazer login primeiro."), "error")
         return redirect(url_for('gestor.gestor_view'))
     perfil = session['perfil']
     id_gestor = session['id_gestor']

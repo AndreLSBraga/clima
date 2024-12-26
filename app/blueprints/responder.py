@@ -20,7 +20,6 @@ def responder_view():
             fk_pais = 3
         if lang =='es':
             fk_pais = 1
-    app.logger.debug(lang)
     #Consulta db para trazer as perguntas e categoria
     fk_perguntas_categorias = consulta_fk_pergunta_categoria()
     #Cria grupo de perguntas que serão sorteadas
@@ -29,8 +28,15 @@ def responder_view():
     semana_atual = datetime.now().isocalendar()[1]
     
     if 'perguntas_selecionadas' not in session:
+        data_atual = datetime.now().date() #Dia atual
+        data_inicio_pesquisa = datetime(2024,9,30).date() #Data de inicio da primeira pesquisa do modelo
+        diferenca_dias = (data_atual - data_inicio_pesquisa).days #Número de dias entre a data atual e o início da pesquisa
+        ciclo_atual = diferenca_dias // 14 #Ciclo atual de respostas
+        divisao = ciclo_atual % 2
+        app.logger.debug(f"Ciclo atual: {ciclo_atual}, Divisão: {divisao}")
+
         # Verifica se a semana é múltipla de 4 e define perguntas fixas
-        if semana_atual % 4 == 0 or semana_atual == 36 or semana_atual == 38 or (semana_atual >=40 and semana_atual <=43):
+        if ciclo_atual % 2 == 0:
             perguntas_fixas = [1,2,3,4,5,6,7,8,9,40,41,42,43]
             shuffle(perguntas_fixas)  # Embaralha a lista de perguntas fixas
             session['pergunta_atual'] = 0
@@ -41,6 +47,7 @@ def responder_view():
             session['perguntas_selecionadas'] = sorteia_perguntas(grupo_perguntas, 13)
     
     perguntas_selecionadas = session['perguntas_selecionadas']
+    app.logger.debug(perguntas_selecionadas)
     num_pergunta_atual = session['pergunta_atual']
     fk_pergunta_atual = perguntas_selecionadas[num_pergunta_atual]
     fk_categoria = consulta_fk_categoria(fk_pergunta_atual)

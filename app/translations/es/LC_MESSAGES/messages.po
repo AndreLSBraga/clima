@@ -7,22 +7,91 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-20 09:56-0300\n"
-"PO-Revision-Date: 2024-12-20 09:47-0300\n"
+"POT-Creation-Date: 2024-12-26 16:39-0300\n"
+"PO-Revision-Date: 2024-12-26 16:39-0300\n"
 "Last-Translator: \n"
-"Language: es\n"
 "Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.16.0\n"
+"X-Generator: Poedit 3.5\n"
+
+#: app/blueprints/configuracoes.py:20 app/blueprints/configuracoes.py:81
+#: app/blueprints/dashboard.py:26 app/blueprints/dashboard.py:120
+#: app/blueprints/dashboard.py:157 app/blueprints/dashboard.py:245
+msgid "É necessário fazer login primeiro."
+msgstr "Primero tienes que conectarte."
+
+#: app/blueprints/configuracoes.py:111 app/blueprints/configuracoes.py:193
+msgid "Preencha os dados obrigatórios."
+msgstr "Rellene la información solicitada."
+
+#: app/blueprints/configuracoes.py:117
+msgid ""
+"Já existe usuário com esse ID cadastrado.<br> Procure pelo ID nas "
+"configurações de usuários."
+msgstr ""
+"Ya hay un usuario con este ID registrado.<br> Busca el ID en la "
+"configuración de usuario."
+
+#: app/blueprints/configuracoes.py:120 app/blueprints/configuracoes.py:196
+msgid ""
+"Os dados informados no campo 'Global ID' não segue algum dos padrões "
+"necessários.<br>Tem mais ou menos que 8 números ou não tem apenas números"
+msgstr ""
+"Los datos introducidos en el campo «ID global» no siguen ninguna de las "
+"normas requeridas.<br>Tiene más o menos de 8 números o no tiene sólo números"
+
+#: app/blueprints/configuracoes.py:123
+msgid ""
+"Os dados informados no campo 'Email' não segue algum dos padrões necessários."
+"<br>Não está digitado corretamente como @ambev.com.br ou @ab-inbev.com"
+msgstr ""
+"Los datos introducidos en el campo «Email» no cumplen ninguna de las normas "
+"requeridas.<br>No se ha introducido correctamente como @ambev.com.br o @ab-"
+"inbev.com"
+
+#: app/blueprints/configuracoes.py:126
+msgid ""
+"Os dados informados no campo 'ID Gestor' não existe na base de gestores."
+"<br>Entre em contato com a área de gente da unidade."
+msgstr ""
+"Los datos introducidos en el campo 'ID de gestor' no existen en la base de "
+"datos de gestores.<br>Póngase en contacto con el departamento de personal de "
+"la unidad."
+
+#: app/blueprints/configuracoes.py:155 app/blueprints/configuracoes.py:215
+msgid "Abra novamente a tela de edição, o ID foi alterado."
+msgstr "Abra de nuevo la pantalla de edición, el ID se ha modificado."
+
+#: app/blueprints/configuracoes.py:162 app/blueprints/configuracoes.py:223
+msgid "Não houve alteração nos dados do usuário"
+msgstr "Sin cambios en los datos del usuario"
+
+#: app/blueprints/configuracoes.py:183
+msgid "A senha do gestor foi alterada"
+msgstr "La contraseña del gestor ha sido modificada"
+
+#: app/blueprints/configuracoes.py:201
+msgid ""
+"Não existe usuário cadastrado para o id informado.<br> Crie o usuário antes "
+"de cadastrar o gestor."
+msgstr ""
+"No hay ningún usuario registrado para el id introducido.<br> Cree el usuario "
+"antes de registrar el gestor."
+
+#: app/blueprints/configuracoes.py:232
+msgid "Já existe um gestor cadastrado com o ID informado"
+msgstr "Ya hay un gestor registrado con el ID introducido"
 
 #: app/blueprints/gestor.py:42 app/blueprints/gestor.py:48
 msgid "A senha digitada está incorreta.<br>Tente novamente com a senha correta"
 msgstr ""
-"La contraseña que ha introducido es incorrecta. <br>Inténtelo de nuevo "
-"con la contraseña correcta"
+"La contraseña que ha introducido es incorrecta. <br>Inténtelo de nuevo con "
+"la contraseña correcta"
 
 #: app/blueprints/gestor.py:59
 msgid "É necessário fazer login primeiro"
@@ -37,30 +106,47 @@ msgstr ""
 #: app/blueprints/gestor.py:73
 msgid "As senhas digitadas não conferem.<br>Digite as senhas corretamente"
 msgstr ""
-"Las contraseñas introducidas no coinciden.<br> Introduzca las contraseñas"
-" correctamente"
+"Las contraseñas introducidas no coinciden.<br> Introduzca las contraseñas "
+"correctamente"
 
 #: app/blueprints/gestor.py:78
 msgid "Senha nova cadastrada"
 msgstr "Nueva contraseña registrada"
 
+#: app/blueprints/pagina_final.py:38
+msgid "Sugestão enviada com sucesso!"
+msgstr "¡Sugerencia enviada con éxito!"
+
 #: app/blueprints/pagina_inicial.py:19
 msgid "Preencha todos os campos"
 msgstr "Rellenar todos los campos"
 
-#: app/templates/configura_senha.html:17 app/templates/gestor.html:17
-#: app/templates/pagina_final.html:17 app/templates/pagina_inicial.html:17
-#: app/templates/responder.html:17
+#: app/templates/configura_senha.html:17 app/templates/configuracoes.html:19
+#: app/templates/configuracoes_gestor.html:19
+#: app/templates/configuracoes_usuario.html:19
+#: app/templates/dash_gestores.html:23 app/templates/dash_sugestoes.html:19
+#: app/templates/dashboard.html:23 app/templates/dashboard_area.html:23
+#: app/templates/gestor.html:17 app/templates/pagina_final.html:17
+#: app/templates/pagina_inicial.html:17 app/templates/responder.html:17
 msgid "Responder"
 msgstr "Responder"
 
-#: app/templates/configura_senha.html:18 app/templates/gestor.html:18
-#: app/templates/pagina_final.html:18 app/templates/pagina_inicial.html:18
-#: app/templates/responder.html:18
+#: app/templates/configura_senha.html:18 app/templates/configuracoes.html:20
+#: app/templates/configuracoes_gestor.html:20
+#: app/templates/configuracoes_usuario.html:20
+#: app/templates/dash_gestores.html:24 app/templates/dash_gestores.html:108
+#: app/templates/dash_sugestoes.html:20 app/templates/dash_sugestoes.html:99
+#: app/templates/dashboard.html:24 app/templates/dashboard_area.html:24
+#: app/templates/gestor.html:18 app/templates/pagina_final.html:18
+#: app/templates/pagina_inicial.html:18 app/templates/responder.html:18
 msgid "Gestor"
 msgstr "Gestor"
 
-#: app/templates/configura_senha.html:23
+#: app/templates/configura_senha.html:23 app/templates/configuracoes.html:25
+#: app/templates/configuracoes_gestor.html:25
+#: app/templates/configuracoes_usuario.html:25
+#: app/templates/dash_gestores.html:29 app/templates/dash_sugestoes.html:25
+#: app/templates/dashboard.html:29 app/templates/dashboard_area.html:29
 msgid "Idioma:"
 msgstr "Idioma:"
 
@@ -80,11 +166,482 @@ msgstr "Nueva contraseña:"
 msgid "Confirme sua nova senha:"
 msgstr "Confirma tu nueva contraseña:"
 
-#: app/templates/gestor.html:44 app/templates/pagina_inicial.html:42
+#: app/templates/configuracoes.html:45
+#: app/templates/configuracoes_gestor.html:45
+#: app/templates/configuracoes_usuario.html:45
+#: app/templates/dash_gestores.html:53 app/templates/dash_sugestoes.html:49
+#: app/templates/dash_sugestoes.html:85 app/templates/dashboard.html:53
+#: app/templates/dashboard_area.html:53
+msgid "Time"
+msgstr "Equipo"
+
+#: app/templates/configuracoes.html:49
+#: app/templates/configuracoes_gestor.html:49
+#: app/templates/configuracoes_usuario.html:49
+#: app/templates/dash_gestores.html:57 app/templates/dash_sugestoes.html:53
+#: app/templates/dash_sugestoes.html:88 app/templates/dashboard.html:57
+#: app/templates/dashboard_area.html:57
+msgid "Área"
+msgstr "Zona"
+
+#: app/templates/configuracoes.html:53
+#: app/templates/configuracoes_gestor.html:53
+#: app/templates/configuracoes_usuario.html:53
+#: app/templates/dash_gestores.html:61 app/templates/dash_sugestoes.html:57
+#: app/templates/dashboard.html:61 app/templates/dashboard_area.html:61
+msgid "Líderes"
+msgstr "Líderes"
+
+#: app/templates/configuracoes.html:57
+#: app/templates/configuracoes_gestor.html:57
+#: app/templates/configuracoes_usuario.html:57
+#: app/templates/dash_gestores.html:65 app/templates/dash_sugestoes.html:61
+#: app/templates/dashboard.html:65 app/templates/dashboard_area.html:65
+msgid "Sugestões"
+msgstr "Sugerencias"
+
+#: app/templates/configuracoes.html:62
+#: app/templates/configuracoes_gestor.html:62
+#: app/templates/configuracoes_usuario.html:62
+#: app/templates/dash_gestores.html:70 app/templates/dash_sugestoes.html:66
+#: app/templates/dashboard.html:70 app/templates/dashboard_area.html:70
+msgid "Configurações"
+msgstr "Configuraciones"
+
+#: app/templates/configuracoes.html:67
+#: app/templates/configuracoes_gestor.html:67
+#: app/templates/configuracoes_usuario.html:67
+#: app/templates/dash_gestores.html:75 app/templates/dash_sugestoes.html:71
+#: app/templates/dashboard.html:75 app/templates/dashboard_area.html:75
+msgid "Sair"
+msgstr "Salir"
+
+#: app/templates/configuracoes.html:77
+msgid "Configurar Usuários"
+msgstr "Configuración de usuarios"
+
+#: app/templates/configuracoes.html:78
+msgid "Cadastrar Usuários/Editar informações dos usuários criados"
+msgstr "Registrar usuarios/Editar información sobre usuarios creados"
+
+#: app/templates/configuracoes.html:81
+msgid "Configurar Gestores"
+msgstr "Configurar gestores"
+
+#: app/templates/configuracoes.html:82
+msgid "Cadastrar Gestores/Editar informações dos gestores criados"
+msgstr "Registrar gestores/Editar información sobre gestores creados"
+
+#: app/templates/configuracoes_gestor.html:81
+msgid "Cadastro/Edição de Gestores"
+msgstr "Registro/edición de gestores"
+
+#: app/templates/configuracoes_gestor.html:85
+msgid "Cadastrar Novo Gestor"
+msgstr "Registrar nuevo gestor"
+
+#: app/templates/configuracoes_gestor.html:96
+msgid "Global Id"
+msgstr "Global Id"
+
+#: app/templates/configuracoes_gestor.html:103
+msgid "Global Id:"
+msgstr "Global Id:"
+
+#: app/templates/configuracoes_gestor.html:110
+#: app/templates/configuracoes_usuario.html:111
+#: app/templates/dash_gestores.html:97 app/templates/dashboard.html:97
+#: app/templates/dashboard_area.html:97
+msgid "Limpar"
+msgstr "Limpiar"
+
+#: app/templates/configuracoes_gestor.html:111
+#: app/templates/configuracoes_usuario.html:112
+msgid "Pesquisar"
+msgstr "Busca"
+
+#: app/templates/configuracoes_gestor.html:117
+#: app/templates/configuracoes_usuario.html:118
+msgid "Nome"
+msgstr "Nombre"
+
+#: app/templates/configuracoes_gestor.html:118
+msgid "Redefinir Senha"
+msgstr "Restablecer contraseña"
+
+#: app/templates/configuracoes_gestor.html:119
+#: app/templates/configuracoes_usuario.html:121
+msgid "Editar"
+msgstr "Edición"
+
+#: app/templates/configuracoes_gestor.html:163
+#: app/templates/configuracoes_usuario.html:163
+msgid "Página"
+msgstr "Página"
+
+#: app/templates/configuracoes_gestor.html:163
+#: app/templates/configuracoes_usuario.html:163
+#: app/templates/dash_sugestoes.html:145 app/templates/responder.html:82
+msgid "de"
+msgstr "de"
+
+#: app/templates/configuracoes_gestor.html:186
+#: app/templates/configuracoes_usuario.html:187
+msgid "Não há usuários cadastrados para a unidade"
+msgstr "No hay usuarios registrados para la unidad"
+
+#: app/templates/configuracoes_gestor.html:193
+msgid "Dados do Gestor:"
+msgstr "Datos del gestor:"
+
+#: app/templates/configuracoes_gestor.html:197
+#: app/templates/configuracoes_usuario.html:198
+msgid "Global ID:"
+msgstr "Global ID:"
+
+#: app/templates/configuracoes_gestor.html:201
+#: app/templates/configuracoes_usuario.html:206
+msgid "Nome:"
+msgstr "Nombre:"
+
+#: app/templates/configuracoes_gestor.html:205
+msgid "Perfil:"
+msgstr "Perfil:"
+
+#: app/templates/configuracoes_gestor.html:214
+#: app/templates/configuracoes_usuario.html:294
+msgid "Salvar Alterações"
+msgstr "Guardar cambios"
+
+#: app/templates/configuracoes_gestor.html:223
+msgid "Redinifir senha"
+msgstr "Restablecer contraseña"
+
+#: app/templates/configuracoes_gestor.html:224
+msgid "A senha do gestor será resetada para a senha padrão. Você tem certeza?"
+msgstr ""
+"La contraseña del gestor se restablecerá a la contraseña por defecto. ¿Está "
+"seguro?"
+
+#: app/templates/configuracoes_gestor.html:226 app/templates/responder.html:103
+msgid "Cancelar"
+msgstr "Cancelar"
+
+#: app/templates/configuracoes_gestor.html:227 app/templates/responder.html:104
+msgid "Confirmar"
+msgstr "Confirmar"
+
+#: app/templates/configuracoes_usuario.html:81
+msgid "Cadastro/Edição de Usuários"
+msgstr "Registro/edición de usuarios"
+
+#: app/templates/configuracoes_usuario.html:85
+msgid "Cadastrar Novo Usuário"
+msgstr "Registrar nuevo usuario"
+
+#: app/templates/configuracoes_usuario.html:117
+msgid "Email"
+msgstr "Email"
+
+#: app/templates/configuracoes_usuario.html:119
+msgid "Unidade"
+msgstr "Unidad"
+
+#: app/templates/configuracoes_usuario.html:120
+msgid "ID Gestor"
+msgstr "ID Gestor"
+
+#: app/templates/configuracoes_usuario.html:194
+msgid "Dados do Usuário"
+msgstr "Datos del usuario"
+
+#: app/templates/configuracoes_usuario.html:202
+msgid "Email:"
+msgstr "Email:"
+
+#: app/templates/configuracoes_usuario.html:210
+msgid "Data Nascimento:"
+msgstr "Fecha de nacimiento:"
+
+#: app/templates/configuracoes_usuario.html:214
+msgid "Data Última Movimentação:"
+msgstr "Fecha del último traslado:"
+
+#: app/templates/configuracoes_usuario.html:218
+msgid "Data Contratação:"
+msgstr "Fecha de contratación:"
+
+#: app/templates/configuracoes_usuario.html:222
+msgid "Banda:"
+msgstr "Banda:"
+
+#: app/templates/configuracoes_usuario.html:230
+msgid "Tipo Cargo:"
+msgstr "Tipo de puesto:"
+
+#: app/templates/configuracoes_usuario.html:238
+msgid "FTE:"
+msgstr "FTE:"
+
+#: app/templates/configuracoes_usuario.html:246
+msgid "Cargo:"
+msgstr "Cargo:"
+
+#: app/templates/configuracoes_usuario.html:254
+msgid "Unidade:"
+msgstr "Unidad:"
+
+#: app/templates/configuracoes_usuario.html:262
+msgid "Área:"
+msgstr "Zona:"
+
+#: app/templates/configuracoes_usuario.html:271
+msgid "Subárea:"
+msgstr "Subzona:"
+
+#: app/templates/configuracoes_usuario.html:280
+msgid "ID Gestor:"
+msgstr "ID Gestor:"
+
+#: app/templates/configuracoes_usuario.html:284
+msgid "Gênero:"
+msgstr "Género:"
+
+#: app/templates/dash_gestores.html:47 app/templates/dash_sugestoes.html:43
+#: app/templates/dashboard.html:47 app/templates/dashboard.html:188
+#: app/templates/dashboard_area.html:47 app/templates/dashboard_area.html:188
+#: app/templates/gestor.html:41
+msgid "Buscando seus dados"
+msgstr "Búsqueda de datos"
+
+#: app/templates/dash_gestores.html:84 app/templates/dash_sugestoes.html:81
+#: app/templates/dashboard.html:84 app/templates/dashboard_area.html:84
+msgid "Olá,"
+msgstr "Hola,"
+
+#: app/templates/dash_gestores.html:84
+msgid "Aqui estão o resultado dos seus liderados:"
+msgstr "He aquí los resultados de su liderazgo:"
+
+#: app/templates/dash_gestores.html:85
+msgid "Esse é seu resultado de promotores por gestor."
+msgstr "Este es su resultado de promotores por gestor."
+
+#: app/templates/dash_gestores.html:89 app/templates/dashboard.html:89
+#: app/templates/dashboard_area.html:89
+msgid "Selecione o intervalo da pesquisa:"
+msgstr "Seleccione el rango de búsqueda:"
+
+#: app/templates/dash_gestores.html:98 app/templates/dashboard.html:98
+#: app/templates/dashboard_area.html:98
+msgid "Aplicar Filtro"
+msgstr "Aplicar filtro"
+
+#: app/templates/dash_gestores.html:109
+msgid "Resultado Geral"
+msgstr "Resultado global"
+
+#: app/templates/dash_gestores.html:110
+msgid "Engagement"
+msgstr "Engagement"
+
+#: app/templates/dash_gestores.html:111
+msgid "Eficácia do Gestor"
+msgstr "Eficacia de los gestores"
+
+#: app/templates/dash_gestores.html:112
+msgid "Funções Desempenhadas"
+msgstr "Funciones desempeñadas"
+
+#: app/templates/dash_gestores.html:113
+msgid "Plano de Carreira"
+msgstr "Plan de carrera"
+
+#: app/templates/dash_gestores.html:114
+msgid "Ambiente e Ferramentas"
+msgstr "Entorno de trabajo y herramientas"
+
+#: app/templates/dash_gestores.html:115
+msgid "Salários e Benefícios"
+msgstr "Salarios y prestaciones"
+
+#: app/templates/dash_gestores.html:116
+msgid "Feedback e Reconhecimento"
+msgstr "Feedback y reconocimiento"
+
+#: app/templates/dash_gestores.html:117
+msgid "Comunicação e Colaboração"
+msgstr "Comunicación y colaboración"
+
+#: app/templates/dash_gestores.html:118
+msgid "Serviços Gerais"
+msgstr "Servicios generales"
+
+#: app/templates/dash_gestores.html:119
+msgid "Segurança Psicológica"
+msgstr "Seguridad psicológica"
+
+#: app/templates/dash_gestores.html:214
+msgid ""
+"Não há dados disponíveis no momento ou você não tem um time de liderados "
+"para analisar."
+msgstr ""
+"No se dispone de datos en este momento o no se cuenta con un equipo de "
+"líderes para analizarlos."
+
+#: app/templates/dash_gestores.html:228 app/templates/dashboard.html:516
+#: app/templates/dashboard_area.html:516
+msgid "Selecione os intervalos de datas..."
+msgstr "Seleccione los intervalos de fechas..."
+
+#: app/templates/dash_gestores.html:258 app/templates/dashboard.html:546
+#: app/templates/dashboard_area.html:546
+msgid "Por favor, selecione ao menos um intervalo."
+msgstr "Seleccione al menos una gama."
+
+#: app/templates/dash_gestores.html:294 app/templates/dash_sugestoes.html:143
+msgid "Mostrar"
+msgstr "Mostrar"
+
+#: app/templates/dash_gestores.html:294
+msgid "sugestões por página"
+msgstr "sugerencias por página"
+
+#: app/templates/dash_gestores.html:295 app/templates/dash_sugestoes.html:144
+msgid "Nenhuma sugestão encontrada para o filtro definido"
+msgstr "No se han encontrado sugerencias para el filtro definido"
+
+#: app/templates/dash_gestores.html:296 app/templates/dash_sugestoes.html:148
+msgid "Pesquisar:"
+msgstr "Busca:"
+
+#: app/templates/dash_sugestoes.html:81
+msgid "Aqui estão suas sugestões:"
+msgstr "He aquí los resultados de su liderazgo:"
+
+#: app/templates/dash_sugestoes.html:98
+msgid "Data"
+msgstr "Data"
+
+#: app/templates/dash_sugestoes.html:100
+msgid "Categoria"
+msgstr "Categoría"
+
+#: app/templates/dash_sugestoes.html:101 app/templates/responder.html:82
+msgid "Pergunta"
+msgstr "Pregunta"
+
+#: app/templates/dash_sugestoes.html:102
+msgid "Sugestão"
+msgstr "Sugerencia"
+
+#: app/templates/dash_sugestoes.html:114
+msgid "Sugestão enviada diretamente"
+msgstr "Sugerencia enviada directamente"
+
+#: app/templates/dash_sugestoes.html:122
+msgid ""
+"Não há sugestões disponíveis no momento ou o seu time tem menos que 3 "
+"colaboradores."
+msgstr ""
+"No hay sugerencias disponibles en este momento o su equipo tiene menos de 3 "
+"colaboradores."
+
+#: app/templates/dash_sugestoes.html:145
+msgid "Mostrando"
+msgstr "Mostrar"
+
+#: app/templates/dash_sugestoes.html:145
+msgid "a"
+msgstr "la"
+
+#: app/templates/dash_sugestoes.html:145 app/templates/dash_sugestoes.html:147
+msgid "sugestões totais"
+msgstr "sugerencias totales"
+
+#: app/templates/dash_sugestoes.html:146
+msgid "Mostrando 0 a 0 de 0 sugestões"
+msgstr "Mostrando 0 a 0 de 0 sugerencias"
+
+#: app/templates/dash_sugestoes.html:147
+msgid "filtrado de"
+msgstr "filtrado de"
+
+#: app/templates/dashboard.html:84
+msgid "Esse é o resultado do seu time direto."
+msgstr "Ese es el resultado de su equipo directo."
+
+#: app/templates/dashboard.html:85 app/templates/dashboard_area.html:85
+msgid "Seu percentual de promotores está baseado em"
+msgstr "Su porcentaje de promotores se basa en"
+
+#: app/templates/dashboard.html:85 app/templates/dashboard_area.html:85
+msgid "perguntas respondidas por"
+msgstr "preguntas contestadas por"
+
+#: app/templates/dashboard.html:85 app/templates/dashboard_area.html:85
+msgid "respondentes únicos entre os dias"
+msgstr "encuestados únicos entre los días"
+
+#: app/templates/dashboard.html:85 app/templates/dashboard.html:168
+#: app/templates/dashboard.html:419 app/templates/dashboard_area.html:85
+msgid "e"
+msgstr "y"
+
+#: app/templates/dashboard.html:109 app/templates/dashboard_area.html:109
+msgid "Dimensões:"
+msgstr "Dimensiones:"
+
+#: app/templates/dashboard.html:159 app/templates/dashboard.html:411
+#: app/templates/dashboard_area.html:159 app/templates/dashboard_area.html:411
+msgid "perguntas respondidas"
+msgstr "preguntas contestadas"
+
+#: app/templates/dashboard.html:163 app/templates/dashboard.html:415
+#: app/templates/dashboard_area.html:163 app/templates/dashboard_area.html:415
+msgid "sugestões recebidas"
+msgstr "sugerencias recibidas"
+
+#: app/templates/dashboard.html:177 app/templates/dashboard_area.html:177
+msgid "Sem dimensões para mostrar"
+msgstr "No hay dimensiones que mostrar"
+
+#: app/templates/dashboard.html:263 app/templates/dashboard.html:313
+#: app/templates/dashboard.html:503 app/templates/dashboard_area.html:263
+#: app/templates/dashboard_area.html:313 app/templates/dashboard_area.html:503
+msgid "Percentual Promotores"
+msgstr "Porcentaje Promotores"
+
+#: app/templates/dashboard.html:278 app/templates/dashboard.html:325
+#: app/templates/dashboard_area.html:278 app/templates/dashboard_area.html:325
+msgid "Percentual Aderência"
+msgstr "Porcentaje de adhesión"
+
+#: app/templates/dashboard.html:305 app/templates/dashboard_area.html:305
+msgid "Semanas do Ano"
+msgstr "Semanas del año"
+
+#: app/templates/dashboard.html:369 app/templates/dashboard_area.html:369
+msgid "Categoria:"
+msgstr "Categoría:"
+
+#: app/templates/dashboard.html:477 app/templates/dashboard_area.html:477
+msgid "Pecentual Promotores"
+msgstr "Porcentaje Promotores"
+
+#: app/templates/dashboard_area.html:84
+msgid "Esse é o resultado da sua área."
+msgstr "Este es el resultado de su área."
+
+#: app/templates/dashboard_area.html:494
+msgid "Pesquisa"
+msgstr "Búsqueda"
+
+#: app/templates/gestor.html:48 app/templates/pagina_inicial.html:46
 msgid "Digite seu ID:"
 msgstr "Introduzca su ID:"
 
-#: app/templates/gestor.html:48
+#: app/templates/gestor.html:52
 msgid "Digite sua senha:"
 msgstr "Introduzca su contraseña:"
 
@@ -108,15 +665,19 @@ msgstr "Deje aquí su comentario/sugerencia ..."
 msgid "Desejo me identificar no comentário/sugestão"
 msgstr "Deseo identificarme en el comentario/sugerencia"
 
-#: app/templates/pagina_inicial.html:43
+#: app/templates/pagina_inicial.html:41
+msgid "Montando sua pesquisa"
+msgstr "Configuración de la encuesta"
+
+#: app/templates/pagina_inicial.html:47
 msgid "Digite seu ID..."
 msgstr "Introduzca su ID..."
 
-#: app/templates/pagina_inicial.html:45
+#: app/templates/pagina_inicial.html:49
 msgid "Selecione sua data de nascimento:"
 msgstr "Seleccione su fecha de nacimiento:"
 
-#: app/templates/pagina_inicial.html:52
+#: app/templates/pagina_inicial.html:56
 msgid "Os dados desta pesquisa são confidenciais."
 msgstr "Los datos de esta encuesta son confidenciales."
 
@@ -126,7 +687,7 @@ msgstr "Totalmente en desacuerdo"
 
 #: app/templates/responder.html:58
 msgid "Não Concordo"
-msgstr "Em desacuerdo"
+msgstr "En desacuerdo"
 
 #: app/templates/responder.html:61
 msgid "Não concordo e Não discordo"
@@ -143,14 +704,6 @@ msgstr "Totalmente de acuerdo"
 #: app/templates/responder.html:73
 msgid "Comentário/Sugestões:"
 msgstr "Deje aquí su comentario/sugerencia:"
-
-#: app/templates/responder.html:82
-msgid "Pergunta"
-msgstr "Pregunta"
-
-#: app/templates/responder.html:82
-msgid "de"
-msgstr "de"
 
 #: app/templates/responder.html:86
 msgid "Anterior"
@@ -180,14 +733,6 @@ msgstr "Confirmar envío"
 msgid "Você tem certeza de que deseja enviar suas respostas?"
 msgstr "¿Está seguro de que quiere enviar sus respuestas?"
 
-#: app/templates/responder.html:103
-msgid "Cancelar"
-msgstr "Cancelar"
-
-#: app/templates/responder.html:104
-msgid "Confirmar"
-msgstr "Confirmar"
-
 #: app/templates/responder.html:110
 msgid "Enviando respostas e comentários"
 msgstr "Envío de respuestas y comentarios"
@@ -198,11 +743,11 @@ msgstr "Ingrese solo números en el ID."
 
 #: app/utils/auth.py:21
 msgid ""
-"Usuário não está cadastrado.<br>Entre em contato com seu gestor<br> ou "
-"time de gente da unidade."
+"Usuário não está cadastrado.<br>Entre em contato com seu gestor<br> ou time "
+"de gente da unidade."
 msgstr ""
-"El usuario no está registrado.<br>Póngase en contacto con su gestor<br> o"
-" equipo de personal de la unidad."
+"El usuario no está registrado.<br>Póngase en contacto con su gestor<br> o "
+"equipo de personal de la unidad."
 
 #: app/utils/auth.py:26
 msgid "Digite uma data de nascimento válida"
@@ -214,9 +759,8 @@ msgstr "Los datos ingresados no coinciden.<br>Verifique los datos ingresados."
 
 #: app/utils/auth.py:56
 msgid ""
-"Usuário não está cadastrado como gestor.<br>Entre em contato com o time "
-"de gente da unidade."
+"Usuário não está cadastrado como gestor.<br>Entre em contato com o time de "
+"gente da unidade."
 msgstr ""
-"El usuario no está registrado como gestor.<br>Póngase en contacto con el "
+"El usuario no está registrado como gestor.<br> Póngase en contacto con el "
 "equipo de personal de la unidad."
-

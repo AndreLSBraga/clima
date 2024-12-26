@@ -20,13 +20,13 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view',lang=session.get('lang', 'pt')) }}">Responder</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view',lang=session.get('lang', 'pt')) }}"class="active">Gestor</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view',lang=session.get('lang', 'pt')) }}">{{_("Responder")}}</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view',lang=session.get('lang', 'pt')) }}"class="active">{{_("Gestor")}}</a></li>
         </ul>
         <div class="navbar-lang">
             <form method="GET" action="{{ url_for('dashboard_area.dashboard_area_view', lang=session.get('lang', 'pt')) }}">
                 <div class="dropdown">
-                    <label for="lang">Idioma:</label>
+                    <label for="lang">{{_("Idioma:")}}</label>
                     <button class="dropdown-btn">
                         <img src="/static/images/flags/{{ session.get('lang', 'pt') }}.png" alt="Idioma Selecionado" class="selected-flag">
                     </button>
@@ -44,35 +44,35 @@
     </nav>
     <div id="loading-spinner-global" class="spinner">
         <div class="loader"></div>
-        <p class="loading-text">Buscando seus dados</p>
+        <p class="loading-text">{{_("Buscando seus dados")}}</p>
     </div>   
     <nav class="sidebar">
         <ul class="sidebar-menu">
             <li><a href="{{ url_for('dashboard.dashboard_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/time.svg" alt="Dashboard Icon"></span>
-                <span class="text_sidebar">Time</span>
+                <span class="text_sidebar">{{_("Time")}}</span>
             </a></li>
             <li class="active"><a href="{{ url_for('dashboard_area.dashboard_area_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/area.svg" alt="Dashboard Icon"></span>
-                <span class="text_sidebar">Área</span>
+                <span class="text_sidebar">{{_("Área")}}</span>
             </a></li>
             <li><a href="{{ url_for('dashboard_lideres.dashboard_lideres_view',lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/lideranca.svg" alt="Sugestoes Icon"></span>
-                <span class="text_sidebar">Líderes</span>
+                <span class="text_sidebar">{{_("Líderes")}}</span>
             </a></li>
             <li><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
-                <span class="text_sidebar">Sugestões</span>
+                <span class="text_sidebar">{{_("Sugestões")}}</span>
             </a></li>
             {% if perfil == 'administrador' %}
                 <li><a href="{{ url_for('configuracoes.configuracoes_view', lang=session.get('lang', 'pt')) }}">
                     <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
-                    <span class="text_sidebar">Configurações</span>
+                    <span class="text_sidebar">{{_("Configurações")}}</span>
                 </a></li>
             {% endif %}
                 <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}">
                     <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
-                    <span class="text_sidebar">Sair</span>
+                    <span class="text_sidebar">{{_("Sair")}}</span>
                 </a></li>
         </ul>
     </nav>
@@ -81,12 +81,12 @@
         <div class="container">
             <div class="introbar">
                 <div class="introbar-text">
-                    <span><h2>Olá, {{dados.nome}}! Esse é o resultado da sua área.</h2></span>
-                    <span class="small-text">Seu percentual de promotores está baseado em {{dados.card1.qtd_respostas}} perguntas respondidas por {{dados.card1.respondentes_unicos}} respondentes únicos entre os dias {{dados.card1.data_min}} e {{dados.card1.data_max}}.</span>
+                    <span><h2>{{_("Olá,")}} {{dados.nome}}! {{_("Esse é o resultado da sua área.")}}</h2></span>
+                    <span class="small-text">{{_("Seu percentual de promotores está baseado em")}} {{dados.card1.qtd_respostas}} {{_("perguntas respondidas por")}} {{dados.card1.respondentes_unicos}} {{_("respondentes únicos entre os dias")}} {{dados.card1.data_min}} {{_("e")}} {{dados.card1.data_max}}.</span>
                 </div>
                 <div class="filtro-container">
                     <div class="filtro-container-intervalo">
-                        <label for="intervalos">Selecione o intervalo da pesquisa:</label>
+                        <label for="intervalos">{{_("Selecione o intervalo da pesquisa:")}}</label>
                         <select id="intervalos" name="intervalos[]" multiple="multiple">
                             {% for intervalo in intervalos %}
                             <option value="{{ intervalo }}">{{ intervalo }}</option>
@@ -94,8 +94,8 @@
                         </select>
                     </div>
                     <div class="filtro-actions">
-                        <button id="limparFiltro" class="btn-limpar">Limpar</button>
-                        <button id="aplicarFiltro" class="btn-aplicar">Aplicar Filtro</button>
+                        <button id="limparFiltro" class="btn-limpar">{{_("Limpar")}}</button>
+                        <button id="aplicarFiltro" class="btn-aplicar">{{_("Aplicar Filtro")}}</button>
                     </div>
                 </div>
             </div>
@@ -106,7 +106,7 @@
                         </div>
                     </div>
                 </div>
-                <span><h2>Dimensões:</h2></span>
+                <span><h2>{{_("Dimensões:")}}</h2></span>
                 <div class="dimensions-container">
                     <div class="container-cards detalhado dimension-card">
                         {% for card in cards %}
@@ -156,11 +156,11 @@
                             <div class="card-info-detalhe">
                                 <div class="info-item-detalhe">
                                     <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                    <p>{{ card.qtd_respostas }} perguntas respondidas</p>
+                                    <p>{{ card.qtd_respostas }} {{_("perguntas respondidas")}}</p>
                                 </div>
                                 <div class="info-item-detalhe">
                                     <img class="icon-small" src="/static/images/icons/sugestoes.svg" alt="Icone Respostas">
-                                    <p>{{ card.qtd_sugestoes }} sugestões recebidas</p>
+                                    <p>{{ card.qtd_sugestoes }} {{_("sugestões recebidas")}}</p>
                                 </div>
                                 <div class="info-item-detalhe">
                                     <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
@@ -174,7 +174,7 @@
                             
                         </div>
                         {% else %}
-                            <span>Sem dimensões para mostrar</span>
+                            <span>{{_("Sem dimensões para mostrar")}}</span>
                         {% endfor %}
                     </div>
                 </div>
@@ -185,7 +185,7 @@
                 <div class="modal-header"></div>
                 <div id="loading-spinner" class="spinner">
                     <div class="loader"></div>
-                    <p class="loading-text">Buscando seus dados</p>
+                    <p class="loading-text">{{_("Buscando seus dados")}}</p>
                 </div>        
                 <div id="modal-body" class="modal-body">
                     <!-- Os cards das perguntas serão adicionados aqui via JavaScript -->
@@ -260,7 +260,7 @@
                     datasets: [
                         {
                             type: 'bar',  // Define a 'nota' como gráfico de linha
-                            label: 'Percentual Promotores',
+                            label: '{{_("Percentual Promotores")}}',
                             data: notas,  // Notas para cada semana
                             backgroundColor: '#52d17a',
                             borderColor: '#52d17a',
@@ -275,7 +275,7 @@
                         },
                         {
                             type: 'bar',  // Define a 'aderência' como gráfico de barras
-                            label: 'Percentual Aderência',
+                            label: '{{_("Percentual Aderência")}}',
                             data: aderencia,  // Aderência para cada semana
                             backgroundColor: '#fbb259',
                             borderColor: '#fbb259',
@@ -302,7 +302,7 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Semanas do Ano'
+                                text: '{{_("Semanas do Ano")}}'
                             }
                         },
                         y: {
@@ -310,7 +310,7 @@
                             max: 100,  // Define o limite para a nota média
                             title: {
                                 display: true,
-                                text: 'Percentual Promotores'
+                                text: '{{_("Percentual Promotores")}}'
                             }
                         },
                         y1: {
@@ -322,7 +322,7 @@
                             },
                             title: {
                                 display: true,
-                                text: 'Percentual Aderência'
+                                text: '{{_("Percentual Aderência")}}'
                             }
                         }
                     }
@@ -366,7 +366,7 @@
                     categoria.classList.add('categoria-info');
                     categoria.innerHTML = 
                         `<div class="modal-card-title">
-                            <span><h2>Categoria: ${data.categoria.descricao} </h2></span>
+                            <span><h2>{{_("Categoria:")}} ${data.categoria.descricao} </h2></span>
                         </div>
                         <div class="card-center-modal">
                             <div class="chart-container-modal">
@@ -408,11 +408,11 @@
                                     <div class="card-info-modal">
                                         <div class="info-item">
                                             <img class="icon-small" src="/static/images/icons/respostas.svg" alt="Icone Respostas">
-                                            <p>${pergunta.qtd_respostas} perguntas respondidas</p>
+                                            <p>${pergunta.qtd_respostas} {{_("perguntas respondidas")}}</p>
                                         </div>
                                         <div class="info-item-detalhe">
                                             <img class="icon-small" src="/static/images/icons/sugestoes.svg" alt="Icone Respostas">
-                                            <p>${pergunta.qtd_sugestoes} sugestões recebidas</p>
+                                            <p>${pergunta.qtd_sugestoes} {{_("sugestões recebidas")}}</p>
                                         </div>
                                         <div class="info-item">
                                             <img class="icon-small" src="/static/images/icons/calendario.svg" alt="Icone Calendario">
@@ -474,7 +474,7 @@
                     labels: labels,  // Semanas do ano
                     datasets: [
                         {
-                            label: 'Pecentual Promotores',
+                            label: '{{_("Pecentual Promotores")}}',
                             data: notas,  // Notas para cada semana
                             backgroundColor: '#52d17a',
                             borderColor: '#52d17a',
@@ -491,7 +491,7 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Pesquisa'
+                                text: '{{_("Pesquisa")}}'
                             }
                         },
                         y: {
@@ -500,7 +500,7 @@
                             max: 100,  // Define o limite para a nota média
                             title: {
                                 display: true,
-                                text: 'Percentual Promotores'
+                                text: '{{_("Percentual Promotores")}}'
                             }
                         }
                     }
@@ -513,7 +513,7 @@
             // Inicializando o Selectize com configurações dinâmicas
             var $select = $('#intervalos').selectize({
                 plugins: ['remove_button'],
-                placeholder: 'Selecione os intervalos de datas...',
+                placeholder: '{{_("Selecione os intervalos de datas...")}}',
                 closeAfterSelect: false,
                 maxItems: null,
                 hideSelected: true,
@@ -543,7 +543,7 @@
                 const intervalosJSON = encodeURIComponent(JSON.stringify(intervalosSelecionados));
                 window.location.href = `/dashboard_area?intervalos=${intervalosJSON}`;
             } else {
-                alert("Por favor, selecione ao menos um intervalo.");
+                alert("{{_('Por favor, selecione ao menos um intervalo.')}}");
             }
         });
 

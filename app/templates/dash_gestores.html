@@ -20,13 +20,13 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=session.get('lang', 'pt')) }}">Responder</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}"class="active">Gestor</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=session.get('lang', 'pt')) }}">{{_("Responder")}}</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}"class="active">{{_("Gestor")}}</a></li>
         </ul>
         <div class="navbar-lang">
             <form method="GET" action="{{ url_for('dashboard_lideres.dashboard_lideres_view', lang=session.get('lang', 'pt')) }}">
                 <div class="dropdown">
-                    <label for="lang">Idioma:</label>
+                    <label for="lang">{{_("Idioma:")}}</label>
                     <button class="dropdown-btn">
                         <img src="/static/images/flags/{{ session.get('lang', 'pt') }}.png" alt="Idioma Selecionado" class="selected-flag">
                     </button>
@@ -44,35 +44,35 @@
     </nav>
     <div id="loading-spinner-global" class="spinner">
         <div class="loader"></div>
-        <p class="loading-text">Buscando seus dados</p>
+        <p class="loading-text">{{_("Buscando seus dados")}}</p>
     </div>   
     <nav class="sidebar">
         <ul class="sidebar-menu">
             <li><a href="{{ url_for('dashboard.dashboard_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/time.svg" alt="Dashboard Icon"></span>
-                <span class="text_sidebar">Time</span>
+                <span class="text_sidebar">{{_("Time")}}</span>
             </a></li>
             <li><a href="{{ url_for('dashboard_area.dashboard_area_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/area.svg" alt="Dashboard Icon"></span>
-                <span class="text_sidebar">Área</span>
+                <span class="text_sidebar">{{_("Área")}}</span>
             </a></li>
             <li class="active"><a href="{{ url_for('dashboard_lideres.dashboard_lideres_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/lideranca.svg" alt="Sugestoes Icon"></span>
-                <span class="text_sidebar">Líderes</span>
+                <span class="text_sidebar">{{_("Líderes")}}</span>
             </a></li>
             <li><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view', lang=session.get('lang', 'pt')) }}">
                 <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
-                <span class="text_sidebar">Sugestões</span>
+                <span class="text_sidebar">{{_("Sugestões")}}</span>
             </a></li>
             {% if perfil == 'administrador' %}
                 <li><a href="{{ url_for('configuracoes.configuracoes_view', lang=session.get('lang', 'pt')) }}">
                     <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
-                    <span class="text_sidebar">Configurações</span>
+                    <span class="text_sidebar">{{_("Configurações")}}</span>
                 </a></li>
             {% endif %}
                 <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}">
                     <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
-                    <span class="text_sidebar">Sair</span>
+                    <span class="text_sidebar">{{_("Sair")}}</span>
                 </a></li>
         </ul>
     </nav>
@@ -81,12 +81,12 @@
         <div class="container">
             <div class="introbar">
                 <div class="introbar-text">
-                    <span><h2>Olá, {{dados.nome}}! Aqui estão o resultado dos seus liderados:</h2></span>
-                    <span class="small-text">Esse é seu resultado de promotores por gestor.</span>
+                    <span><h2>{{_("Olá,")}} {{dados.nome}}! {{_("Aqui estão o resultado dos seus liderados:")}}</h2></span>
+                    <span class="small-text">{{_("Esse é seu resultado de promotores por gestor.")}}</span>
                 </div>
                 <div class="filtro-container">
                     <div class="filtro-container-intervalo">
-                        <label for="intervalos">Selecione o intervalo da pesquisa:</label>
+                        <label for="intervalos">{{_("Selecione o intervalo da pesquisa:")}}</label>
                         <select id="intervalos" name="intervalos[]" multiple="multiple">
                             {% for intervalo in intervalos %}
                             <option value="{{ intervalo }}">{{ intervalo }}</option>
@@ -94,8 +94,8 @@
                         </select>
                     </div>
                     <div class="filtro-actions">
-                        <button id="limparFiltro" class="btn-limpar">Limpar</button>
-                        <button id="aplicarFiltro" class="btn-aplicar">Aplicar Filtro</button>
+                        <button id="limparFiltro" class="btn-limpar">{{_("Limpar")}}</button>
+                        <button id="aplicarFiltro" class="btn-aplicar">{{_("Aplicar Filtro")}}</button>
                     </div>
                 </div>
             </div>
@@ -105,18 +105,18 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Gestor</th>
-                                    <th>Resultado Geral</th>
-                                    <th>Engagement</th>
-                                    <th>Eficácia do Gestor</th>
-                                    <th>Funções Desempenhadas</th>
-                                    <th>Plano de Carreira</th>
-                                    <th>Ambiente e Ferramentas</th>
-                                    <th>Salários e Benefícios</th>
-                                    <th>Feedback e Reconhecimento</th>
-                                    <th>Comunicação e Colaboração</th>
-                                    <th>Serviços Gerais</th>
-                                    <th>Segurança Psicológica</th>
+                                    <th>{{_("Gestor")}}</th>
+                                    <th>{{_("Resultado Geral")}}</th>
+                                    <th>{{_("Engagement")}}</th>
+                                    <th>{{_("Eficácia do Gestor")}}</th>
+                                    <th>{{_("Funções Desempenhadas")}}</th>
+                                    <th>{{_("Plano de Carreira")}}</th>
+                                    <th>{{_("Ambiente e Ferramentas")}}</th>
+                                    <th>{{_("Salários e Benefícios")}}</th>
+                                    <th>{{_("Feedback e Reconhecimento")}}</th>
+                                    <th>{{_("Comunicação e Colaboração")}}</th>
+                                    <th>{{_("Serviços Gerais")}}</th>
+                                    <th>{{_("Segurança Psicológica")}}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -211,7 +211,7 @@
                             </tbody>
                         </table>
                     {% else %}
-                        <p>Não há dados disponíveis no momento ou você não tem um time de liderados para analisar.</p>
+                        <p>{{_("Não há dados disponíveis no momento ou você não tem um time de liderados para analisar.")}}</p>
                     {% endif %}
                 </div>                
         </div>        
@@ -225,7 +225,7 @@
             // Inicializando o Selectize com configurações dinâmicas
             var $select = $('#intervalos').selectize({
                 plugins: ['remove_button'],
-                placeholder: 'Selecione os intervalos de datas...',
+                placeholder: '{{_("Selecione os intervalos de datas...")}}',
                 closeAfterSelect: false,
                 maxItems: null,
                 hideSelected: true,
@@ -255,7 +255,7 @@
                 const intervalosJSON = encodeURIComponent(JSON.stringify(intervalosSelecionados));
                 window.location.href = `/dashboard_lideres?intervalos=${intervalosJSON}`;
             } else {
-                alert("Por favor, selecione ao menos um intervalo.");
+                alert("{{_('Por favor, selecione ao menos um intervalo.')}}");
                 document.getElementById('loading-spinner-global').style.display = 'none';
             }
         });
@@ -291,9 +291,9 @@
             "scrollX": false,
             "scrollY": false,
             "language": {
-                "lengthMenu": "Mostrar _MENU_ sugestões por página",
-                "zeroRecords": "Nenhuma sugestão encontrada para o filtro definido",
-                "search": "Pesquisar: ",
+                "lengthMenu": "{{_('Mostrar')}} _MENU_ {{_('sugestões por página')}}",
+                "zeroRecords": "{{_('Nenhuma sugestão encontrada para o filtro definido')}}",
+                "search": "{{_('Pesquisar:')}} ",
             },
             "dom": '<"top"fl>rt<"bottom"ip><"clear">'
         });

@@ -23,7 +23,6 @@ def get_locale():
             lang = 'pt'
         session['lang'] = lang 
 
-    app.logger.debug(f'Selected language: {session["lang"]}')
     return session['lang']
 
 def create_app():

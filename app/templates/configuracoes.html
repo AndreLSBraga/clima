@@ -6,6 +6,7 @@
     <title>Pulsa Supply</title>
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/main_dash_config.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
     <link rel="stylesheet" href="/static/css/configuracoes.css">
     <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
 </head>
@@ -15,24 +16,56 @@
             <img class="logo" src="/static/images/logos/logo_completa.svg">
         </div>
         <ul class="navbar-menu">
-            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view') }}">Responder</a></li>
-            <li><a href="{{ url_for('gestor.gestor_view') }}"class="active">Gestor</a></li>
+            <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=session.get('lang', 'pt')) }}">{{_("Responder")}}</a></li>
+            <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}"class="active">{{_("Gestor")}}</a></li>
         </ul>
+        <div class="navbar-lang">
+            <form method="GET" action="{{ url_for('configuracoes.configuracoes_view', lang=session.get('lang', 'pt')) }}">
+                <div class="dropdown">
+                    <label for="lang">{{_("Idioma:")}}</label>
+                    <button class="dropdown-btn">
+                        <img src="/static/images/flags/{{ session.get('lang', 'pt') }}.png" alt="Idioma Selecionado" class="selected-flag">
+                    </button>
+                    <div class="dropdown-content">
+                        <button type="submit" class="lang-option" name="lang" value="pt">
+                            <img src="/static/images/flags/pt.png" alt="Português">
+                        </button>
+                        <button type="submit" class="lang-option" name="lang" value="es">
+                            <img src="/static/images/flags/es.png" alt="Español">
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </nav>
     <nav class="sidebar">
         <ul class="sidebar-menu">
-            <li ><a href="{{ url_for('dashboard.dashboard_view') }}">
-                <span class="icon"><img src="/static/images/icons/dashboard.svg" alt="Dashboard Icon"></span>
-                <span class="text_sidebar">Dashboard</span>
+            <li><a href="{{ url_for('dashboard.dashboard_view', lang=session.get('lang', 'pt')) }}">
+                <span class="icon"><img src="/static/images/icons/time.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">{{_("Time")}}</span>
             </a></li>
-            <li class="active"><a href="{{ url_for('configuracoes.configuracoes_view') }}">
-                <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
-                <span class="text_sidebar">Configurações</span>
+            <li><a href="{{ url_for('dashboard_area.dashboard_area_view', lang=session.get('lang', 'pt')) }}">
+                <span class="icon"><img src="/static/images/icons/area.svg" alt="Dashboard Icon"></span>
+                <span class="text_sidebar">{{_("Área")}}</span>
             </a></li>
-            <li><a href="{{ url_for('gestor.gestor_view') }}">
-                <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
-                <span class="text_sidebar">Sair</span>
+            <li><a href="{{ url_for('dashboard_lideres.dashboard_lideres_view', lang=session.get('lang', 'pt')) }}">
+                <span class="icon"><img src="/static/images/icons/lideranca.svg" alt="Sugestoes Icon"></span>
+                <span class="text_sidebar">{{_("Líderes")}}</span>
             </a></li>
+            <li><a href="{{ url_for('dashboard_sugestoes.dashboard_sugestoes_view', lang=session.get('lang', 'pt')) }}">
+                <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
+                <span class="text_sidebar">{{_("Sugestões")}}</span>
+            </a></li>
+            {% if perfil == 'administrador' %}
+                <li class="active"><a href="{{ url_for('configuracoes.configuracoes_view', lang=session.get('lang', 'pt')) }}">
+                    <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
+                    <span class="text_sidebar">{{_("Configurações")}}</span>
+                </a></li>
+            {% endif %}
+                <li><a href="{{ url_for('gestor.gestor_view', lang=session.get('lang', 'pt')) }}">
+                    <span class="icon"><img src="/static/images/icons/logout.svg" alt="logout Icon"></span>
+                    <span class="text_sidebar">{{_("Sair")}}</span>
+                </a></li>
         </ul>
     </nav>
     
@@ -40,13 +73,13 @@
         <form action="/configuracoes" method="POST">
             <div class="container">
                 <div class="cards">
-                    <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view') }}" class="card" id="usuario">
-                        <h2>Configurar Usuários</h2>
-                        <p>Cadastrar Usuários/Editar informações dos usuários criados</p>
+                    <a href="{{ url_for('configuracoes_usuario.configuracoes_usuario_view', lang=session.get('lang', 'pt')) }}" class="card" id="usuario">
+                        <h2>{{_("Configurar Usuários")}}</h2>
+                        <p>{{_("Cadastrar Usuários/Editar informações dos usuários criados")}}</p>
                     </a>
-                    <a  href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view') }}" class="card" id="gestor">
-                        <h2>Configurar Gestores</h2>
-                        <p>Cadastrar Gestores/Editar informações dos gestores criados</p>
+                    <a  href="{{ url_for('configuracoes_gestor.configuracoes_gestor_view', lang=session.get('lang', 'pt')) }}" class="card" id="gestor">
+                        <h2>{{_("Configurar Gestores")}}</h2>
+                        <p>{{_("Cadastrar Gestores/Editar informações dos gestores criados")}}</p>
                     </a>
                 </div>
             </div>

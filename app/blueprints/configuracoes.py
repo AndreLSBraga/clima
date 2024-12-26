@@ -5,7 +5,7 @@ from app.utils.db_consultas import consulta_dados_gestor, consulta_usuario_id, c
 from app.utils.db_consultas import consulta_pesquisa_gestor, consulta_pesquisa_usuario
 from app.utils.db_dml import processar_diferencas, criar_usuario, processar_diferencas_gestor, criar_gestor, reset_senha_gestor
 from app.utils.configuracoes import gera_tabela, gera_dados_modal_selecao, verificar_alteracao, gera_tabela_gestores
-
+from flask_babel import _
 configuracoes = Blueprint('configuracoes', __name__)
 configuracoes_usuario = Blueprint('configuracoes_usuario', __name__)
 configuracoes_gestor = Blueprint('configuracoes_gestor', __name__)
@@ -15,14 +15,15 @@ configuracoes_pesquisa_gestor = Blueprint('configuracoes_pesquisa_gestor', __nam
 
 @configuracoes.route('/configuracoes', methods = ['GET', 'POST'])
 def configuracoes_view():
+    perfil = session['perfil']
     if 'logged_in' not in session:
-        flash("É necessário fazer login primeiro.", "error")
+        flash(_("É necessário fazer login primeiro."), "error")
         return redirect(url_for('gestor.gestor_view'))
-    return render_template('configuracoes.html')
+    return render_template('configuracoes.html', perfil= perfil)
 
 @configuracoes_usuario.route('/configuracoes_usuario', methods = ['GET', 'POST'])
 def configuracoes_usuario_view():
-    
+    perfil = session['perfil']
     #Se não tiver globalId, voltar para tela inicial
     if 'logged_in' not in session:
         flash("É necessário fazer login primeiro.", "error")
@@ -45,10 +46,11 @@ def configuracoes_usuario_view():
     total_paginas = (total_usuarios + por_pagina - 1) // por_pagina
     
     dados_modal = gera_dados_modal_selecao()
-    return render_template('configuracoes_usuario.html', usuarios = dados_usuarios, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal)
+    return render_template('configuracoes_usuario.html',perfil=perfil, usuarios = dados_usuarios, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal)
 
 @configuracoes_usuario.route('/pesquisar_usuario', methods=['GET'])
 def pesquisar_usuario():
+    perfil = session['perfil']
     global_id_pesquisa = request.args.get('globalId')
     globalId_gestor = session['id_gestor']
     dados_gestor= consulta_usuario_id(globalId_gestor)
@@ -57,7 +59,7 @@ def pesquisar_usuario():
 
     usuarios = consulta_pesquisa_usuario(global_id_pesquisa, fk_unidade)
     if not usuarios:
-        return render_template('configuracoes_usuario.html', usuarios = None, pagina = 1, total_paginas = 1, selecao = dados_modal)
+        return render_template('configuracoes_usuario.html', perfil = perfil, usuarios = None, pagina = 1, total_paginas = 1, selecao = dados_modal)
     
     # Paginando os resultados
     pagina = request.args.get('pagina', 1, type=int)
@@ -74,8 +76,9 @@ def pesquisar_usuario():
 
 @configuracoes_gestor.route('/configuracoes_gestor', methods = ['GET', 'POST'])
 def configuracoes_gestor_view():
+    perfil = session['perfil']
     if 'logged_in' not in session:
-        flash("É necessário fazer login primeiro.", "error")
+        flash(_("É necessário fazer login primeiro."), "error")
         return redirect(url_for('gestor.gestor_view'))
     
     gestores = consulta_todos_gestores()
@@ -94,32 +97,33 @@ def configuracoes_gestor_view():
         'perfis':['gestor', 'administrador']
     }
 
-    return render_template('configuracoes_gestor.html', gestores = dados_gestores, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal, modo='visualizacao')
+    return render_template('configuracoes_gestor.html', perfil=perfil, gestores = dados_gestores, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal, modo='visualizacao')
 
 @configuracoes_salvar_alteracoes.route('/salvar_alteracoes', methods=['POST'])
 def salvar_alteracoes():  
+    perfil = session['perfil']
     dados_formulario = request.json
     tipo = dados_formulario.get('tipo')
     globalId_original = dados_formulario.get('globalIdOriginal')
     globalId_novo = dados_formulario.get('globalId')
     #Verifica as informações digitadas
     if not globalId_novo:
-        return jsonify({"message":"Preencha os dados obrigatórios.", "status": "error"})
+        return jsonify({"message":_("Preencha os dados obrigatórios."), "status": "error"})
     id_gestor = dados_formulario.get('id_gestor')
     
     #Verifica se o usuário já existe
     if not globalId_original == globalId_novo:
         if valida_id(globalId_novo):
-            return jsonify({"message":"Já existe usuário com esse ID cadastrado.<br> Procure pelo ID nas configurações de usuários.", "status": "error"})
+            return jsonify({"message":_("Já existe usuário com esse ID cadastrado.<br> Procure pelo ID nas configurações de usuários."), "status": "error"})
     #Verifica se o ID é apenas números e se são 8 caracteres
     if not valida_id_novo(globalId_novo):
-        return jsonify({"message":"Os dados informados no campo 'Global ID' não segue algum dos padrões necessários.<br>Tem mais ou menos que 8 números ou não tem apenas números", "status": "error"})
+        return jsonify({"message":_("Os dados informados no campo 'Global ID' não segue algum dos padrões necessários.<br>Tem mais ou menos que 8 números ou não tem apenas números"), "status": "error"})
     #Verifica se o email digitado é válido
     if not valida_email_novo(dados_formulario.get('email')):
-        return jsonify({"message":"Os dados informados no campo 'Email' não segue algum dos padrões necessários.<br>Não está digitado corretamente como @ambev.com.br ou @ab-inbev.com", "status": "error"})
+        return jsonify({"message":_("Os dados informados no campo 'Email' não segue algum dos padrões necessários.<br>Não está digitado corretamente como @ambev.com.br ou @ab-inbev.com"), "status": "error"})
     #Verificar se o ID do gestor é o ID de um gestor existente na base de gestores
     if not consulta_dados_gestor(id_gestor):
-        return jsonify({"message":"Os dados informados no campo 'ID Gestor' não existe na base de gestores.<br>Entre em contato com a área de gente da unidade.", "status": "error"})
+        return jsonify({"message":_("Os dados informados no campo 'ID Gestor' não existe na base de gestores.<br>Entre em contato com a área de gente da unidade."), "status": "error"})
 
     data_nascimento = dados_formulario.get('data_nascimento')
     data_ultima_movimentacao = dados_formulario.get('data_ultima_movimentacao')
@@ -148,14 +152,14 @@ def salvar_alteracoes():
     if tipo == 'edicao':
         #Se o usuário não existir, mensagem de ID Alterado
         if not dados_usuario:
-            return jsonify({"message":"Abrea novamente a tela de edição, o ID foi alterado.", "status": "warning"})
+            return jsonify({"message":_("Abra novamente a tela de edição, o ID foi alterado."), "status": "warning"})
         
         dados_alteracao = dados
         dicionario_dados_usuario = dict(zip(chaves, dados_usuario))
         dicionario_dados_alteracao = dict(zip(chaves, dados_alteracao))
         #Verifica se houve alterações nos dados
         if dicionario_dados_usuario == dicionario_dados_alteracao:
-            return jsonify({"message": "Não houve alteração nos dados do usuário", "status": "warning"})
+            return jsonify({"message": _("Não houve alteração nos dados do usuário"), "status": "warning"})
         else:
             alteracoes = verificar_alteracao(dicionario_dados_usuario, dicionario_dados_alteracao)
             resultado_diferencas = processar_diferencas(alteracoes, globalId_original)
@@ -176,7 +180,7 @@ def reset_senha():
     reset_senha_gestor(globalId)  # A função para resetar a senha do gestor
     
     # Retorna uma resposta JSON com status de sucesso
-    return jsonify({"message": "A senha do gestor foi alterada", "status": "success"})
+    return jsonify({"message": _("A senha do gestor foi alterada"), "status": "success"})
     
 @configuracoes_salvar_alteracoes.route('/salvar_alteracoes_gestor', methods=['POST'])
 def salvar_alteracoes_gestor():  
@@ -186,15 +190,15 @@ def salvar_alteracoes_gestor():
     globalId_novo = dados_formulario.get('globalId')
     #Verifica as informações digitadas
     if not globalId_novo:
-        return jsonify({"message":"Preencha os dados obrigatórios.", "status": "error"})
+        return jsonify({"message":_("Preencha os dados obrigatórios."), "status": "error"})
     #Verifica se o ID é apenas números e se são 8 caracteres
     if not valida_id_novo(globalId_novo):
-        return jsonify({"message":"Os dados informados no campo 'Global ID' não segue algum dos padrões necessários.<br>Tem mais ou menos que 8 números ou não tem apenas números", "status": "error"})
+        return jsonify({"message":_("Os dados informados no campo 'Global ID' não segue algum dos padrões necessários.<br>Tem mais ou menos que 8 números ou não tem apenas números"), "status": "error"})
     
     #Verifica se o usuário já existe
     if not globalId_original == globalId_novo:
         if not valida_id(globalId_novo):
-            return jsonify({"message":"Não existe usuário cadastrado para o id informado.<br> Crie o usuário antes de cadastrar o gestor.", "status": "error"})
+            return jsonify({"message":_("Não existe usuário cadastrado para o id informado.<br> Crie o usuário antes de cadastrar o gestor."), "status": "error"})
     
     dados = (
         int(dados_formulario.get('globalId')),
@@ -208,7 +212,7 @@ def salvar_alteracoes_gestor():
     if tipo == 'edicao':
         #Se o usuário não existir, mensagem de ID Alterado
         if not dados_gestor:
-            return jsonify({"message":"Abra novamente a tela de edição, o ID foi alterado.", "status": "warning"})
+            return jsonify({"message":_("Abra novamente a tela de edição, o ID foi alterado."), "status": "warning"})
         
         dados_gestor = dados_gestor[1], dados_gestor[2], dados_gestor[5]
         dados_alteracao = dados
@@ -216,7 +220,7 @@ def salvar_alteracoes_gestor():
         dicionario_dados_alteracao = dict(zip(chaves, dados_alteracao))
         #Verifica se houve alterações nos dados
         if dicionario_dados_gestor == dicionario_dados_alteracao:
-            return jsonify({"message": "Não houve alteração nos dados do usuário", "status": "warning"})
+            return jsonify({"message": _("Não houve alteração nos dados do usuário"), "status": "warning"})
         else:
             alteracoes = verificar_alteracao(dicionario_dados_gestor, dicionario_dados_alteracao)
             resultado_diferencas = processar_diferencas_gestor(alteracoes, globalId_original)
@@ -225,7 +229,7 @@ def salvar_alteracoes_gestor():
     if tipo == 'criacao':
         gestor_existe = consulta_gestor_cadastrado(globalId_novo)
         if gestor_existe:
-            return jsonify({"message": "Já existe um gestor cadastrado com o ID informado", "status": "error"})
+            return jsonify({"message": _("Já existe um gestor cadastrado com o ID informado"), "status": "error"})
         
         dicionario_dados_criacao = dict(zip(chaves, dados))
         resultado_criar = criar_gestor(dicionario_dados_criacao)
@@ -233,13 +237,14 @@ def salvar_alteracoes_gestor():
     
 @configuracoes_gestor.route('/pesquisar_gestor', methods=['GET'])
 def pesquisar_gestor():
+    perfil = session['perfil']
     global_id_pesquisa = request.args.get('globalId')
     pagina = request.args.get('pagina', 1, type=int)
     por_pagina = 10
 
     gestores = consulta_pesquisa_gestor(global_id_pesquisa)
     if not gestores:
-        return render_template('configuracoes_gestor.html', gestores = None, pagina = 1,total_paginas = 1, selecao = None,  modo='pesquisa')
+        return render_template('configuracoes_gestor.html',perfil=perfil,  gestores = None, pagina = 1,total_paginas = 1, selecao = None,  modo='pesquisa')
     # Paginando os resultados
     inicio = (pagina - 1) * por_pagina
     final = inicio + por_pagina
@@ -254,5 +259,5 @@ def pesquisar_gestor():
     }
 
     # Retorna apenas o HTML da tabela
-    return render_template('configuracoes_gestor.html', gestores = dados_gestores, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal, modo='pesquisa')
+    return render_template('configuracoes_gestor.html',perfil=perfil,gestores = dados_gestores, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal, modo='pesquisa')
 

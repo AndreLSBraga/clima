@@ -5,7 +5,7 @@
     flex-wrap: wrap; /* Permite que os cards sejam dispostos em linha ou coluna em telas menores */
 }
 
-.card {
+.card{
     background-color: #ffffff; /* Cor de fundo dos cards */
     border: 1px solid #ddd; /* Borda leve ao redor dos cards */
     border-radius: 5px; /* Bordas arredondadas */
@@ -17,6 +17,8 @@
     text-align: center;
     text-decoration: none;
     transition: transform 0.2s; /* Adiciona uma animação de escala */
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .card:hover {
@@ -105,7 +107,7 @@
 }
 
 /* Estilo para a tabela */
-.tabela-container {
+.tabela-configuracoes-container {
     width: 100%;
     background-color: #ffffff;
     border: 1px solid #ddd;
@@ -115,7 +117,7 @@
     max-height: 80%;
 }
 
-.tabela-titulo-imagem{
+.tabela-configuracoes-titulo-imagem{
     display: flex;
     align-items: center; /* Alinha verticalmente no centro */
     justify-content: space-between; /* Espaça o texto e o botão */

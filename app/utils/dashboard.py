@@ -193,7 +193,7 @@ def gera_main_cards(nota):
                 'data_max': nota[5],
         }
 
-def gera_cards(datas_min_max,fk_gestor):
+def gera_cards(datas_min_max,fk_gestor, fk_pais = 3):
     # Consulta promotores por categoria
     dados_categorias = consulta_promotores_categorias(datas_min_max, fk_gestor)
     cards = []
@@ -203,7 +203,7 @@ def gera_cards(datas_min_max,fk_gestor):
         for categoria in categorias:
             card = {
                 'id': categoria[0],
-                'title': consulta_desc_categoria_pelo_fk_categoria(categoria[0]),  # O título da categoria
+                'title': consulta_desc_categoria_pelo_fk_categoria(categoria[0], fk_pais),  # O título da categoria
                 'value': None ,  # Defina o valor como 0 se não houver média
                 'size': 0,  # Defina o tamanho como 0 se não houver média
                 'qtd_respostas': 0,
@@ -256,7 +256,7 @@ def gera_cards(datas_min_max,fk_gestor):
             cards.append(card)
     return cards
 
-def gera_cards_area(datas_min_max,fk_gestor):
+def gera_cards_area(datas_min_max,fk_gestor, fk_pais = 3):
     # Consulta promotores por categoria
     dados_categorias = consulta_promotores_categorias_area(datas_min_max, fk_gestor)
     cards = []
@@ -266,7 +266,7 @@ def gera_cards_area(datas_min_max,fk_gestor):
         for categoria in categorias:
             card = {
                     'id': categoria[0],
-                    'title': consulta_desc_categoria_pelo_fk_categoria(categoria[0]),  # O título da categoria
+                    'title': consulta_desc_categoria_pelo_fk_categoria(categoria[0], fk_pais),  # O título da categoria
                     'value': None ,  # Defina o valor como 0 se não houver média
                     'size': 0,  # Defina o tamanho como 0 se não houver média
                     'qtd_respostas': 0,
@@ -380,7 +380,7 @@ def gera_cards_categoria_area(datas_min_max, fk_gestor, fk_categoria):
         'notas':  notas
     }
 
-def gera_cards_detalhe(datas_min_max, fk_gestor,  fk_categoria_detalhe):
+def gera_cards_detalhe(datas_min_max, fk_gestor,  fk_categoria_detalhe, fk_pais =3 ):
     cards = []
     lista_semanas = []
     #Traz os dados do gestor
@@ -393,7 +393,7 @@ def gera_cards_detalhe(datas_min_max, fk_gestor,  fk_categoria_detalhe):
         
         for pergunta in perguntas_categoria[:10]:
             fk_pergunta = pergunta[0]
-            descricao_pergunta = consulta_texto_perguntas(fk_pergunta)
+            descricao_pergunta = consulta_texto_perguntas(fk_pergunta, fk_pais)
             card = {
             'id': fk_pergunta,
             'title': descricao_pergunta,  
@@ -460,7 +460,7 @@ def gera_cards_detalhe(datas_min_max, fk_gestor,  fk_categoria_detalhe):
             cards.append(card)
     return cards
 
-def gera_cards_detalhe_area(datas_min_max, fk_gestor,  fk_categoria_detalhe):
+def gera_cards_detalhe_area(datas_min_max, fk_gestor,  fk_categoria_detalhe, fk_pais = 3):
     cards = []
     lista_semanas = []
     #Traz os dados do gestor
@@ -473,7 +473,7 @@ def gera_cards_detalhe_area(datas_min_max, fk_gestor,  fk_categoria_detalhe):
         
         for pergunta in perguntas_categoria[:10]:
             fk_pergunta = pergunta[0]
-            descricao_pergunta = consulta_texto_perguntas(fk_pergunta)
+            descricao_pergunta = consulta_texto_perguntas(fk_pergunta, fk_pais)
             card = {
                 'id': fk_pergunta,
                 'title': descricao_pergunta,  

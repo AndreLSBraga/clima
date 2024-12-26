@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from flask_babel import _
 from app.utils.auth import valida_id, valida_data_nascimento, consulta_usuario_id, codifica_id, verifica_resposta_usuario
 import datetime
-
+import time
 pagina_inicial = Blueprint('pagina_inicial', __name__)
 
 @pagina_inicial.route('/', methods=['GET', 'POST'])
@@ -64,7 +64,6 @@ def pagina_inicial_view():
                 usuario_respondeu_semana = verifica_resposta_usuario(user_id)
                 if usuario_respondeu_semana == True:
                     return redirect(url_for('pagina_final.pagina_final_view', lang=lang))
-                app.logger.debug(session)
                 return redirect(url_for('responder.responder_view', lang=lang))
 
         return redirect(url_for('pagina_inicial.pagina_inicial_view',lang=lang))
