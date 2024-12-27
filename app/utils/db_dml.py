@@ -372,3 +372,10 @@ def criar_gestor(dados_gestor):
             "message": "Falha ao criar o usuário."
         }
 
+def update_qtd_perguntas(qtd_perguntas):
+    db = get_db()
+    cursor = db.cursor()
+    query = 'UPDATE qtd_perguntas_pesquisa SET qtd_perguntas = %s'
+    cursor.execute(query, (qtd_perguntas,))
+    db.commit()
+    cursor.close

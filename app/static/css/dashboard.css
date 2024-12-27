@@ -276,6 +276,21 @@
     text-decoration: none;
     cursor: pointer;
 }
+.modal-content form { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+} 
+.modal-content label { 
+    font-weight: bold; 
+} 
+.modal-content input { 
+    padding: 10px; 
+    border: 1px solid #ddd; 
+    border-radius: 5px; 
+    width: 100%; 
+    box-sizing: border-box;
+}
 
 .card-content-modal {
     display: flex;

@@ -212,7 +212,11 @@ def dashboard_area_view():
 def detalhes_categoria_area_view(card_id):
     datas_min_max = [None, None]
     intervalos_param = request.args.get('intervalos')
-    lang = session.get('lang', 'pt')
+    lang_url = request.args.get('lang')
+    if not lang_url:
+        lang = session.get('lang', 'pt')
+    else:
+        lang = request.args.get('lang')
     fk_pais = 3
     if lang == 'es':
         fk_pais = 1

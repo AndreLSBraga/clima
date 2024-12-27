@@ -2,16 +2,19 @@ from flask import Blueprint, render_template, session, request, flash, redirect,
 from datetime import datetime
 from app.utils.auth import valida_id, valida_id_novo, valida_email_novo, consulta_gestor_cadastrado
 from app.utils.db_consultas import consulta_dados_gestor, consulta_usuario_id, consulta_usuarios_por_unidade, consulta_fk_dimensao, consulta_todos_gestores
-from app.utils.db_consultas import consulta_pesquisa_gestor, consulta_pesquisa_usuario
-from app.utils.db_dml import processar_diferencas, criar_usuario, processar_diferencas_gestor, criar_gestor, reset_senha_gestor
+from app.utils.db_consultas import consulta_pesquisa_gestor, consulta_pesquisa_usuario, quantidade_perguntas_pesquisa, quantidade_perguntas_mega_pulso
+from app.utils.db_dml import processar_diferencas, criar_usuario, processar_diferencas_gestor, criar_gestor, reset_senha_gestor, update_qtd_perguntas
 from app.utils.configuracoes import gera_tabela, gera_dados_modal_selecao, verificar_alteracao, gera_tabela_gestores
 from flask_babel import _
+import time
+
 configuracoes = Blueprint('configuracoes', __name__)
 configuracoes_usuario = Blueprint('configuracoes_usuario', __name__)
 configuracoes_gestor = Blueprint('configuracoes_gestor', __name__)
 configuracoes_salvar_alteracoes = Blueprint('configuracoes_salvar_alteracoes', __name__)
 configuracoes_reset_senha = Blueprint('configuracoes_reset_senha', __name__)
 configuracoes_pesquisa_gestor = Blueprint('configuracoes_pesquisa_gestor', __name__)
+configuracoes_pesquisa = Blueprint('configuracoes_pesquisa', __name__)
 
 @configuracoes.route('/configuracoes', methods = ['GET', 'POST'])
 def configuracoes_view():
@@ -261,3 +264,30 @@ def pesquisar_gestor():
     # Retorna apenas o HTML da tabela
     return render_template('configuracoes_gestor.html',perfil=perfil,gestores = dados_gestores, pagina = pagina, total_paginas = total_paginas, selecao = dados_modal, modo='pesquisa')
 
+@configuracoes_pesquisa.route('/configuracoes_pesquisa', methods = ['GET', 'POST'])
+def configuracoes_pesquisa_view():
+    perfil = session['perfil']
+    if 'logged_in' not in session:
+        flash(_("É necessário fazer login primeiro."), "error")
+        return redirect(url_for('gestor.gestor_view'))
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'alterarQtdPerguntas':
+            nova_qtd_perguntas = request.form.get('qtdPerguntas')
+            app.logger.debug(nova_qtd_perguntas)
+            if nova_qtd_perguntas:
+                update_qtd_perguntas(nova_qtd_perguntas)
+                flash(_(f"""Quantidade de perguntas do Pulso atualizada com sucesso.<br>
+                        A pesquisa agora terá {nova_qtd_perguntas} perguntas"""), "success")
+                time.sleep(1.5)
+            else:
+                flash(_("Falha na atualização da quantidade de perguntas"), "error")
+                time.sleep(1.5)
+    
+    dados_qtd_perguntas = {
+        "pulso":quantidade_perguntas_pesquisa(),
+        "mega_pulso": quantidade_perguntas_mega_pulso()
+    }
+
+    return render_template('configuracoes_pesquisa.html', perfil= perfil, qtd_perguntas = dados_qtd_perguntas)

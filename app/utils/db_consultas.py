@@ -33,7 +33,25 @@ def consulta_usuario_resposta_semana(user_id):
                 return result[0]
         else:
                 return None
-
+def consulta_perguntas_selecionadas(perguntas_selecionadas):
+    # Criar placeholders
+    placeholders = ', '.join(['%s'] * len(perguntas_selecionadas))
+    
+    # Construir a query
+    query = f'SELECT fk_pergunta, fk_categoria, texto_pergunta, texto_pergunta_es FROM perguntas WHERE fk_pergunta IN ({placeholders})'
+        
+    # Conectar ao banco de dados e executar a query
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(query, perguntas_selecionadas)
+    result = cursor.fetchall()
+    
+    # Fechar o cursor e a conexão com o banco de dados
+    cursor.close()
+    
+    # Retornar o resultado da query
+    return result if result else None
+        
 def consulta_fk_pergunta_categoria(fk_categoria=None):
         query = 'SELECT fk_pergunta, fk_categoria FROM perguntas'
         conditions = []
@@ -440,3 +458,39 @@ def consulta_resumo_respostas_categoria_gestor(fk_gestor):
               return result
        else:
               return None
+       
+def quantidade_perguntas_pesquisa():
+        db = get_db()
+        cursor = db.cursor()
+        query = "SELECT qtd_perguntas FROM qtd_perguntas_pesquisa"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        cursor.close()
+        if result:
+                return result[0]
+        else:
+                return 10
+        
+def quantidade_perguntas_mega_pulso():
+        db = get_db()
+        cursor = db.cursor()
+        query = "SELECT count(*) FROM perguntas WHERE mega_pulso = 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        cursor.close()
+        if result:
+                return result[0]
+        
+def consulta_fk_perguntas_mega_pulso():
+        db = get_db()
+        cursor = db.cursor()
+        query = "SELECT fk_pergunta FROM perguntas WHERE mega_pulso = 1"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        cursor.close()
+        if result:
+                lista_perguntas = [item[0] for item in result]
+                return lista_perguntas
+        else:
+                return 10
+        

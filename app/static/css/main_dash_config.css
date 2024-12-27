@@ -389,3 +389,29 @@ body, html {
     66% { content: ".."; }
     100% { content: "..."; }
 }
+
+.configuracoes-options{
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.configuracao_card{
+    background-color: #ffffff; /* Cor de fundo dos cards */
+    border: 1px solid #ddd; /* Borda leve ao redor dos cards */
+    border-radius: 5px; /* Bordas arredondadas */
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para dar um efeito de elevação */
+    max-width: 300px; /* Tamanho máximo do card */
+    box-sizing: border-box; /* Inclui padding e border no tamanho total */
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.2s; /* Adiciona uma animação de escala */
+    display:flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+}

@@ -6,7 +6,7 @@ from app.blueprints.pagina_final import pagina_final
 from app.blueprints.sugestao import sugestao
 from app.blueprints.gestor import gestor, configura_senha
 from app.blueprints.configuracoes import  configuracoes, configuracoes_usuario, configuracoes_gestor, configuracoes_salvar_alteracoes, configuracoes_reset_senha
-from app.blueprints.configuracoes import configuracoes_pesquisa_gestor
+from app.blueprints.configuracoes import configuracoes_pesquisa_gestor, configuracoes_pesquisa
 from app.blueprints.dashboard import dashboard, dashboard_categoria, dashboard_sugestoes, dashboard_area, dashboard_categoria_area, dashboard_lideres
 from app.blueprints.responder import responder
 from app.utils.db import close_db
@@ -14,7 +14,7 @@ from app.utils.db import close_db
 def get_locale():
     supported_languages = ['pt', 'es']  # Lista de idiomas suportados
     lang = request.args.get('lang')
-
+    app.logger.debug(f'lang no init {lang}')
     if lang and lang in supported_languages:
         session['lang'] = lang
     else:
@@ -56,6 +56,7 @@ def create_app():
     app.register_blueprint(configura_senha)
     app.register_blueprint(configuracoes_reset_senha)
     app.register_blueprint(configuracoes_pesquisa_gestor)
+    app.register_blueprint(configuracoes_pesquisa)
     # Finaliza a conexão com o banco de dados
     app.teardown_appcontext(close_db)
     return app

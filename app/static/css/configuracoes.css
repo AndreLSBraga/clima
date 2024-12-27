@@ -79,6 +79,7 @@
 
 .cadastrar_usuario {
     display: flex;               /* Alinha o conteúdo do botão em linha */
+    justify-content: center;
     align-items: center;         /* Centraliza verticalmente o conteúdo do botão */
     background-color: #2397A6;   /* Cor de fundo do botão */
     color: white;                /* Cor do texto */
@@ -449,3 +450,4 @@ pagination a:hover img{
     background-color: #FECB34;
     color: #000;
 }
+

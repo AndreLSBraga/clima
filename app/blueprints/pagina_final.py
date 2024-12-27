@@ -8,7 +8,12 @@ pagina_final = Blueprint('pagina_final', __name__)
 @pagina_final.route('/Sugerir', methods=['GET', 'POST'])
 def pagina_final_view():
 
-    lang = session.get('lang', 'pt')
+    lang_url = request.args.get('lang')
+    if not lang_url:
+        lang = session.get('lang', 'pt')
+    else:
+        lang = request.args.get('lang')
+
     if lang:
         if lang == 'pt':
             fk_pais = 3

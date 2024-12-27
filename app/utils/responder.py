@@ -7,6 +7,7 @@ def cria_grupos_perguntas(perguntas):
             if fk_categoria not in grupos_perguntas:
                 grupos_perguntas[fk_categoria] = []
             grupos_perguntas[fk_categoria].append(fk_pergunta)
+
         return grupos_perguntas
 
 def navegar_perguntas(num_pergunta_atual, botao, total_perguntas):

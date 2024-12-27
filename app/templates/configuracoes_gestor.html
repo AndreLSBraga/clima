@@ -56,7 +56,7 @@
                 <span class="icon"><img src="/static/images/icons/sugestoes.svg" alt="Sugestoes Icon"></span>
                 <span class="text_sidebar">{{_("Sugestões")}}</span>
             </a></li>
-            {% if perfil == 'administrador' %}
+            {% if perfil == 'administrador' or perfil == 'administrador_geral' %}
                 <li class="active"><a href="{{ url_for('configuracoes.configuracoes_view', lang=session.get('lang', 'pt')) }}">
                     <span class="icon"><img src="/static/images/icons/configuracoes.svg" alt="configuracoes Icon"></span>
                     <span class="text_sidebar">{{_("Configurações")}}</span>

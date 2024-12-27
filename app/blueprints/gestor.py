@@ -16,7 +16,11 @@ configura_senha = Blueprint('configura_senha', __name__)
 
 @gestor.route('/gestor', methods = ['GET', 'POST'])
 def gestor_view():
-    lang = session.get('lang', 'pt')   
+    lang_url = request.args.get('lang')
+    if not lang_url:
+        lang = session.get('lang', 'pt')
+    else:
+        lang = request.args.get('lang')  
     if request.method == 'POST':
         user_id = request.form['username']
         senha_formulario = request.form['password']

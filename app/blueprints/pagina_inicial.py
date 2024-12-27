@@ -8,7 +8,11 @@ pagina_inicial = Blueprint('pagina_inicial', __name__)
 @pagina_inicial.route('/', methods=['GET', 'POST'])
 def pagina_inicial_view():
     
-    lang = session.get('lang', 'pt') 
+    lang_url = request.args.get('lang')
+    if not lang_url:
+        lang = session.get('lang', 'pt')
+    else:
+        lang = request.args.get('lang')
     session.clear()
     session['lang'] = lang
 
