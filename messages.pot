@@ -1,14 +1,14 @@
 # Translations template for PROJECT.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-26 16:39-0300\n"
+"POT-Creation-Date: 2025-01-03 16:02-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,93 +17,107 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: app/blueprints/configuracoes.py:20 app/blueprints/configuracoes.py:81
-#: app/blueprints/dashboard.py:26 app/blueprints/dashboard.py:120
-#: app/blueprints/dashboard.py:157 app/blueprints/dashboard.py:245
+#: app/blueprints/configuracoes.py:26 app/blueprints/configuracoes.py:87
+#: app/blueprints/configuracoes.py:276 app/blueprints/dashboard.py:27
+#: app/blueprints/dashboard.py:124 app/blueprints/dashboard.py:162
+#: app/blueprints/dashboard.py:256
 msgid "É necessário fazer login primeiro."
 msgstr ""
 
-#: app/blueprints/configuracoes.py:111 app/blueprints/configuracoes.py:193
+#: app/blueprints/configuracoes.py:117 app/blueprints/configuracoes.py:201
 msgid "Preencha os dados obrigatórios."
 msgstr ""
 
-#: app/blueprints/configuracoes.py:117
+#: app/blueprints/configuracoes.py:123
 msgid ""
 "Já existe usuário com esse ID cadastrado.<br> Procure pelo ID nas "
 "configurações de usuários."
 msgstr ""
 
-#: app/blueprints/configuracoes.py:120 app/blueprints/configuracoes.py:196
+#: app/blueprints/configuracoes.py:126 app/blueprints/configuracoes.py:204
 msgid ""
 "Os dados informados no campo 'Global ID' não segue algum dos padrões "
 "necessários.<br>Tem mais ou menos que 8 números ou não tem apenas números"
 msgstr ""
 
-#: app/blueprints/configuracoes.py:123
+#: app/blueprints/configuracoes.py:129
 msgid ""
 "Os dados informados no campo 'Email' não segue algum dos padrões "
-"necessários.<br>Não está digitado corretamente como @ambev.com.br ou @ab-"
+"necessários.<br>Não está digitado corretamente como @ambev.com ou @ab-"
 "inbev.com"
 msgstr ""
 
-#: app/blueprints/configuracoes.py:126
+#: app/blueprints/configuracoes.py:132
 msgid ""
 "Os dados informados no campo 'ID Gestor' não existe na base de "
 "gestores.<br>Entre em contato com a área de gente da unidade."
 msgstr ""
 
-#: app/blueprints/configuracoes.py:155 app/blueprints/configuracoes.py:215
+#: app/blueprints/configuracoes.py:162 app/blueprints/configuracoes.py:223
 msgid "Abra novamente a tela de edição, o ID foi alterado."
 msgstr ""
 
-#: app/blueprints/configuracoes.py:162 app/blueprints/configuracoes.py:223
+#: app/blueprints/configuracoes.py:169 app/blueprints/configuracoes.py:231
 msgid "Não houve alteração nos dados do usuário"
 msgstr ""
 
-#: app/blueprints/configuracoes.py:183
+#: app/blueprints/configuracoes.py:191
 msgid "A senha do gestor foi alterada"
 msgstr ""
 
-#: app/blueprints/configuracoes.py:201
+#: app/blueprints/configuracoes.py:209
 msgid ""
 "Não existe usuário cadastrado para o id informado.<br> Crie o usuário "
 "antes de cadastrar o gestor."
 msgstr ""
 
-#: app/blueprints/configuracoes.py:232
+#: app/blueprints/configuracoes.py:240
 msgid "Já existe um gestor cadastrado com o ID informado"
 msgstr ""
 
-#: app/blueprints/gestor.py:42 app/blueprints/gestor.py:48
+#: app/blueprints/configuracoes.py:291
+msgid "Falha na atualização da quantidade de perguntas"
+msgstr ""
+
+#: app/blueprints/configuracoes.py:304
+msgid "Novo administrador geral cadastrado"
+msgstr ""
+
+#: app/blueprints/configuracoes.py:374
+msgid "Nada aconteceu"
+msgstr ""
+
+#: app/blueprints/gestor.py:46 app/blueprints/gestor.py:52
 msgid "A senha digitada está incorreta.<br>Tente novamente com a senha correta"
 msgstr ""
 
-#: app/blueprints/gestor.py:59
+#: app/blueprints/gestor.py:63
 msgid "É necessário fazer login primeiro"
 msgstr ""
 
-#: app/blueprints/gestor.py:69
+#: app/blueprints/gestor.py:73
 msgid "A senha padrão está incorreta.<br>Tente novamente com a senha correta"
 msgstr ""
 
-#: app/blueprints/gestor.py:73
+#: app/blueprints/gestor.py:77
 msgid "As senhas digitadas não conferem.<br>Digite as senhas corretamente"
 msgstr ""
 
-#: app/blueprints/gestor.py:78
+#: app/blueprints/gestor.py:82
 msgid "Senha nova cadastrada"
 msgstr ""
 
-#: app/blueprints/pagina_final.py:38
+#: app/blueprints/pagina_final.py:43
 msgid "Sugestão enviada com sucesso!"
 msgstr ""
 
-#: app/blueprints/pagina_inicial.py:19
+#: app/blueprints/pagina_inicial.py:23
 msgid "Preencha todos os campos"
 msgstr ""
 
-#: app/templates/configura_senha.html:17 app/templates/configuracoes.html:19
+#: app/templates/configura_senha.html:17 app/templates/configuracoes.html:18
 #: app/templates/configuracoes_gestor.html:19
+#: app/templates/configuracoes_pesquisa.html:19
 #: app/templates/configuracoes_usuario.html:19
 #: app/templates/dash_gestores.html:23 app/templates/dash_sugestoes.html:19
 #: app/templates/dashboard.html:23 app/templates/dashboard_area.html:23
@@ -112,8 +126,9 @@ msgstr ""
 msgid "Responder"
 msgstr ""
 
-#: app/templates/configura_senha.html:18 app/templates/configuracoes.html:20
+#: app/templates/configura_senha.html:18 app/templates/configuracoes.html:19
 #: app/templates/configuracoes_gestor.html:20
+#: app/templates/configuracoes_pesquisa.html:20
 #: app/templates/configuracoes_usuario.html:20
 #: app/templates/dash_gestores.html:24 app/templates/dash_gestores.html:108
 #: app/templates/dash_sugestoes.html:20 app/templates/dash_sugestoes.html:99
@@ -123,8 +138,9 @@ msgstr ""
 msgid "Gestor"
 msgstr ""
 
-#: app/templates/configura_senha.html:23 app/templates/configuracoes.html:25
+#: app/templates/configura_senha.html:23 app/templates/configuracoes.html:24
 #: app/templates/configuracoes_gestor.html:25
+#: app/templates/configuracoes_pesquisa.html:25
 #: app/templates/configuracoes_usuario.html:25
 #: app/templates/dash_gestores.html:29 app/templates/dash_sugestoes.html:25
 #: app/templates/dashboard.html:29 app/templates/dashboard_area.html:29
@@ -147,8 +163,9 @@ msgstr ""
 msgid "Confirme sua nova senha:"
 msgstr ""
 
-#: app/templates/configuracoes.html:45
+#: app/templates/configuracoes.html:44
 #: app/templates/configuracoes_gestor.html:45
+#: app/templates/configuracoes_pesquisa.html:45
 #: app/templates/configuracoes_usuario.html:45
 #: app/templates/dash_gestores.html:53 app/templates/dash_sugestoes.html:49
 #: app/templates/dash_sugestoes.html:85 app/templates/dashboard.html:53
@@ -156,8 +173,9 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: app/templates/configuracoes.html:49
+#: app/templates/configuracoes.html:48
 #: app/templates/configuracoes_gestor.html:49
+#: app/templates/configuracoes_pesquisa.html:49
 #: app/templates/configuracoes_usuario.html:49
 #: app/templates/dash_gestores.html:57 app/templates/dash_sugestoes.html:53
 #: app/templates/dash_sugestoes.html:88 app/templates/dashboard.html:57
@@ -165,52 +183,65 @@ msgstr ""
 msgid "Área"
 msgstr ""
 
-#: app/templates/configuracoes.html:53
+#: app/templates/configuracoes.html:52
 #: app/templates/configuracoes_gestor.html:53
+#: app/templates/configuracoes_pesquisa.html:53
 #: app/templates/configuracoes_usuario.html:53
 #: app/templates/dash_gestores.html:61 app/templates/dash_sugestoes.html:57
 #: app/templates/dashboard.html:61 app/templates/dashboard_area.html:61
 msgid "Líderes"
 msgstr ""
 
-#: app/templates/configuracoes.html:57
+#: app/templates/configuracoes.html:56
 #: app/templates/configuracoes_gestor.html:57
+#: app/templates/configuracoes_pesquisa.html:57
 #: app/templates/configuracoes_usuario.html:57
 #: app/templates/dash_gestores.html:65 app/templates/dash_sugestoes.html:61
 #: app/templates/dashboard.html:65 app/templates/dashboard_area.html:65
 msgid "Sugestões"
 msgstr ""
 
-#: app/templates/configuracoes.html:62
+#: app/templates/configuracoes.html:61
 #: app/templates/configuracoes_gestor.html:62
+#: app/templates/configuracoes_pesquisa.html:62
 #: app/templates/configuracoes_usuario.html:62
 #: app/templates/dash_gestores.html:70 app/templates/dash_sugestoes.html:66
 #: app/templates/dashboard.html:70 app/templates/dashboard_area.html:70
 msgid "Configurações"
 msgstr ""
 
-#: app/templates/configuracoes.html:67
+#: app/templates/configuracoes.html:66
 #: app/templates/configuracoes_gestor.html:67
+#: app/templates/configuracoes_pesquisa.html:67
 #: app/templates/configuracoes_usuario.html:67
 #: app/templates/dash_gestores.html:75 app/templates/dash_sugestoes.html:71
 #: app/templates/dashboard.html:75 app/templates/dashboard_area.html:75
 msgid "Sair"
 msgstr ""
 
-#: app/templates/configuracoes.html:77
+#: app/templates/configuracoes.html:76
 msgid "Configurar Usuários"
 msgstr ""
 
-#: app/templates/configuracoes.html:78
+#: app/templates/configuracoes.html:77
 msgid "Cadastrar Usuários/Editar informações dos usuários criados"
 msgstr ""
 
-#: app/templates/configuracoes.html:81
+#: app/templates/configuracoes.html:80
 msgid "Configurar Gestores"
 msgstr ""
 
-#: app/templates/configuracoes.html:82
+#: app/templates/configuracoes.html:81
 msgid "Cadastrar Gestores/Editar informações dos gestores criados"
+msgstr ""
+
+#: app/templates/configuracoes.html:85
+#: app/templates/configuracoes_pesquisa.html:81
+msgid "Configurar Pesquisa"
+msgstr ""
+
+#: app/templates/configuracoes.html:86
+msgid "Configurar perguntas do mega pulso/ Quantidade de perguntas"
 msgstr ""
 
 #: app/templates/configuracoes_gestor.html:81
@@ -231,8 +262,8 @@ msgstr ""
 
 #: app/templates/configuracoes_gestor.html:110
 #: app/templates/configuracoes_usuario.html:111
-#: app/templates/dash_gestores.html:97 app/templates/dashboard.html:97
-#: app/templates/dashboard_area.html:97
+#: app/templates/dash_gestores.html:97 app/templates/dashboard.html:101
+#: app/templates/dashboard_area.html:101
 msgid "Limpar"
 msgstr ""
 
@@ -290,6 +321,9 @@ msgid "Perfil:"
 msgstr ""
 
 #: app/templates/configuracoes_gestor.html:214
+#: app/templates/configuracoes_pesquisa.html:207
+#: app/templates/configuracoes_pesquisa.html:254
+#: app/templates/configuracoes_pesquisa.html:293
 #: app/templates/configuracoes_usuario.html:294
 msgid "Salvar Alterações"
 msgstr ""
@@ -308,6 +342,246 @@ msgstr ""
 
 #: app/templates/configuracoes_gestor.html:227 app/templates/responder.html:104
 msgid "Confirmar"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:98
+msgid "Cadastrar Administrador Geral:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:101
+msgid "Defina um novo administrador geral."
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:106
+msgid "Definir Administrador"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:112
+msgid "Quantidade de Perguntas - Pulso:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:115
+msgid "Defina quantas perguntas do Pulso. A quantidade atual é de "
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:115
+msgid " perguntas por Pulso."
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:120
+msgid "Alterar Quantidade"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:126
+msgid "Pesquisa Mega - Pulso:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:129
+msgid "Defina quais perguntas vão estar no Mega Pulso. A quantidade atual é de"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:129
+msgid " perguntas por Mega Pulso."
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:134
+#: app/templates/configuracoes_pesquisa.html:215
+msgid "Alterar Mega Pulso"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:140
+msgid "Alterar Perguntas:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:143
+msgid "Redefina o texto e/ou categoria das perguntas já existentes."
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:148
+msgid "Alterar Perguntas"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:154
+msgid "Incluir Novas Perguntas:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:157
+msgid "Inclua novas perguntas as categorias já existentes."
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:162
+msgid "Incluir Perguntas"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:168
+msgid "Incluir Novas Categorias:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:171
+msgid "Inclua novas categorias as pesquisas."
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:176
+msgid "Incluir Categoria"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:184
+msgid "Novo Administrador Geral"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:188
+msgid "Digite o ID de um novo administrador geral:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:189
+msgid "Digite o ID..."
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:192
+msgid "Cadastrar Administrador"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:200
+msgid "Alterar Quantidade de Perguntas"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:204
+msgid "Digite a nova quantidade de perguntas:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:218
+msgid ""
+"As perguntas em destaque são as perguntas do Mega Pulso, para incluir ou "
+"retirar uma pergunta basta clicar no checkbox e 'Salvar Alterações' no "
+"final da tabela"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:224
+msgid "Nº"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:225
+msgid "Pergunta em PT"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:226
+msgid "Pergunta em ES"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:227
+#: app/templates/dash_sugestoes.html:100
+msgid "Categoria"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:228
+msgid "Mega Pulso"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:246
+msgid "Não há perguntas para exibir"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:262
+msgid "Alterar Pergunta:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:266
+msgid "Selecione a pergunta a ser alterada:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:268
+msgid "Selecione a pergunta"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:275
+msgid "Número Pergunta: "
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:276
+msgid "Categoria Pergunta: "
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:278
+msgid "Novo texto da pergunta em português"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:279
+msgid "Novo texto da pergunta em Português:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:281
+msgid "Novo texto da pergunta em espanhol"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:282
+msgid "Novo texto da pergunta em Espanhol:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:284
+#: app/templates/configuracoes_pesquisa.html:312
+msgid "Selecione a categoria da pergunta:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:286
+#: app/templates/pagina_final.html:47
+msgid "Selecione a categoria..."
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:301
+msgid "Incluir Nova Pergunta:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:304
+msgid "Preencha os dados da pergunta que será criada na Pulsa"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:306
+#: app/templates/configuracoes_pesquisa.html:310
+msgid "Texto da nova pergunta em Português:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:307
+msgid "Digite aqui o texto da nova pergunta em Português"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:309
+msgid "Digite aqui o texto da nova pergunta em Espanhol"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:314
+msgid "Selecione a categoria da pergunta"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:321
+msgid "Criar nova pergunta"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:329
+msgid "Incluir Nova Categoria:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:332
+msgid "Preencha o a descrição da nova categoria que será criada na Pulsa"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:334
+msgid "Digite aqui o texto da nova categoria em Português"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:335
+msgid "Texto da nova categoria em Português:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:337
+msgid "Digite aqui o texto da nova categoria em Espanhol"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:338
+msgid "Texto da nova categoria em Espanhol:"
+msgstr ""
+
+#: app/templates/configuracoes_pesquisa.html:341
+msgid "Criar nova categoria"
 msgstr ""
 
 #: app/templates/configuracoes_usuario.html:81
@@ -387,8 +661,8 @@ msgid "Gênero:"
 msgstr ""
 
 #: app/templates/dash_gestores.html:47 app/templates/dash_sugestoes.html:43
-#: app/templates/dashboard.html:47 app/templates/dashboard.html:188
-#: app/templates/dashboard_area.html:47 app/templates/dashboard_area.html:188
+#: app/templates/dashboard.html:47 app/templates/dashboard.html:192
+#: app/templates/dashboard_area.html:47 app/templates/dashboard_area.html:192
 #: app/templates/gestor.html:41
 msgid "Buscando seus dados"
 msgstr ""
@@ -406,13 +680,13 @@ msgstr ""
 msgid "Esse é seu resultado de promotores por gestor."
 msgstr ""
 
-#: app/templates/dash_gestores.html:89 app/templates/dashboard.html:89
-#: app/templates/dashboard_area.html:89
+#: app/templates/dash_gestores.html:89 app/templates/dashboard.html:93
+#: app/templates/dashboard_area.html:93
 msgid "Selecione o intervalo da pesquisa:"
 msgstr ""
 
-#: app/templates/dash_gestores.html:98 app/templates/dashboard.html:98
-#: app/templates/dashboard_area.html:98
+#: app/templates/dash_gestores.html:98 app/templates/dashboard.html:102
+#: app/templates/dashboard_area.html:102
 msgid "Aplicar Filtro"
 msgstr ""
 
@@ -466,13 +740,13 @@ msgid ""
 "para analisar."
 msgstr ""
 
-#: app/templates/dash_gestores.html:228 app/templates/dashboard.html:516
-#: app/templates/dashboard_area.html:516
+#: app/templates/dash_gestores.html:228 app/templates/dashboard.html:547
+#: app/templates/dashboard_area.html:548
 msgid "Selecione os intervalos de datas..."
 msgstr ""
 
-#: app/templates/dash_gestores.html:258 app/templates/dashboard.html:546
-#: app/templates/dashboard_area.html:546
+#: app/templates/dash_gestores.html:258 app/templates/dashboard.html:577
+#: app/templates/dashboard_area.html:578
 msgid "Por favor, selecione ao menos um intervalo."
 msgstr ""
 
@@ -498,10 +772,6 @@ msgstr ""
 
 #: app/templates/dash_sugestoes.html:98
 msgid "Data"
-msgstr ""
-
-#: app/templates/dash_sugestoes.html:100
-msgid "Categoria"
 msgstr ""
 
 #: app/templates/dash_sugestoes.html:101 app/templates/responder.html:82
@@ -546,61 +816,89 @@ msgstr ""
 msgid "Esse é o resultado do seu time direto."
 msgstr ""
 
-#: app/templates/dashboard.html:85 app/templates/dashboard_area.html:85
+#: app/templates/dashboard.html:86 app/templates/dashboard_area.html:86
 msgid "Seu percentual de promotores está baseado em"
 msgstr ""
 
-#: app/templates/dashboard.html:85 app/templates/dashboard_area.html:85
+#: app/templates/dashboard.html:86 app/templates/dashboard_area.html:86
 msgid "perguntas respondidas por"
 msgstr ""
 
-#: app/templates/dashboard.html:85 app/templates/dashboard_area.html:85
+#: app/templates/dashboard.html:86 app/templates/dashboard_area.html:86
 msgid "respondentes únicos entre os dias"
 msgstr ""
 
-#: app/templates/dashboard.html:85 app/templates/dashboard.html:168
-#: app/templates/dashboard.html:419 app/templates/dashboard_area.html:85
+#: app/templates/dashboard.html:86 app/templates/dashboard.html:172
+#: app/templates/dashboard.html:450 app/templates/dashboard_area.html:86
 msgid "e"
 msgstr ""
 
-#: app/templates/dashboard.html:109 app/templates/dashboard_area.html:109
+#: app/templates/dashboard.html:87 app/templates/dashboard_area.html:87
+msgid "O seu time têm "
+msgstr ""
+
+#: app/templates/dashboard.html:87 app/templates/dashboard_area.html:87
+msgid " colaboradores atualmente."
+msgstr ""
+
+#: app/templates/dashboard.html:88 app/templates/dashboard_area.html:88
+msgid "Ver Time"
+msgstr ""
+
+#: app/templates/dashboard.html:113 app/templates/dashboard_area.html:113
 msgid "Dimensões:"
 msgstr ""
 
-#: app/templates/dashboard.html:159 app/templates/dashboard.html:411
-#: app/templates/dashboard_area.html:159 app/templates/dashboard_area.html:411
+#: app/templates/dashboard.html:163 app/templates/dashboard.html:442
+#: app/templates/dashboard_area.html:163 app/templates/dashboard_area.html:443
 msgid "perguntas respondidas"
 msgstr ""
 
-#: app/templates/dashboard.html:163 app/templates/dashboard.html:415
-#: app/templates/dashboard_area.html:163 app/templates/dashboard_area.html:415
+#: app/templates/dashboard.html:167 app/templates/dashboard.html:446
+#: app/templates/dashboard_area.html:167 app/templates/dashboard_area.html:447
 msgid "sugestões recebidas"
 msgstr ""
 
-#: app/templates/dashboard.html:177 app/templates/dashboard_area.html:177
+#: app/templates/dashboard.html:181 app/templates/dashboard_area.html:181
 msgid "Sem dimensões para mostrar"
 msgstr ""
 
-#: app/templates/dashboard.html:263 app/templates/dashboard.html:313
-#: app/templates/dashboard.html:503 app/templates/dashboard_area.html:263
-#: app/templates/dashboard_area.html:313 app/templates/dashboard_area.html:503
+#: app/templates/dashboard.html:201 app/templates/dashboard_area.html:201
+msgid "Esse é o seu time atualmente:"
+msgstr ""
+
+#: app/templates/dashboard.html:206 app/templates/dashboard_area.html:206
+msgid "GlobalID"
+msgstr ""
+
+#: app/templates/dashboard.html:207 app/templates/dashboard_area.html:207
+msgid "Nome colaborador"
+msgstr ""
+
+#: app/templates/dashboard.html:220 app/templates/dashboard_area.html:222
+msgid "Não há time para ser exibido"
+msgstr ""
+
+#: app/templates/dashboard.html:294 app/templates/dashboard.html:344
+#: app/templates/dashboard.html:534 app/templates/dashboard_area.html:295
+#: app/templates/dashboard_area.html:345 app/templates/dashboard_area.html:535
 msgid "Percentual Promotores"
 msgstr ""
 
-#: app/templates/dashboard.html:278 app/templates/dashboard.html:325
-#: app/templates/dashboard_area.html:278 app/templates/dashboard_area.html:325
+#: app/templates/dashboard.html:309 app/templates/dashboard.html:356
+#: app/templates/dashboard_area.html:310 app/templates/dashboard_area.html:357
 msgid "Percentual Aderência"
 msgstr ""
 
-#: app/templates/dashboard.html:305 app/templates/dashboard_area.html:305
+#: app/templates/dashboard.html:336 app/templates/dashboard_area.html:337
 msgid "Semanas do Ano"
 msgstr ""
 
-#: app/templates/dashboard.html:369 app/templates/dashboard_area.html:369
+#: app/templates/dashboard.html:400 app/templates/dashboard_area.html:401
 msgid "Categoria:"
 msgstr ""
 
-#: app/templates/dashboard.html:477 app/templates/dashboard_area.html:477
+#: app/templates/dashboard.html:508 app/templates/dashboard_area.html:509
 msgid "Pecentual Promotores"
 msgstr ""
 
@@ -608,7 +906,11 @@ msgstr ""
 msgid "Esse é o resultado da sua área."
 msgstr ""
 
-#: app/templates/dashboard_area.html:494
+#: app/templates/dashboard_area.html:208
+msgid "Gestor direto do colaborador"
+msgstr ""
+
+#: app/templates/dashboard_area.html:526
 msgid "Pesquisa"
 msgstr ""
 
@@ -626,10 +928,6 @@ msgstr ""
 
 #: app/templates/pagina_final.html:45
 msgid "Deixe aqui um comentário/sugestão"
-msgstr ""
-
-#: app/templates/pagina_final.html:47
-msgid "Selecione a categoria..."
 msgstr ""
 
 #: app/templates/pagina_final.html:54 app/templates/responder.html:79

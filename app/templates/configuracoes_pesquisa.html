@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pulsa Supply</title>
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="/static/css/main_dash_config.css">
-    <link rel="stylesheet" href="/static/css/configuracoes.css">
-    <link rel="stylesheet" href="/static/css/dashboard.css">
-    <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main_dash_config.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/configuracoes.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/configuracoes_pesquisa.css">
+    <link rel="icon" type="image/x-icon" href="/static/images/logos/fav_logo.png" alt="Pulsa Supply">
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-logo">
-            <img class="logo" src="/static/images/logos/logo_completa.svg">
+            <img class="logo" src="/static/images/logos/logo_completa.svg" alt="Pulsa Supply">
         </div>
         <ul class="navbar-menu">
             <li><a href="{{ url_for('pagina_inicial.pagina_inicial_view', lang=session.get('lang', 'pt')) }}">{{_("Responder")}}</a></li>
@@ -22,8 +22,8 @@
         <div class="navbar-lang">
             <form method="GET" action="{{ url_for('configuracoes_pesquisa.configuracoes_pesquisa_view', lang=session.get('lang', 'pt')) }}">
                 <div class="dropdown">
-                    <label for="lang">{{_("Idioma:")}}</label>
-                    <button class="dropdown-btn">
+                    <label for="dropdown-btn">{{_("Idioma:")}}</label>
+                    <button id="dropdown-btn" type="button" class="dropdown-btn">
                         <img src="/static/images/flags/{{ session.get('lang', 'pt') }}.png" alt="Idioma Selecionado" class="selected-flag">
                     </button>
                     <div class="dropdown-content">
@@ -83,82 +83,359 @@
                     </div>
                 </div>
             </div>
-            <div class="configuracoes-options">
-                <div class="configuracao_card qtd_perguntas">
-                    <div class="configuracao_card_texto">
-                        <h2>{{_("Quantidade de Perguntas - Pulso:")}}</h2>
-                        <p>{{_("A quantidade de perguntas atual de um Pulso é de ")}} {{ qtd_perguntas.pulso }} {{_(" perguntas por pulso")}}</p>
+            <div class="alerts">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ _(message) | safe }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="config-opcoes">
+                <div class="config-opcao">
+                    <div class="config-opcao-titulo">
+                        <h3>{{_("Cadastrar Administrador Geral:")}}</h3>
                     </div>
-                    <button id="alterar_qtd_perguntas" class="cadastrar_usuario" type="button" onclick="abrirModal('modalQtdPerguntas', 'alterarQtdPerguntas')">
-                        <img src="/static/images/icons/detalhes.svg" alt="alterar">
-                        {{_("Alterar Quantidade")}}
-                    </button>
+                    <div class="config-opcao-descricao">
+                        {{_("Defina um novo administrador geral.")}}
+                    </div>
+                    <div class="config-opcao-botao">
+                        <button id="definir_adm" class="botao-config" type="button" onclick="abrirModal('modalAdmGeral', 'incluirNovoAdm')">
+                            <img src="/static/images/icons/detalhes.svg" alt="alterar">
+                            {{_("Definir Administrador")}}
+                        </button>
+                    </div>
                 </div>
-            <div id="modalQtdPerguntas" class="modal">
-                <div class="modal-content">
-                    <span class="close" onclick="fecharModal('modalQtdPerguntas')">&times;</span>
-                    <h2>{{_("Alterar Quantidade de Perguntas")}}</h2>
-                    <form id="formQtdPerguntas" method="POST" action="{{ url_for('configuracoes_pesquisa.configuracoes_pesquisa_view') }}">
+                <div class="config-opcao">
+                    <div class="config-opcao-titulo">
+                        <h3>{{_("Quantidade de Perguntas - Pulso:")}}</h3>
+                    </div>
+                    <div class="config-opcao-descricao">
+                        {{_("Defina quantas perguntas do Pulso. A quantidade atual é de ")}} {{ qtd_perguntas.pulso }} {{_(" perguntas por Pulso.")}}
+                    </div>
+                    <div class="config-opcao-botao">
+                        <button id="alterar_qtd_perguntas" class="botao-config" type="button" onclick="abrirModal('modalQtdPerguntas', 'alterarQtdPerguntas')">
+                            <img src="/static/images/icons/detalhes.svg" alt="alterar">
+                            {{_("Alterar Quantidade")}}
+                        </button>
+                    </div>
+                </div>
+                <div class="config-opcao">
+                    <div class="config-opcao-titulo">
+                        <h3>{{_("Pesquisa Mega - Pulso:")}}</h3>
+                    </div>
+                    <div class="config-opcao-descricao">
+                        {{_("Defina quais perguntas vão estar no Mega Pulso. A quantidade atual é de")}} {{ qtd_perguntas.mega_pulso }} {{_(" perguntas por Mega Pulso.")}}
+                    </div>
+                    <div class="config-opcao-botao">
+                        <button id="alterar_mega_pulso" class="botao-config" type="button" onclick="abrirModal('modalAlterarMegaPulso', 'alterarMegaPulso')">
+                            <img src="/static/images/icons/detalhes.svg" alt="alterar">
+                            {{_("Alterar Mega Pulso")}}
+                        </button>
+                    </div>
+                </div>
+                <!-- <div class="config-opcao">
+                    <div class="config-opcao-titulo">
+                        <h3>{{_("Alterar Perguntas:")}}</h3>
+                    </div>
+                    <div class="config-opcao-descricao">
+                        {{_("Redefina o texto e/ou categoria das perguntas já existentes.")}}
+                    </div>
+                    <div class="config-opcao-botao">
+                        <button id="alterar_perguntas" class="botao-config" type="button" onclick="abrirModal('modalAlterarPergunta', 'alterarPergunta')">
+                            <img src="/static/images/icons/detalhes.svg" alt="alterar">
+                            {{_("Alterar Perguntas")}}
+                        </button>
+                    </div>
+                </div> -->
+                <div class="config-opcao">
+                    <div class="config-opcao-titulo">
+                        <h3>{{_("Incluir Novas Perguntas:")}}</h3>
+                    </div>
+                    <div class="config-opcao-descricao">
+                        {{_("Inclua novas perguntas as categorias já existentes.")}}
+                    </div>
+                    <div class="config-opcao-botao">
+                        <button id="incluir_perguntas" class="botao-config" type="button" onclick="abrirModal('modalIncluirPergunta', 'incluirPergunta')">
+                            <img src="/static/images/icons/detalhes.svg" alt="alterar">
+                            {{_("Incluir Perguntas")}}
+                        </button>
+                    </div>
+                </div>
+                <div class="config-opcao">
+                    <div class="config-opcao-titulo">
+                        <h3>{{_("Incluir Novas Categorias:")}}</h3>
+                    </div>
+                    <div class="config-opcao-descricao">
+                        {{_("Inclua novas categorias as pesquisas.")}}
+                    </div>
+                    <div class="config-opcao-botao">
+                        <button id="incluir_categoria" class="botao-config" type="button" onclick="abrirModal('modalIncluirCategoria', 'incluirCategoria')">
+                            <img src="/static/images/icons/detalhes.svg" alt="alterar">
+                            {{_("Incluir Categoria")}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="modalAdmGeral" class="modal-config">
+                <div class="modal-config-content">
+                    <div class="modal-config-titulo">
+                        <h2>{{_("Novo Administrador Geral")}}</h2><span class="close" onclick="fecharModal('modalAdmGeral')">&times;</span>
+                    </div>
+                    <form class="modal-configuracao" id="formAdmGeral" method="POST" action="{{ url_for('configuracoes_pesquisa.configuracoes_pesquisa_view') }}">
+                        <input type="hidden" name="action" value="incluirNovoAdm">
+                        <label for="novoId">{{_("Digite o ID de um novo administrador geral:")}}</label>
+                        {% set user_id_placeholder = _("Digite o ID...") %}
+                        <input type="text" name="user_id" placeholder="{{ user_id_placeholder }}" required>
+                        <div class="buttons">
+                            <button type="submit" id="modal-save-button" data-action="incluirNovoAdm">{{_("Cadastrar Administrador")}}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="modalQtdPerguntas" class="modal-config">
+                <div class="modal-config-content">
+                    <div class="modal-config-titulo">
+                        <h2>{{_("Alterar Quantidade de Perguntas")}}</h2><span class="close" onclick="fecharModal('modalQtdPerguntas')">&times;</span>
+                    </div>
+                    <form class="modal-configuracao" id="formQtdPerguntas" method="POST" action="{{ url_for('configuracoes_pesquisa.configuracoes_pesquisa_view') }}">
                         <input type="hidden" name="action" value="alterarQtdPerguntas">
                         <label for="qtdPerguntas">{{_("Digite a nova quantidade de perguntas:")}}</label>
-                        <input type="number" id="qtdPerguntas" name="qtdPerguntas" min="10" required>
+                        <input type="number" id="qtdPerguntas" name="qtdPerguntas" min="10" max="50" placeholder="10" required>
                         <div class="buttons">
                             <button type="submit" id="modal-save-button" data-action="alterarQtdPerguntas">{{_("Salvar Alterações")}}</button>
                         </div>
                     </form>
-                    <div class="alerts">
-                        <!-- As mensagens de alerta aparecerão aqui -->
-                    </div>
                 </div>
-            </div>            
-            <div id="modalMegaPulso" class="modal"> 
-                <div class="modal-content">
-                    <span class="close" onclick="fecharModal('modalQtdPerguntas')">&times;</span> 
-                    <div class="buttons"> 
-                        <button type ="submit" id="modal-save-button">{{_("Salvar Alterações")}}</button> 
-                    </div> 
-                    <div class="alerts">
-                        {% with messages = get_flashed_messages(with_categories=true) %}
-                            {% if messages %}
-                                {% for category, message in messages %}
-                                    <div class="alert alert-{{ category }}">{{ _(message) | safe }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        {% endwith %}
+            </div>
+            <div id="modalAlterarMegaPulso" class="modal-config">
+                <div class="modal-config-content">
+                    <div class="modal-config-titulo">
+                        <h2>{{_("Alterar Mega Pulso")}}</h2><span class="close" onclick="fecharModal('modalAlterarMegaPulso')">&times;</span>
                     </div>
-                </div> 
+                    <div class="modal-config-texto">
+                        <p>{{_("As perguntas em destaque são as perguntas do Mega Pulso, para incluir ou retirar uma pergunta basta clicar no checkbox e 'Salvar Alterações' no final da tabela") }}</p>
+                    </div>
+                    <div class="tabela-perguntas-mega-pulso">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>{{_("Nº")}}</th>
+                                    <th>{{_("Pergunta em PT")}}</th>
+                                    <th>{{_("Pergunta em ES")}}</th>
+                                    <th>{{_("Categoria")}}</th>
+                                    <th>{{_("Mega Pulso")}}</th>
+                                </tr>
+                            </thead>
+                            {% if perguntas %}
+                                <tbody>
+                                    {% for pergunta in perguntas %}
+                                    <tr id="pergunta-{{ pergunta[0] }}" class="{% if pergunta[4] == 1 %}marcada{% endif %}">
+                                        <td>{{pergunta[0]}}</td>
+                                        <td>{{pergunta[1]}}</td>
+                                        <td>{{pergunta[2]}}</td>
+                                        <td>{{pergunta[3]}}</td>
+                                        <td>
+                                            <input type="checkbox" class="mega-pulso-checkbox" id="checkbox-{{ pergunta[0] }}" name="mega_pulso_{{ pergunta[0] }}" data-pergunta-id="{{ pergunta[0] }}" {% if pergunta[4] == 1 %}checked{% endif %}>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            {% else %}
+                                <p>{{_("Não há perguntas para exibir")}}</p>
+                            {% endif %}
+                        </table>
+                    </div>
+                    <form class="modal-configuracao" id="formMegaPuslo" method="POST" action="{{ url_for('configuracoes_pesquisa.configuracoes_pesquisa_view') }}">
+                        <input type="hidden" name="action" value="alterarMegaPulso">
+                        <input type="hidden" id="checkboxData" name="checkboxData" value="">
+                        <div class="buttons">
+                            <button type="submit" id="modal-save-button" data-action="alterarMegaPulso">{{_("Salvar Alterações")}}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="modalAlterarPergunta" class="modal-config">
+                <div class="modal-config-content">
+                    <div class="modal-config-titulo">
+                        <h2>{{_("Alterar Pergunta:")}}</h2><span class="close" onclick="fecharModal('modalAlterarPergunta')">&times;</span>
+                    </div>
+                    <form class="modal-configuracao" id="formAlterarPergunta" method="POST" action="{{ url_for('configuracoes_pesquisa.configuracoes_pesquisa_view') }}">
+                        <input type="hidden" name="action" value="alterarPergunta">
+                        <label for="alterarPergunta">{{_("Selecione a pergunta a ser alterada:")}}</label>
+                        <select name="perguntas" id="perguntas" class="custom-select" required>
+                            {% set pergunta_placeholder = _("Selecione a pergunta") %}
+                            <option value="" disabled selected hidden>{{_(pergunta_placeholder)}}</option>
+                            {% for pergunta in perguntas %}
+                                <option value="{{ pergunta[0] }}" data-numero="{{ pergunta[0] }}" data-categoria="{{ pergunta[3] }}">{{ _(pergunta[1]) }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="perguntas-detalhes">
+                            <div id="numero-pergunta">{{ _("Número Pergunta: ") }}</div>
+                            <div id="categoria-pergunta">{{ _("Categoria Pergunta: ") }}</div>
+                        </div>                        
+                        {% set pergunta_pt_placeholder = _("Novo texto da pergunta em português") %}
+                        <label for="textoPerguntaPt">{{_("Novo texto da pergunta em Português:")}}</label>
+                        <input type="text" id="textoPerguntaPt" name="textoPerguntaPt" placeholder="{{pergunta_pt_placeholder}}">
+                        {% set pergunta_es_placeholder = _("Novo texto da pergunta em espanhol") %}
+                        <label for="textoPerguntaEs">{{_("Novo texto da pergunta em Espanhol:")}}</label>
+                        <input type="text" id="textoPerguntaEs" name="textoPerguntaEs" placeholder="{{pergunta_es_placeholder}}">
+                        <label for="categoriaPergunta">{{_("Selecione a categoria da pergunta:")}}</label>
+                        <select name="categoria" id="categoria" class="custom-select">
+                            {% set categoria_placeholder = _("Selecione a categoria...") %}
+                            <option value="" disabled selected hidden>{{_(categoria_placeholder)}}</option>
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria[0] }}">{{ _(categoria[0]) }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="buttons">
+                            <button type="submit" id="modal-save-button" data-action="alterarPergunta">{{_("Salvar Alterações")}}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="modalIncluirPergunta" class="modal-config">
+                <div class="modal-config-content">
+                    <div class="modal-config-titulo">
+                        <h2>{{_("Incluir Nova Pergunta:")}}</h2><span class="close" onclick="fecharModal('modalIncluirPergunta')">&times;</span>
+                    </div>
+                    <form class="modal-configuracao" id="formIncluirPergunta" method="POST" action="{{ url_for('configuracoes_pesquisa.configuracoes_pesquisa_view') }}">
+                        <label><p>{{_("Preencha os dados da pergunta que será criada na Pulsa")}}</p></label>
+                        <input type="hidden" name="action" value="incluirPergunta">                    
+                        <label for="textoPerguntaPt">{{_("Texto da nova pergunta em Português:")}}</label>
+                        {% set texto_pt_placeholder = _("Digite aqui o texto da nova pergunta em Português") %}
+                        <input type="text" id="textoPerguntaPt" name="textoPerguntaPt" placeholder= "{{texto_pt_placeholder}}" required>
+                        {% set texto_es_placeholder = _("Digite aqui o texto da nova pergunta em Espanhol") %}
+                        <label for="textoPerguntaEs">{{_("Texto da nova pergunta em Português:")}}</label>
+                        <input type="text" id="textoPerguntaEs" name="textoPerguntaEs" placeholder="{{texto_es_placeholder}}"  required>
+                        <label for="categoriaPergunta">{{_("Selecione a categoria da pergunta:")}}</label>
+                        <select name="categoria" id="categoria" class="custom-select" required>
+                            {% set categoria_placeholder = _("Selecione a categoria da pergunta") %}
+                            <option value="" disabled selected hidden>{{_(categoria_placeholder)}}</option>
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria[0] }}">{{ _(categoria[0]) }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="buttons">
+                            <button type="submit" id="modal-save-button" data-action="incluirPergunta">{{_("Criar nova pergunta")}}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="modalIncluirCategoria" class="modal-config">
+                <div class="modal-config-content">
+                    <div class="modal-config-titulo">
+                        <h2>{{_("Incluir Nova Categoria:")}}</h2><span class="close" onclick="fecharModal('modalIncluirCategoria')">&times;</span>
+                    </div>
+                    <form class="modal-configuracao" id="formIncluirCategoria" method="POST" action="{{ url_for('configuracoes_pesquisa.configuracoes_pesquisa_view') }}">
+                        <label><p>{{_("Preencha o a descrição da nova categoria que será criada na Pulsa")}}</p></label>
+                        <input type="hidden" name="action" value="incluirCategoria">
+                        {% set categoria_pt_placeholder = _("Digite aqui o texto da nova categoria em Português") %}
+                        <label for="textoCategoriaPt">{{_("Texto da nova categoria em Português:")}}</label>
+                        <input type="text" id="textoPerguntaPt" name="textoCategoriaPt" placeholder="{{ categoria_pt_placeholder }}" required>
+                        {% set categoria_es_placeholder = _("Digite aqui o texto da nova categoria em Espanhol") %}
+                        <label for="textoCategoriaEs">{{_("Texto da nova categoria em Espanhol:")}}</label>
+                        <input type="text" id="textoCategoriaEs" name="textoCategoriaEs" placeholder="{{ categoria_es_placeholder }}" required>
+                        <div class="buttons">
+                            <button type="submit" id="modal-save-button" data-action="incluirCategoria">{{_("Criar nova categoria")}}</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-    <script src="/static/js/background.js"></script>
-    <script>
-        function abrirModal(modalId, action) {
-            var modal = document.getElementById(modalId);
-            if (modal) {
-                var saveButton = modal.querySelector('#modal-save-button');
-                if (saveButton) {
-                    saveButton.setAttribute('data-action', action);
-                }
-                modal.style.display = "block";
-            }
-        }
-
-        function fecharModal(modalId) {
-            var modal = document.getElementById(modalId);
-            if (modal) {
-                modal.style.display = "none";
-            }
-        }
-
-        // Fecha o modal quando o usuário clica fora do conteúdo do modal
-        window.onclick = function(event) {
-            var modals = document.getElementsByClassName("modal");
-            for (var i = 0; i < modals.length; i++) {
-                if (event.target == modals[i]) {
-                    modals[i].style.display = "none";
-                }
-            }
-        }
-    </script>
 </body>
+<script src="/static/js/background.js"></script>
+<script> //Abre e fecha os modals
+    function abrirModal(modalId, action) {
+        console.log(action)
+        var modal = document.getElementById(modalId);
+        if (modal) {
+            var saveButton = modal.querySelector('#modal-save-button');
+            if (saveButton) {
+                saveButton.setAttribute('data-action', action);
+            }
+            modal.style.display = "block";
+        }
+    }
+
+    function fecharModal(modalId) {
+        var modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Fecha o modal quando o usuário clica fora do conteúdo do modal
+    window.onclick = function(event) {
+        var modals = document.getElementsByClassName("modal-config");
+        for (var i = 0; i < modals.length; i++) {
+            if (event.target == modals[i]) {
+                modals[i].style.display = "none";
+            }
+        }
+    }
+</script>
+<script> // Coleta todos as perguntas e os respectivos checkboxes
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('formMegaPuslo');
+        form.addEventListener('submit', function(event) {
+            // Impede o envio padrão do formulário
+            event.preventDefault();
+            
+            const checkboxes = document.querySelectorAll('.mega-pulso-checkbox');
+            const checkboxData = {};
+
+            checkboxes.forEach(function(checkbox) {
+                const perguntaId = checkbox.getAttribute('data-pergunta-id');
+                checkboxData[perguntaId] = checkbox.checked ? 1 : 0;
+            });
+
+            // Atualiza o campo hidden com os dados dos checkboxes em formato JSON
+            document.getElementById('checkboxData').value = JSON.stringify(checkboxData);
+            
+            // Envia o formulário após atualizar o campo hidden
+            form.submit();
+        });
+    });
+</script>
+<script> //Altera dinâmicamente a cor das perguntas que estão selecionadas no checkbox
+    document.addEventListener('DOMContentLoaded', function() {
+        // Obtém todos os checkboxes com a classe 'mega-pulso-checkbox'
+        const checkboxes = document.querySelectorAll('.mega-pulso-checkbox');
+        
+        // Adiciona o evento de clique a cada checkbox
+        checkboxes.forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                const perguntaId = checkbox.getAttribute('data-pergunta-id');
+                const perguntaRow = document.getElementById('pergunta-' + perguntaId);
+                
+                // Adiciona ou remove a classe 'marcada' conforme o estado do checkbox
+                if (checkbox.checked) {
+                    perguntaRow.classList.add('marcada');
+                } else {
+                    perguntaRow.classList.remove('marcada');
+                }
+            });
+        });
+    });
+</script>
+<script> //Altera dinâmicamente o número da pergunta e a categoria da pergunta selecionada no select
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectPerguntas = document.getElementById('perguntas');
+        const numeroPerguntaDiv = document.getElementById('numero-pergunta');
+        const categoriaPerguntaDiv = document.getElementById('categoria-pergunta');
+
+        selectPerguntas.addEventListener('change', function() {
+            const selectedOption = selectPerguntas.options[selectPerguntas.selectedIndex];
+            const numeroPergunta = selectedOption.getAttribute('data-numero');
+            const categoriaPergunta = selectedOption.getAttribute('data-categoria');
+
+            numeroPerguntaDiv.textContent = `Número Pergunta: ${numeroPergunta}`;
+            categoriaPerguntaDiv.textContent = `Categoria Pergunta: ${categoriaPergunta}`;
+        });
+    });
+</script>
+
 </html>

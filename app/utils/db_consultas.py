@@ -96,6 +96,44 @@ def consulta_texto_perguntas(fk_pergunta, fk_pais=3):
         result = cursor.fetchone()[0]
         cursor.close()
         return result
+def get_todas_perguntas(fk_pais = 3):
+        db = get_db()
+        cursor = db.cursor()
+        if fk_pais == 3:
+                query = """
+                SELECT 
+                        p.fk_pergunta,
+                        p.texto_pergunta,
+                        p.texto_pergunta_es,
+                        c.desc_categoria,
+                        p.mega_pulso,
+                        c.fk_categoria
+                FROM
+                        pulsa.perguntas p
+                JOIN
+                        pulsa.categorias c ON p.fk_categoria = c.fk_categoria
+                """
+        else:
+                query = """
+                SELECT 
+                        p.fk_pergunta,
+                        p.texto_pergunta,
+                        p.texto_pergunta_es,
+                        c.desc_categoria_es,
+                        p.mega_pulso,
+                        c.fk_categoria
+                FROM
+                        pulsa.perguntas p
+                JOIN
+                        pulsa.categorias c ON p.fk_categoria = c.fk_categoria
+                """
+        cursor.execute(query)
+        result = cursor.fetchall()
+        cursor.close()
+        if result:
+                return result
+        else:
+               return None
 
 def consulta_categorias(fk_pais = 3):
         db = get_db()
@@ -289,6 +327,64 @@ def consulta_time_por_fk_gestor(fk_gestor):
                 return result
         else:
                 return None
+
+def get_id_nome_time(fk_gestor):
+       db = get_db()
+       cursor = db.cursor()
+       query = 'SELECT globalId, nome FROM usuarios WHERE fk_gestor = %s order by nome asc'
+       cursor.execute(query, (fk_gestor,))
+       result = cursor.fetchall()
+       if result:
+                return result
+       else:
+              return None
+
+def get_id_nome_time_area(fk_gestor):
+       db = get_db()
+       cursor = db.cursor()
+       query = '''
+        SELECT 
+                u.globalId, 
+                u.nome,
+                g.gestor_nome
+        FROM 
+                usuarios u
+        JOIN
+                lideres_com_liderados ll 
+                        ON ll.fk_gestor_liderado = u.fk_gestor
+        JOIN 
+	        gestores g
+		        ON g.fk_gestor = ll.fk_gestor_liderado
+        WHERE 
+                ll.fk_gestor_lider = %s
+        ORDER BY 
+                u.nome ASC
+        '''
+       cursor.execute(query, (fk_gestor,))
+       result = cursor.fetchall()
+       if result:
+                return result
+       else:
+              return None
+
+def get_tamanho_time_area(fk_gestor):
+        db = get_db()
+        cursor = db.cursor()
+        query = """
+        SELECT
+                sum(tamanho_time)
+        FROM
+                lideres_com_liderados
+        WHERE
+                fk_gestor_lider = %s
+        """
+        cursor.execute(query, (fk_gestor,))
+        result = cursor.fetchone()
+        cursor.close()
+        if result:
+                return result[0]
+        else:
+                return None
         
 def consulta_usuario_respondeu():
         db = get_db()
@@ -367,7 +463,7 @@ def consulta_sugestoes_por_gestor_area(fk_gestor):
                 INNER JOIN
                         gestores g ON s.fk_gestor_liderado = g.fk_gestor
                 INNER JOIN
-                categorias c ON s.fk_categoria = c.fk_categoria
+                        categorias c ON s.fk_categoria = c.fk_categoria
                 INNER JOIN
                         perguntas p ON s.fk_pergunta = p.fk_pergunta
                 WHERE s.fk_gestor_lider = %s
@@ -493,4 +589,13 @@ def consulta_fk_perguntas_mega_pulso():
                 return lista_perguntas
         else:
                 return 10
-        
+
+def get_perfil_gestor(globalId):
+        db = get_db()
+        cursor = db.cursor()
+        query = "SELECT perfil FROM gestores WHERE globalId = %s"
+        cursor.execute(query, (globalId,))
+        result = cursor.fetchone()
+        cursor.close()
+        if result:
+               return result[0]

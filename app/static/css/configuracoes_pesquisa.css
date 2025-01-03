@@ -1,0 +1,134 @@
+.config-opcoes{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.config-opcao{
+    background-color: #ffffff; /* Cor de fundo dos cards */
+    border: 1px solid #ddd; /* Borda leve ao redor dos cards */
+    border-radius: 5px; /* Bordas arredondadas */
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para dar um efeito de elevação */
+    width: 300px;
+    height: 250px;
+    box-sizing: border-box; /* Inclui padding e border no tamanho total */
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.modal-config {
+    display: none; /* Esconde o modal por padrão */
+    position: fixed;
+    z-index: 1000; /* Fica sobre os outros elementos */
+    left: 0;
+    top: 0;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4); /* Cor de fundo com transparência */
+    width: 100%;
+    height: 100%;
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+}
+
+.modal-config-content {
+    background-color: #fefefe;
+    margin: 70px auto;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content; /* Ajusta a largura de acordo com o conteúdo */
+}
+
+.modal-config-titulo{
+    display: flex;
+    align-items: center;
+    gap:10px;
+    width: 100%;
+}
+
+.modal-configuracao{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap:20px;
+}
+
+.modal-config-content input[type="number"] {
+    padding: 10px; /* Espaçamento interno */ 
+    font-size: 1em; /* Tamanho da fonte */ 
+    border: 1px solid #ccc; /* Borda */ 
+    border-radius: 5px; /* Bordas arredondadas */ 
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Sombra interna */ 
+    box-sizing: border-box; /* Inclui padding e border no tamanho total */
+}
+
+.modal-config-content input[type="text"] {
+    width: 100%;
+    padding: 10px; /* Espaçamento interno */ 
+    font-size: 1em; /* Tamanho da fonte */ 
+    border: 1px solid #ccc; /* Borda */ 
+    border-radius: 5px; /* Bordas arredondadas */ 
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Sombra interna */ 
+    box-sizing: border-box; /* Inclui padding e border no tamanho total */
+}
+
+.tabela-perguntas-mega-pulso {
+    overflow-x: auto; /* Permite a rolagem horizontal se necessário */
+    width: 100%; /* Ajusta a largura da div ao tamanho da página */
+}
+
+.tabela-perguntas-mega-pulso table {
+    width: 100%; /* Ajusta a largura da tabela ao tamanho da div */
+    border-collapse: collapse; /* Remove o espaço entre as bordas das células */
+}
+
+.tabela-perguntas-mega-pulso th, .tabela-perguntas-mega-pulso td {
+    border: 1px solid #ddd; /* Adiciona bordas às células */
+    padding: 8px; /* Adiciona preenchimento às células */
+}
+
+.tabela-perguntas-mega-pulso th {
+    background-color: #f2f2f2; /* Adiciona uma cor de fundo ao cabeçalho */
+}
+
+.tabela-perguntas-mega-pulso .marcada { 
+    background-color: rgba(42, 183, 202, 0.5); /* Adiciona uma cor de fundo diferente para as linhas marcadas */ 
+}
+
+.custom-select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #f2f2f2;
+    color: #333;
+    transition: border-color 0.3s ease;
+    margin-bottom: 20px;
+    margin: 0 auto; display: block;
+    text-align: center;
+}
+
+
+.custom-select option {
+    padding: 10px;
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+.perguntas-detalhes{
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}

@@ -35,7 +35,7 @@ def responder_view():
         data_inicio_pesquisa = datetime(2024,9,30).date() #Data de inicio da primeira pesquisa do modelo
         diferenca_dias = (data_atual - data_inicio_pesquisa).days #Número de dias entre a data atual e o início da pesquisa
         ciclo_atual = diferenca_dias // 14 #Ciclo atual de respostas
-
+        app.logger.debug(ciclo_atual)
         # Verifica se o ciclo é um ciclo par, ciclos pares = Mega pulso | ciclos impares = Pulso
         if ciclo_atual % 2 == 0:
             perguntas_fixas = consulta_fk_perguntas_mega_pulso()
@@ -55,7 +55,6 @@ def responder_view():
     dados_perguntas_selecionadas = consulta_perguntas_selecionadas(perguntas_selecionadas)
     num_pergunta_atual = session['pergunta_atual']
     fk_pergunta_atual = perguntas_selecionadas[num_pergunta_atual]
-    app.logger.debug(f'lang no responder {lang}')
     for fk_pergunta_selecionadas, fk_categoria_selecionadas, texto_pergunta_pt, texto_pergunta_es in dados_perguntas_selecionadas:
         if fk_pergunta_selecionadas == fk_pergunta_atual:
             fk_categoria = fk_categoria_selecionadas

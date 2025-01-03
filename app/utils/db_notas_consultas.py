@@ -339,9 +339,7 @@ def consulta_promotores_grafico_geral_area(datas_min_max, fk_gestor):
         i.intervalo_pesquisa,
         count(distinct(r.identificador)) as respondentes_unicos,
         ROUND(100.0 * COALESCE(SUM(CASE WHEN r.resposta >= 6 THEN 1 ELSE 0 END), 0) / NULLIF(COUNT(r.resposta), 0), 2) AS percentual_promotores,
-        ROUND(
-            (SELECT count(*) FROM pulsa.respondentes_por_pesquisa where fk_gestor = %s and data between i.data_referencia_min and i.data_referencia_max) /
-            (SELECT COUNT(globalId) FROM pulsa.usuarios WHERE fk_gestor = %s) * 100, 0) as aderencia
+        ROUND(count(distinct(r.identificador)) / (SELECT sum(tamanho_time) FROM pulsa.lideres_com_liderados where fk_gestor_lider = %s) * 100, 0) as aderencia
     FROM 
         pulsa.intervalos_pesquisa_view i
     INNER JOIN 
@@ -350,7 +348,7 @@ def consulta_promotores_grafico_geral_area(datas_min_max, fk_gestor):
             AND r.fk_gestor_lider = %s
     '''
     conditions = []
-    params =[fk_gestor, fk_gestor, fk_gestor]
+    params =[fk_gestor, fk_gestor]
     if data_min is not None:
         conditions.append('data_hora >= %s')
         params.append(data_min)
@@ -369,6 +367,8 @@ def consulta_promotores_grafico_geral_area(datas_min_max, fk_gestor):
     '''
     db = get_db()
     cursor = db.cursor()
+    app.logger.debug(f'Query: {query}')
+    app.logger.debug(f'Parametros: {params}')
     cursor.execute(query, params)
     result = cursor.fetchall()
     cursor.close()

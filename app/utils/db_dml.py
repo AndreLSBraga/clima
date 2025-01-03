@@ -300,7 +300,7 @@ def criar_usuario(dados_usuario):
     fk_subarea = dados_usuario.get('fk_subarea')
     fk_gestor = dados_usuario.get('fk_gestor')
     fk_genero = dados_usuario.get('fk_genero')
-
+    app.logger.debug(f'fk_tipo_cargo:{fk_tipo_cargo}')
     db = get_db()
     cursor = db.cursor()
     query = '''
@@ -378,4 +378,102 @@ def update_qtd_perguntas(qtd_perguntas):
     query = 'UPDATE qtd_perguntas_pesquisa SET qtd_perguntas = %s'
     cursor.execute(query, (qtd_perguntas,))
     db.commit()
-    cursor.close
+    cursor.close()
+
+def update_perfil_adm_geral(globalId):
+    db = get_db()
+    cursor = db.cursor()
+    query = """UPDATE gestores SET perfil = 'administrador_geral' WHERE globalId = %s """
+    cursor.execute(query, (globalId,))
+    db.commit()
+    cursor.close()
+
+def update_perguntas_mega_pulso(fk_pergunta, mega_pulso):
+    db = get_db()
+    cursor = db.cursor()
+    query = """
+        UPDATE perguntas SET
+            mega_pulso = %s
+        WHERE fk_pergunta = %s        
+        """
+    cursor.execute(query, (mega_pulso, fk_pergunta))
+    db.commit()
+    cursor.close()
+
+def update_pergunta(fk_pergunta, texto_pt=None, texto_es=None, fk_categoria = None):
+    query = """UPDATE perguntas SET """
+    params = []
+    conditions = []
+    
+    if texto_pt is not None:
+        conditions.append('texto_pergunta = %s ')
+        params.append(texto_pt)
+    if texto_es is not None:
+        conditions.append('texto_pergunta_es = %s ')
+        params.append(texto_es)
+    if fk_categoria is not None:
+        conditions.append('fk_categoria = %s ')
+        params.append(fk_categoria)
+
+    query += ' , '.join(conditions)
+    query += 'WHERE fk_pergunta = %s'
+    params.append(fk_pergunta)
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(query, params)
+    db.commit()
+    cursor.close()
+
+def insert_pergunta(texto_pt=None, texto_es=None, fk_categoria = None):
+    query = """
+    INSERT into perguntas
+    (texto_pergunta, fk_categoria, texto_pergunta_es) 
+    values
+    (%s, %s, %s)
+    """
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(query, (texto_pt, fk_categoria, texto_es))
+    db.commit()
+    cursor.close()
+
+def select_max_fk_pergunta():
+    db = get_db()
+    cursor = db.cursor()
+    query_select = """
+    SELECT max(fk_pergunta) FROM perguntas LIMIT 1
+    """
+    cursor.execute(query_select)
+    result = cursor.fetchone()
+    cursor.close()
+    if result:
+        return result[0]
+    else:
+        return False
+    
+def insert_categoria(texto_pt=None, texto_es=None):
+    query = """
+    INSERT into categorias
+    (desc_categoria, desc_categoria_es) 
+    values
+    (%s, %s)
+    """
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(query, (texto_pt,texto_es))
+    db.commit()
+    cursor.close()
+
+def select_max_fk_categoria():
+    db = get_db()
+    cursor = db.cursor()
+    query_select = """
+    SELECT max(fk_categoria) FROM categorias LIMIT 1
+    """
+    cursor.execute(query_select)
+    result = cursor.fetchone()
+    cursor.close()
+    if result:
+        return result[0]
+    else:
+        return False

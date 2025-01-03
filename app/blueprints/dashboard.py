@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, session, request, flash, redirect, url_for, current_app as app, jsonify
-from app.utils.db_consultas import consulta_dados_respostas, consulta_dados_gestor, consulta_time_por_fk_gestor
-from app.utils.db_consultas import consulta_sugestoes_por_gestor, consulta_fk_categoria_geral, consulta_desc_categoria_pelo_fk_categoria, consulta_sugestoes_por_gestor_area
+from app.utils.db_consultas import (consulta_dados_respostas, consulta_dados_gestor, consulta_time_por_fk_gestor, 
+    consulta_sugestoes_por_gestor, consulta_fk_categoria_geral, consulta_desc_categoria_pelo_fk_categoria, consulta_sugestoes_por_gestor_area, get_tamanho_time_area,
+    get_id_nome_time, get_id_nome_time_area)
 from app.utils.db_notas_consultas import consulta_promotores, consulta_intervalo_respostas, consulta_promotores_area
 from app.utils.dashboard import gera_cards, gera_cards_detalhe, gera_informacoes_respostas, processa_sugestoes
 from app.utils.dashboard import gera_grafico, gera_tabela_liderados, gera_main_cards, gera_cards_categoria,gera_grafico_area, gera_cards_area, gera_cards_categoria_area, gera_cards_detalhe_area
@@ -58,14 +59,18 @@ def dashboard_view():
 
 
     nota_geral = consulta_promotores(datas_min_max, fk_gestor)[0]
-    nota_nps = consulta_promotores(datas_min_max, fk_gestor, 29)[0]
-    nota_pulsa = consulta_promotores(datas_min_max, fk_gestor, 59)[0]
     grafico_geral = gera_grafico(datas_min_max, fk_gestor)
+    cards = gera_cards(datas_min_max, fk_gestor, fk_pais)
+    ids_nomes_time = get_id_nome_time(fk_gestor)
+    if ids_nomes_time == None:
+        tamanho_time = 0
+    else:
+        tamanho_time = len(ids_nomes_time)
+
     dados_main_cards = {
         'nome': nome_dashboard,
         'card1': gera_main_cards(nota_geral),
-        'card2': gera_main_cards(nota_nps),
-        'card3': gera_main_cards(nota_pulsa)
+        'tamanho_time': tamanho_time
     }
     
     
@@ -74,9 +79,8 @@ def dashboard_view():
         'notas': grafico_geral[1],
         'aderencia': grafico_geral[2]
     }]
-
-    cards = gera_cards(datas_min_max, fk_gestor, fk_pais)
-    return render_template('dashboard.html',lang=lang, perfil = perfil, dados=dados_main_cards, cards=cards, grafico = dados_main_grafico, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados)
+    
+    return render_template('dashboard.html',lang=lang, perfil = perfil, dados=dados_main_cards, cards=cards, grafico = dados_main_grafico, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados, ids_time= ids_nomes_time)
 
 @dashboard_categoria.route('/dashboard/detalhes-categoria:<int:card_id>', methods = ['GET', 'POST'])
 def detalhes_categoria_view(card_id):
@@ -134,17 +138,18 @@ def dashboard_sugestoes_view():
         tamanho_time = len(ids_time)
     else:
         tamanho_time = 0
-
-    if tamanho_time < 3:
-        return render_template('dash_sugestoes.html', perfil= perfil, dados_gestor = dados_gestor)
     
     selecao_sugestao = request.args.get('filtro')
     if selecao_sugestao:
+        tamanho_time_area = get_tamanho_time_area(fk_gestor)
+        if tamanho_time_area == None or tamanho_time_area < 3:
+            return render_template('dash_sugestoes.html', perfil= perfil, dados_gestor = dados_gestor)
         sugestoes = consulta_sugestoes_por_gestor_area(fk_gestor)
     else:
+        if tamanho_time < 3:
+            return render_template('dash_sugestoes.html', perfil= perfil, dados_gestor = dados_gestor)
         sugestoes = consulta_sugestoes_por_gestor(fk_gestor)
 
-    app.logger.debug(sugestoes)
     return render_template('dash_sugestoes.html', perfil = perfil, dados_gestor = dados_gestor, sugestoes = sugestoes)
 
 @dashboard_area.route('/dashboard_area', methods = ['GET', 'POST'])
@@ -187,26 +192,28 @@ def dashboard_area_view():
     else:
         datas_min_max = [None, None]
 
-
     nota_geral = consulta_promotores_area(datas_min_max, fk_gestor)[0]
-    nota_nps = consulta_promotores_area(datas_min_max, fk_gestor, 29)[0]
-    nota_pulsa = consulta_promotores_area(datas_min_max, fk_gestor, 59)[0]
+    grafico_geral = gera_grafico_area(datas_min_max, fk_gestor)
+    cards = gera_cards_area(datas_min_max, fk_gestor, fk_pais)
+    ids_nomes_time = get_id_nome_time_area(fk_gestor)
+
+    if ids_nomes_time == None:
+        tamanho_time = 0
+    else:
+        tamanho_time = len(ids_nomes_time)
     dados_main_cards = {
         'nome': nome_dashboard,
         'card1': gera_main_cards(nota_geral),
-        'card2': gera_main_cards(nota_nps),
-        'card3': gera_main_cards(nota_pulsa)
+        'tamanho_time': tamanho_time
     }
 
-    grafico_geral = gera_grafico_area(datas_min_max, fk_gestor)
     dados_main_grafico = [{
         'semanas': grafico_geral[0],
         'notas': grafico_geral[1],
         'aderencia': grafico_geral[2]
     }]
 
-    cards = gera_cards_area(datas_min_max, fk_gestor, fk_pais)
-    return render_template('dashboard_area.html', perfil = perfil, dados=dados_main_cards, cards=cards, grafico = dados_main_grafico, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados)
+    return render_template('dashboard_area.html', perfil = perfil, dados=dados_main_cards, cards=cards, grafico = dados_main_grafico, intervalos = intervalo_datas, intervalos_selecionados= intervalos_selecionados, ids_time = ids_nomes_time)
 
 @dashboard_categoria_area.route('/dashboard_area/detalhes-categoria:<int:card_id>', methods = ['GET', 'POST'])
 def detalhes_categoria_area_view(card_id):

@@ -55,7 +55,6 @@ def usuario_is_gestor(user_id):
         else:
                flash(_("Usuário não está cadastrado como gestor.<br>Entre em contato com o time de gente da unidade."),"error")
                return False
-        
 def codifica_id(user_id):
     user_id_str = str(user_id)
     user_id_bytes = user_id_str.encode('utf-8')
@@ -120,7 +119,7 @@ def valida_email_novo(email):
         if globalId and dominio:
             dominio = dominio.lower()
             # Verifica se o domínio é um dos permitidos
-            if dominio == 'ambev.com.br' or dominio == 'ab-inbev.com':
+            if 'ambev.com' in dominio  or 'ab-inbev.com' in dominio:
                 return True
         return False
     return False

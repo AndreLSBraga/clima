@@ -107,6 +107,11 @@ body, html {
     margin-right: 5px;
 }
 
+.icon {
+    width: 18px;
+    height: 18px;
+}
+
 /* Esconde o texto dos links quando a barra está minimizada */
 .sidebar-menu li a .text_sidebar {
     font-size: 14px;
@@ -172,40 +177,41 @@ body, html {
 
 .filtro-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
     gap: 5px;
     background-color: #f5f5f5;
-    padding: 10px;
+    padding: 5px;
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin: auto;
     width: 50%;
 }
-
-/* Estilo para os botões */
-.filtro-actions {
+.filtro-container-intervalo{
+    width: 70%;
+}
+.filtro-actions{
+    width: 30%;
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+    flex-direction: column;
+    gap:5px
 }
 
-.btn-aplicar, .btn-limpar {
-    flex: 1;
+.btn-aplicar, .btn-limpar, .btn-time  {
     padding: 8px 15px;
     font-size: 14px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
-    width: 20%;
 }
 
-.btn-aplicar {
+.btn-aplicar, .btn-time {
     background-color: #2AB7CA;
     color: #fff;
 }
 
-.btn-aplicar:hover {
+.btn-aplicar:hover, .btn-time:hover{
     background-color: #0056b3;
 }
 
@@ -293,18 +299,18 @@ body, html {
 
 .selectize-control.multi .selectize-input > div {
     background-color: #2AB7CA;       /* Fundo das tags selecionadas */
-    color: #fff;                     /* Texto branco */
+    color: #f9f9f9;                     /* Texto branco */
     border-radius: 4px;              /* Bordas arredondadas nas tags */
     padding: 4px 8px;                /* Espaço interno das tags */
     margin: 2px 4px;                 /* Espaço entre as tags */
-    font-size: 13px;                 /* Tamanho da fonte das tags */
+    font-size: 12px;                 /* Tamanho da fonte das tags */
     display: flex;
     align-items: center;
 }
 
 
 .selectize-control.multi .selectize-input > div .remove {
-    color: #fff;                /* Cor do botão de remoção */
+    color: #f9f9f9;                /* Cor do botão de remoção */
     margin-left: 8px;                /* Espaçamento entre o texto e o "X" */
     cursor: pointer;                 /* Cursor pointer para indicar clicável */
     font-weight: bold;
@@ -326,7 +332,7 @@ body, html {
 .selectize-control.multi .selectize-dropdown {
     position: absolute;   /* Define o dropdown como absoluto */
     z-index: 1000;        /* Garante que o dropdown fique sobre outros elementos */
-    background: #fff;     /* Define o fundo do dropdown */
+    background: #f9f9f9;     /* Define o fundo do dropdown */
     border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -339,7 +345,7 @@ body, html {
 }
 .selectize-control.multi .selectize-dropdown .option:hover {
     background: #2AB7CA;
-    color: #fff;
+    color: #f9f9f9;
 }
 
 .spinner {
@@ -390,28 +396,10 @@ body, html {
     100% { content: "..."; }
 }
 
-.configuracoes-options{
+.config-opcoes{
     display: flex;
     justify-content: flex-start;
     gap: 20px;
     align-items: center;
     margin-bottom: 30px;
-}
-
-.configuracao_card{
-    background-color: #ffffff; /* Cor de fundo dos cards */
-    border: 1px solid #ddd; /* Borda leve ao redor dos cards */
-    border-radius: 5px; /* Bordas arredondadas */
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para dar um efeito de elevação */
-    max-width: 300px; /* Tamanho máximo do card */
-    box-sizing: border-box; /* Inclui padding e border no tamanho total */
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    transition: transform 0.2s; /* Adiciona uma animação de escala */
-    display:flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: center;
 }

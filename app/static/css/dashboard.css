@@ -247,6 +247,7 @@
     background-color: rgba(0,0,0,0.4); /* Cor de fundo com transparência */
 }
 
+
 .modal-content {
     background-color: #fefefe;
     margin-top: 75px;
@@ -261,6 +262,61 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.modal-time {
+    display: none; /* Esconde o modal por padrão */
+    position: fixed;
+    z-index: 1000; /* Fica sobre os outros elementos */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0); /* Fundo preto com opacidade */
+    background-color: rgba(0,0,0,0.4); /* Cor de fundo com transparência */
+}
+
+.modal-content-time {
+    background-color: #fefefe;
+    margin: 70px auto;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content;
+}
+.modal-header-time{
+    display: flex;
+    align-items: center;
+    gap:10px;
+    width: 100%;
+}
+.modal-body-time {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: fit-content;
+}
+
+.modal-body-time table {
+    width: auto; /* Ajusta a largura da tabela ao conteúdo */
+    max-width: 100%; /* Evita que a tabela ultrapasse a largura do modal */
+    table-layout: auto; /* Permite que a tabela se ajuste ao conteúdo */
+    border-collapse: collapse; /* Remove o espaço entre as células */
+    margin: 0 auto; /* Centraliza a tabela dentro do modal */
+}
+
+.modal-body-time th, .modal-body-time td {
+    border: 1px solid #ddd; /* Adiciona bordas às células */
+    padding: 8px; /* Adiciona preenchimento às células */
+    text-align: left; /* Alinha o texto à esquerda */
+}
+
+.modal-body-time th {
+    background-color: #f2f2f2; /* Adiciona uma cor de fundo ao cabeçalho */
 }
 
 .close {

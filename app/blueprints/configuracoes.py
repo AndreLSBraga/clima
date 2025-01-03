@@ -1,12 +1,15 @@
 from flask import Blueprint, render_template, session, request, flash, redirect, url_for, current_app as app, jsonify
 from datetime import datetime
-from app.utils.auth import valida_id, valida_id_novo, valida_email_novo, consulta_gestor_cadastrado
-from app.utils.db_consultas import consulta_dados_gestor, consulta_usuario_id, consulta_usuarios_por_unidade, consulta_fk_dimensao, consulta_todos_gestores
-from app.utils.db_consultas import consulta_pesquisa_gestor, consulta_pesquisa_usuario, quantidade_perguntas_pesquisa, quantidade_perguntas_mega_pulso
-from app.utils.db_dml import processar_diferencas, criar_usuario, processar_diferencas_gestor, criar_gestor, reset_senha_gestor, update_qtd_perguntas
+from app.utils.auth import valida_id, valida_id_novo, valida_email_novo, consulta_gestor_cadastrado, usuario_is_gestor
+from app.utils.db_consultas import (consulta_dados_gestor, consulta_usuario_id, consulta_usuarios_por_unidade, consulta_fk_dimensao, 
+    consulta_todos_gestores, consulta_pesquisa_gestor, consulta_pesquisa_usuario, quantidade_perguntas_pesquisa, quantidade_perguntas_mega_pulso,
+    get_perfil_gestor, get_todas_perguntas, consulta_categorias, consulta_fk_categoria_pela_desc_categoria )
+from app.utils.db_dml import (processar_diferencas, criar_usuario, processar_diferencas_gestor, criar_gestor, reset_senha_gestor, update_qtd_perguntas,
+                              update_perfil_adm_geral, update_perguntas_mega_pulso, update_pergunta, insert_pergunta, select_max_fk_pergunta,
+                              insert_categoria, select_max_fk_categoria)
 from app.utils.configuracoes import gera_tabela, gera_dados_modal_selecao, verificar_alteracao, gera_tabela_gestores
 from flask_babel import _
-import time
+import json
 
 configuracoes = Blueprint('configuracoes', __name__)
 configuracoes_usuario = Blueprint('configuracoes_usuario', __name__)
@@ -123,7 +126,7 @@ def salvar_alteracoes():
         return jsonify({"message":_("Os dados informados no campo 'Global ID' não segue algum dos padrões necessários.<br>Tem mais ou menos que 8 números ou não tem apenas números"), "status": "error"})
     #Verifica se o email digitado é válido
     if not valida_email_novo(dados_formulario.get('email')):
-        return jsonify({"message":_("Os dados informados no campo 'Email' não segue algum dos padrões necessários.<br>Não está digitado corretamente como @ambev.com.br ou @ab-inbev.com"), "status": "error"})
+        return jsonify({"message":_("Os dados informados no campo 'Email' não segue algum dos padrões necessários.<br>Não está digitado corretamente como @ambev.com ou @ab-inbev.com"), "status": "error"})
     #Verificar se o ID do gestor é o ID de um gestor existente na base de gestores
     if not consulta_dados_gestor(id_gestor):
         return jsonify({"message":_("Os dados informados no campo 'ID Gestor' não existe na base de gestores.<br>Entre em contato com a área de gente da unidade."), "status": "error"})
@@ -148,6 +151,7 @@ def salvar_alteracoes():
         consulta_fk_dimensao('gestores', 'fk_gestor', 'globalId', dados_formulario.get('id_gestor'))[0],
         consulta_fk_dimensao('generos', 'fk_genero', 'genero', dados_formulario.get('genero'))[0]
         )
+    app.logger.debug(dados)
     #Baseado no ID do formulário, consulta o usuário no banco
     dados_usuario = consulta_usuario_id(globalId_original)
     chaves = ("globalId", "email", "nome", "data_nascimento", "data_ultima_movimentacao", "data_contratacao", "fk_banda", "fk_tipo_cargo", "fk_fte", "fk_cargo","fk_unidade", "fk_area", "fk_subarea", "fk_gestor", "fk_genero")
@@ -170,6 +174,7 @@ def salvar_alteracoes():
     
     if tipo == 'criacao':
         dicionario_dados_criacao = dict(zip(chaves, dados))
+        app.logger.debug(dicionario_dados_criacao)
         resultado_criar = criar_usuario(dicionario_dados_criacao)
         return resultado_criar
     
@@ -270,24 +275,110 @@ def configuracoes_pesquisa_view():
     if 'logged_in' not in session:
         flash(_("É necessário fazer login primeiro."), "error")
         return redirect(url_for('gestor.gestor_view'))
+    lang = session.get('lang', 'pt')
+    fk_pais = 3
+    if lang == 'es':
+        fk_pais = 1
     
     if request.method == 'POST':
         action = request.form.get('action')
         if action == 'alterarQtdPerguntas':
             nova_qtd_perguntas = request.form.get('qtdPerguntas')
-            app.logger.debug(nova_qtd_perguntas)
             if nova_qtd_perguntas:
                 update_qtd_perguntas(nova_qtd_perguntas)
-                flash(_(f"""Quantidade de perguntas do Pulso atualizada com sucesso.<br>
-                        A pesquisa agora terá {nova_qtd_perguntas} perguntas"""), "success")
-                time.sleep(1.5)
+                flash(_(f"Quantidade de perguntas do Pulso atualizada com sucesso. A pesquisa agora terá {nova_qtd_perguntas} perguntas"), "success")
             else:
                 flash(_("Falha na atualização da quantidade de perguntas"), "error")
-                time.sleep(1.5)
-    
+
+            return redirect(url_for('configuracoes_pesquisa.configuracoes_pesquisa_view'))
+
+        elif action =='incluirNovoAdm':
+            novo_global_id = request.form.get('user_id')
+            if not valida_id(novo_global_id) or not usuario_is_gestor(novo_global_id):
+                return redirect(url_for('configuracoes_pesquisa.configuracoes_pesquisa_view'))
+            else:
+                if get_perfil_gestor(novo_global_id) == 'administrador_geral':
+                    flash(_(f'O perfil do ID {novo_global_id} já está como administrador geral'), "warning")
+                else:
+                    update_perfil_adm_geral(novo_global_id)
+                    flash(_('Novo administrador geral cadastrado'), "success")
+            return redirect(url_for('configuracoes_pesquisa.configuracoes_pesquisa_view'))
+        
+        elif action == 'alterarMegaPulso': 
+            checkbox_data = request.form.get('checkboxData')
+            perguntas_alteradas = json.loads(checkbox_data)
+            perguntas_mega_pulso = []
+            for str_fk_pergunta, mega_pulso in perguntas_alteradas.items():
+                fk_pergunta = int(str_fk_pergunta)
+                update_perguntas_mega_pulso(fk_pergunta, mega_pulso)
+                if mega_pulso == 1:
+                    perguntas_mega_pulso.append(fk_pergunta)
+
+            flash(_(f"Perguntas Mega Pulso atualizadas, as perguntas do Mega Pulso agora são as perguntas: {perguntas_mega_pulso}"), "success")
+            redirect(url_for('configuracoes_pesquisa.configuracoes_pesquisa_view'))
+        
+        elif action == 'alterarPergunta': 
+            fk_pergunta = request.form.get('perguntas', 0)
+            novo_texto_pt = request.form.get('textoPerguntaPt', None)
+            novo_texto_es = request.form.get('textoPerguntaEs', None)
+            nome_categoria = request.form.get('categoria', None)
+            fk_categoria = None
+            if len(novo_texto_pt) == 0:
+                novo_texto_pt = None
+            if len(novo_texto_es) == 0:
+                novo_texto_es = None
+            if nome_categoria:
+                fk_categoria = consulta_fk_categoria_pela_desc_categoria(nome_categoria)
+            
+            if novo_texto_pt == None and novo_texto_es == None and fk_categoria == None:
+                flash(_(f"Não foi informado nenhum dado para alteração da pergunta número {fk_pergunta}"), "warning")
+                return redirect(url_for('configuracoes_pesquisa.configuracoes_pesquisa_view'))
+            
+            update_pergunta(fk_pergunta, novo_texto_pt, novo_texto_es, fk_categoria)
+            flash(_(f"A pergunta de número {fk_pergunta} foi atualizada com sucesso"), "success")
+            redirect(url_for('configuracoes_pesquisa.configuracoes_pesquisa_view'))
+
+        elif action == 'incluirPergunta': 
+            novo_texto_pt = request.form.get('textoPerguntaPt', None)
+            novo_texto_es = request.form.get('textoPerguntaEs', None)
+            nome_categoria = request.form.get('categoria', None)
+            fk_categoria = None
+            if len(novo_texto_pt) == 0:
+                novo_texto_pt = None
+            if len(novo_texto_es) == 0:
+                novo_texto_es = None
+            if nome_categoria:
+                fk_categoria = consulta_fk_categoria_pela_desc_categoria(nome_categoria, fk_pais)
+
+            insert_pergunta(novo_texto_pt, novo_texto_es, fk_categoria)
+            fk_pergunta =  select_max_fk_pergunta()
+            app.logger.debug((fk_pergunta, novo_texto_pt, novo_texto_es, fk_categoria))
+            flash(_(f"A pergunta:'{novo_texto_pt}'/'{novo_texto_es}' foi criada com sucesso! A pergunta é o número {fk_pergunta}"), "success")
+            redirect(url_for('configuracoes_pesquisa.configuracoes_pesquisa_view'))
+
+        elif action == 'incluirCategoria': 
+            novo_texto_pt = request.form.get('textoCategoriaPt', None)
+            novo_texto_es = request.form.get('textoCategoriaEs', None)
+            
+            if len(novo_texto_pt) == 0:
+                novo_texto_pt = None
+            if len(novo_texto_es) == 0:
+                novo_texto_es = None
+
+            insert_categoria(novo_texto_pt, novo_texto_es)
+            fk_categoria =  select_max_fk_categoria()
+            flash(_(f"A Categoria:'{novo_texto_pt}'/'{novo_texto_es}' foi criada com sucesso! A nova categoria é o número: {fk_categoria}"), "success")
+            redirect(url_for('configuracoes_pesquisa.configuracoes_pesquisa_view'))
+
+        else:
+            flash(_("Nada aconteceu"), "warning")
+
+
     dados_qtd_perguntas = {
         "pulso":quantidade_perguntas_pesquisa(),
         "mega_pulso": quantidade_perguntas_mega_pulso()
     }
 
-    return render_template('configuracoes_pesquisa.html', perfil= perfil, qtd_perguntas = dados_qtd_perguntas)
+    perguntas = get_todas_perguntas(fk_pais)
+    categorias = consulta_categorias(fk_pais)
+    return render_template('configuracoes_pesquisa.html', perfil= perfil, qtd_perguntas = dados_qtd_perguntas, perguntas = perguntas, categorias = categorias)

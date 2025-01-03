@@ -82,7 +82,11 @@
             <div class="introbar">
                 <div class="introbar-text">
                     <span><h2>{{_("Olá,")}} {{dados.nome}}! {{_("Esse é o resultado da sua área.")}}</h2></span>
-                    <span class="small-text">{{_("Seu percentual de promotores está baseado em")}} {{dados.card1.qtd_respostas}} {{_("perguntas respondidas por")}} {{dados.card1.respondentes_unicos}} {{_("respondentes únicos entre os dias")}} {{dados.card1.data_min}} {{_("e")}} {{dados.card1.data_max}}.</span>
+                    <span class="small-text">
+                        {{_("Seu percentual de promotores está baseado em")}} {{dados.card1.qtd_respostas}} {{_("perguntas respondidas por")}} {{dados.card1.respondentes_unicos}} {{_("respondentes únicos entre os dias")}} {{dados.card1.data_min}} {{_("e")}} {{dados.card1.data_max}}.
+                        {{_("O seu time têm ")}} {{dados.tamanho_time}} {{_(" colaboradores atualmente.")}}
+                        <button id="verTime" class="btn-time" onclick="modalTime()">{{_("Ver Time")}}</button>
+                    </span>
                 </div>
                 <div class="filtro-container">
                     <div class="filtro-container-intervalo">
@@ -192,7 +196,35 @@
                 </div>
             </div>
         </div>
-        
+        <div id="modalTime" class="modal-time">
+            <div class="modal-content-time">
+                <div class="modal-header-time"><h2>{{_("Esse é o seu time atualmente:")}}</h2><span class="close" onclick="fecharModalTime()">&times;</span></div>
+                <div class="modal-body-time">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>{{_("GlobalID")}}</th>
+                                <th>{{_("Nome colaborador")}}</th>
+                                <th>{{_("Gestor direto do colaborador")}}</th>
+                            </tr>
+                        </thead>
+                        {% if ids_time %}
+                            <tbody>
+                                {% for id in ids_time %}
+                                    <tr>
+                                        <td>{{id[0]}}</td>
+                                        <td>{{id[1]}}</td>
+                                        <td>{{id[2]}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        {% else %}
+                            <p>{{_("Não há time para ser exibido")}}</p>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="/static/js/background.js"></script>
     <script src="/static/js/chart.umd.js"></script>
@@ -568,5 +600,39 @@
             document.getElementById('loading-spinner-global').style.display = 'none';
         });
     </script>
+    <script>
+        function modalTime() {
+            var modal = document.getElementById('modalTime');
+            var spinner = document.getElementById('loading-spinner');
+            var modalBody = document.getElementById('modal-body-time');
+            
+            // Exibe o modal
+            modal.style.display = 'block';
+            
+            // Simula o carregamento de dados
+            setTimeout(function() {
+                spinner.style.display = 'none';
+            }, 2000);
+        }
+        
+        function fecharModalTime() {
+            var modal = document.getElementById('modalTime');
+            var spinner = document.getElementById('loading-spinner');
+            var modalBody = document.getElementById('modal-body-time');
+            
+            // Oculta o modal e reseta o spinner e conteúdo
+            modal.style.display = 'none';
+            spinner.style.display = 'block';
+            modalBody.innerHTML = '';
+        }
+        
+        // Fechar o modal clicando fora dele
+        window.onclick = function(event) {
+            var modal = document.getElementById('modalTime');
+            if (event.target == modal) {
+                fecharModalTime();
+            }
+        }
+    </script>   
 </body>
 </html>
